@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DATABASE_HOST") { "database" } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= File.exist?("/run/secrets/db_admin_password") ? File.read("/run/secrets/db_admin_password").strip : ENV.fetch("POSTGRES_PASSWORD") { "password" } %>
+
+development:
+  <<: *default
+  database: app_development
+
+test:
+  <<: *default
+  database: app_test
+
+production:
+  <<: *default
+  database: app_production
+  username: app
+  password: <%= File.exist?("/run/secrets/db_user_password") ? File.read("/run/secrets/db_user_password").strip : ENV["APP_DATABASE_PASSWORD"] %>
