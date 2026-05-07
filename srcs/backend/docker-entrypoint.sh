@@ -11,5 +11,5 @@ if [ -f Gemfile ]; then
   bundle check || bundle install
 fi
 
-# 引数で渡されたコマンドを実行 (デフォルトは rails server)
+# 引数で渡されたコマンドを実行
 exec "$@"
