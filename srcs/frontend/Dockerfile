@@ -14,5 +14,5 @@ USER appuser
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["dev"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["npm", "run", "dev", "--", "--host"]

@@ -8,35 +8,45 @@
 !/srcs/nginx/
 
 # allow source directories
-!/ToDoApp/**/
+!/Exchange-support-system/**/
 !/srcs/frontend/src/
 !/srcs/frontend/public/
 !/srcs/frontend/src/**/
-!/srcs/backend/src/
-!/srcs/backend/src/**/
-!/srcs/backend/scripts/
-!/srcs/backend/scripts/**/
-!/srcs/backend/prisma/
-!/srcs/backend/prisma/**/
+!/srcs/backend/
+!/srcs/backend/**/
+!/srcs/backend/tmp/
 !/srcs/nginx/config/
 !/srcs/nginx/config/**/
 
 # allow files inside allowed dirs
 !/srcs/**/*.ts
 !/srcs/**/*.tsx
+!/srcs/**/*.rb
+!/srcs/**/*.erb
+!/srcs/**/*.keep
+!/srcs/**/*.ru
 !/srcs/**/*.js
 !/srcs/**/*.json
 !/srcs/**/*.toml
-!/srcs/**/*.prisma
+!/srcs/**/*.yml
+!/srcs/**/*.png
+!/srcs/**/*.yml.enc
 !/srcs/**/*.html
 !/srcs/**/*.css
+!/srcs/**/*.txt
 !/srcs/**/*.svg
 !/srcs/**/*.sql
 !/srcs/**/*.conf
 !/srcs/**/*.sh
+!/srcs/**/*.lock
+!/srcs/**/*.example
+!/srcs/**/*.png
+!/srcs/backend/bin/**
 
 # allow infra files
 !**/Dockerfile
+!**/Gemfile
+!**/Rakefile
 !**/docker-compose.yml
 !**/docker-entrypoint.sh
 !**/Makefile
@@ -44,10 +54,14 @@
 !**/README.md
 !**/.gitignore
 !**/.dockerignore
+!**/.ruby-version
+!**/.rubocop.yml
+!**/.gitattributes
 
 # explicitly ignore secrets
 **/secrets/
 **/*.env
 **/*.key
 **/*.crt
+**/master.key
 
