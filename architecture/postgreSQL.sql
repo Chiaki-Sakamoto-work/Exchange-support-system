@@ -6,7 +6,11 @@ CREATE TABLE "rooms" (
   "is_mandatory_new_recruit" boolean DEFAULT false,
   "location_name" varchar,
   "location_address" varchar,
-  "started_at" timestamp,
+  "open_at" timestamp,
+  "close_at" timestamp,
+  "event_start_at" timestamp,
+  "event_end_at" timestamp,
+  "status" varchar,
   "created_at" timestamp,
   "updated_at" timestamp
 );
@@ -16,13 +20,18 @@ CREATE TABLE "users" (
   "email" varchar UNIQUE,
   "password" varchar,
   "username" varchar,
-  "department" varchar,
+  "department_id" integer,
   "user_type" varchar,
   "is_support_used" boolean DEFAULT false,
   "is_admin" boolean DEFAULT false,
   "allergies" varchar[],
   "created_at" timestamp,
   "updated_at" timestamp
+);
+
+CREATE TABLE "departments" (
+  "id" integer PRIMARY KEY,
+  "name" varchar NOT NULL
 );
 
 CREATE TABLE "user_rooms" (
@@ -41,6 +50,8 @@ CREATE TABLE "messages" (
   "content" text,
   "created_at" timestamp
 );
+
+ALTER TABLE "users" ADD FOREIGN KEY ("department_id") REFERENCES "departments" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
 ALTER TABLE "user_rooms" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
