@@ -49,5 +49,5 @@ docker-compose up -d
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white) ![RSpec](https://img.shields.io/badge/RSpec-CC0000?style=for-the-badge&logo=ruby&logoColor=white) ![Rubocop](https://img.shields.io/badge/Rubocop-000000?style=for-the-badge&logo=rubygems&logoColor=white)
 
 ## Design Artifacts
-![er](./er_diagram.drawio.svg)
+![er](./architecture/er_diagram.drawio.svg)
 
