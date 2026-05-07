@@ -1,0 +1,53 @@
+# ignore all files
+*
+
+# allow base directories
+!/srcs/
+!/srcs/frontend/
+!/srcs/backend/
+!/srcs/nginx/
+
+# allow source directories
+!/ToDoApp/**/
+!/srcs/frontend/src/
+!/srcs/frontend/public/
+!/srcs/frontend/src/**/
+!/srcs/backend/src/
+!/srcs/backend/src/**/
+!/srcs/backend/scripts/
+!/srcs/backend/scripts/**/
+!/srcs/backend/prisma/
+!/srcs/backend/prisma/**/
+!/srcs/nginx/config/
+!/srcs/nginx/config/**/
+
+# allow files inside allowed dirs
+!/srcs/**/*.ts
+!/srcs/**/*.tsx
+!/srcs/**/*.js
+!/srcs/**/*.json
+!/srcs/**/*.toml
+!/srcs/**/*.prisma
+!/srcs/**/*.html
+!/srcs/**/*.css
+!/srcs/**/*.svg
+!/srcs/**/*.sql
+!/srcs/**/*.conf
+!/srcs/**/*.sh
+
+# allow infra files
+!**/Dockerfile
+!**/docker-compose.yml
+!**/docker-entrypoint.sh
+!**/Makefile
+!**/Justfile
+!**/README.md
+!**/.gitignore
+!**/.dockerignore
+
+# explicitly ignore secrets
+**/secrets/
+**/*.env
+**/*.key
+**/*.crt
+
