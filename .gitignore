@@ -18,6 +18,8 @@
 !/srcs/**/*.html
 !/srcs/**/*.sql
 !/srcs/**/*.sh
+!/srcs/**/*.svg
+!/srcs/**/*.md
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
