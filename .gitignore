@@ -1,0 +1,33 @@
+# 1. すべてを無視
+*
+
+# 2. ディレクトリ構造を辿れるように「フォルダ自体」を許可
+# (末尾に / をつけるのがポイント)
+!/srcs/
+!/srcs/client/
+!/srcs/client/**/
+
+# 3. 具体的な拡張子を許可
+!/srcs/**/*.ts
+!/srcs/**/*.tsx
+!/srcs/**/*.d.ts
+!/srcs/**/*.js
+!/srcs/**/*.mjs
+!/srcs/**/*.json
+!/srcs/**/*.css
+!/srcs/**/*.html
+!/srcs/**/*.sql
+!/srcs/**/*.sh
+
+# 4. インフラ系ファイルの許可
+!**/Dockerfile
+!**/docker-compose.yml
+!**/.gitignore
+!**/.dockerignore
+!**/README.md
+
+# 5. セキュリティ上、絶対に無視するもの（ここは最後に書く）
+**/*.env
+**/*.env.local
+**/*.key
+**/secrets/
