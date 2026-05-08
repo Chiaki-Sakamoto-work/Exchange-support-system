@@ -1,4 +1,5 @@
 import Image from "next/image";
+import TestConnect from "./test/Connect";
 
 export default function Home() {
   return (
@@ -58,8 +59,10 @@ export default function Home() {
           >
             Documentation
           </a>
+          <TestConnect />
         </div>
       </main>
     </div>
   );
 }
+
