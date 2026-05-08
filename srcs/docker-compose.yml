@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: app
+      context: client
     image: app:exchange_support_system
     container_name: exchange_support_system_app
     restart: on-failure
@@ -12,7 +12,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./app:/usr/src/app
+      - ./client:/usr/src/app
       - exchange_support_system_app_node_module:/usr/src/app/node_modules
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
