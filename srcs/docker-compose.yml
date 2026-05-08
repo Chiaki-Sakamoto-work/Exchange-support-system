@@ -1,94 +1,27 @@
 services:
-  frontend:
+  app:
     build:
-      context: frontend
-    image: frontend:exchange_support_system
-    container_name: exchange_support_system_front
+      context: app
+    image: app:exchange_support_system
+    container_name: exchange_support_system_app
     restart: on-failure
     working_dir: /usr/src/app
     env_file:
       - .env
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
     ports:
-      - 5173:5173
+      - 3000:3000
     volumes:
-      - ./frontend:/usr/src/app
-      - exchange_support_system_front_node_module:/usr/src/app/node_modules
-    networks:
-      front:
-    depends_on:
-      - backend
+      - ./app:/usr/src/app
+      - exchange_support_system_app_node_module:/usr/src/app/node_modules
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 3s
 
-  backend:
-    build:
-      context: backend
-    image: backend:exchange_support_system
-    container_name: exchange_support_system_back
-    restart: on-failure
-    working_dir: /usr/src/app
-    env_file:
-      - .env
-    ports:
-      - 3000:3000
-    environment:
-      DB_PASSWORD_FILE: /run/secrets/db_user_password
-    secrets:
-      - db_user_password
-    volumes:
-      - ./backend:/usr/src/app
-      - exchange_support_system_back_bundle:/usr/local/bundle
-    networks:
-      back:
-      database:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      - database
-
-  database:
-    image: postgres:16
-    container_name: exchange_support_system_database
-    restart: on-failure
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_user_password
-      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
-    secrets:
-      - db_user_password
-    volumes:
-      - exchange_support_system_data:/var/lib/postgresql/data
-    networks:
-      database:
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
-  exchange_support_system_data:
-  exchange_support_system_front_node_module:
-  exchange_support_system_back_bundle:
-
-networks:
-  front:
-    driver: bridge
-  back:
-    driver: bridge
-  database:
-    driver: bridge
-
-secrets:
-  db_user_password:
-    file: ./secrets/db_user_password.txt
+  exchange_support_system_app_node_module:

@@ -1,67 +1,32 @@
-# ignore all files
+# 1. すべてを無視
 *
 
-# allow base directories
+# 2. ディレクトリ構造を辿れるように「フォルダ自体」を許可
+# (末尾に / をつけるのがポイント)
 !/srcs/
-!/srcs/frontend/
-!/srcs/backend/
-!/srcs/nginx/
+!/srcs/app/
+!/srcs/app/**/
 
-# allow source directories
-!/Exchange-support-system/**/
-!/srcs/frontend/src/
-!/srcs/frontend/public/
-!/srcs/frontend/src/**/
-!/srcs/backend/
-!/srcs/backend/**/
-!/srcs/backend/tmp/
-!/srcs/nginx/config/
-!/srcs/nginx/config/**/
-
-# allow files inside allowed dirs
+# 3. 具体的な拡張子を許可
 !/srcs/**/*.ts
 !/srcs/**/*.tsx
-!/srcs/**/*.rb
-!/srcs/**/*.erb
-!/srcs/**/*.keep
-!/srcs/**/*.ru
+!/srcs/**/*.d.ts
 !/srcs/**/*.js
+!/srcs/**/*.mjs
 !/srcs/**/*.json
-!/srcs/**/*.toml
-!/srcs/**/*.yml
-!/srcs/**/*.png
-!/srcs/**/*.yml.enc
-!/srcs/**/*.html
 !/srcs/**/*.css
-!/srcs/**/*.txt
-!/srcs/**/*.svg
+!/srcs/**/*.html
 !/srcs/**/*.sql
-!/srcs/**/*.conf
 !/srcs/**/*.sh
-!/srcs/**/*.lock
-!/srcs/**/*.example
-!/srcs/**/*.png
-!/srcs/backend/bin/**
 
-# allow infra files
+# 4. インフラ系ファイルの許可
 !**/Dockerfile
-!**/Gemfile
-!**/Rakefile
 !**/docker-compose.yml
-!**/docker-entrypoint.sh
-!**/Makefile
-!**/Justfile
-!**/README.md
 !**/.gitignore
 !**/.dockerignore
-!**/.ruby-version
-!**/.rubocop.yml
-!**/.gitattributes
+!**/README.md
 
-# explicitly ignore secrets
-**/secrets/
+# 5. セキュリティ上、絶対に無視するもの（ここは最後に書く）
 **/*.env
 **/*.key
-**/*.crt
-**/master.key
-
+**/secrets/
