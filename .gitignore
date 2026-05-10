@@ -28,7 +28,13 @@
 !**/.dockerignore
 !**/README.md
 
-# 5. セキュリティ上、絶対に無視するもの（ここは最後に書く）
+# 5. CI/CDの許可（git Action）
+!**/.prettierignore
+!/.github/
+!/.github/workflows
+!/.github/workflows/ci.yml
+
+# 6. セキュリティ上、絶対に無視するもの（ここは最後に書く）
 **/*.env
 **/*.env.local
 **/*.key
