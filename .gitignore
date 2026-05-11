@@ -20,6 +20,7 @@
 !/srcs/**/*.sh
 !/srcs/**/*.svg
 !/srcs/**/*.md
+!/**/.gitkeep
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
