@@ -1,18 +1,23 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
+'use client';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
+
+type Department = {
+  id: number | string;
+  name: string;
+};
 
 function TestConnect() {
-  const [departments, setDepartments] = useState<any[]>([])
-  const supabase = createClient()
+  const [departments, setDepartments] = useState<Department[]>([]);
 
   useEffect(() => {
+    const supabase = createClient();
     const getData = async () => {
-      const { data } = await supabase.from('departments').select('*')
-      if (data) setDepartments(data)
-    }
-    getData()
-  }, [])
+      const { data } = await supabase.from('departments').select('*');
+      if (data) setDepartments(data);
+    };
+    getData();
+  }, []);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -27,7 +32,7 @@ function TestConnect() {
         <p>データが見つからないか、接続されていません...</p>
       )}
     </div>
-  )
+  );
 }
 
 export default TestConnect;
