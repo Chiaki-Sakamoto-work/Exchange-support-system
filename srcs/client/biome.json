@@ -29,6 +29,32 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "style": {
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": true,
+            "requireAscii": true,
+            "conventions": [
+              {
+                "selector": { "kind": "typeProperty" },
+                "formats": ["camelCase", "snake_case"]
+              },
+              {
+                "selector": { "kind": "objectLiteralProperty" },
+                "formats": ["camelCase", "snake_case"]
+              }
+            ]
+          }
+        },
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": true,
+            "requireAscii": true
+          }
+        }
+      },
       "suspicious": {
         "noDoubleEquals": "error"
       }
