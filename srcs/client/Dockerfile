@@ -5,7 +5,7 @@ ENV TZ=Asia/Tokyo
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl  openssl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
