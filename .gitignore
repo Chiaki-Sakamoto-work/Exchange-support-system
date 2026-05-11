@@ -6,6 +6,8 @@
 !/srcs/
 !/srcs/client/
 !/srcs/client/**/
+!/srcs/supabase/
+!/srcs/supabase/**/
 
 # 3. 具体的な拡張子を許可
 !/srcs/**/*.ts
@@ -20,6 +22,8 @@
 !/srcs/**/*.sh
 !/srcs/**/*.svg
 !/srcs/**/*.md
+!/srcs/**/*.toml
+!/srcs/**/*.prisma
 !/**/.gitkeep
 
 # 4. インフラ系ファイルの許可
