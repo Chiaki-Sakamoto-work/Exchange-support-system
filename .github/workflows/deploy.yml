@@ -32,5 +32,5 @@ jobs:
 
       - name: 🚀 本番DBへマイグレーションを適用 (Prisma Migrate deploy)
         env:
-          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_DIRECT_URL }}
         run: npx prisma migrate deploy
