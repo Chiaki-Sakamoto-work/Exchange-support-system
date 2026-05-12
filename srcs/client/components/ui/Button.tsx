@@ -39,6 +39,13 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
+    compoundVariants: [
+      {
+        variant: 'secondary',
+        size: ['icon', 'icon-xs', 'icon-sm', 'icon-lg'],
+        className: 'border-0', // 테두리 두께를 0으로 강제합니다.
+      },
+    ],
   },
 );
 
