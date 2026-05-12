@@ -6,11 +6,14 @@
 !/srcs/
 !/srcs/client/
 !/srcs/client/**/
+!/srcs/supabase/
+!/srcs/supabase/**/
+!/.github/workflows/
+!/.github/workflows/**/
 
 # 3. 具体的な拡張子を許可
 !/srcs/**/*.ts
 !/srcs/**/*.tsx
-!/srcs/**/*.d.ts
 !/srcs/**/*.js
 !/srcs/**/*.mjs
 !/srcs/**/*.json
@@ -20,7 +23,10 @@
 !/srcs/**/*.sh
 !/srcs/**/*.svg
 !/srcs/**/*.md
+!/srcs/**/*.toml
+!/srcs/**/*.prisma
 !/**/.gitkeep
+!/**/*.yml
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
