@@ -11,8 +11,12 @@ export const EventCreateForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // TODO: ここで Supabase の rooms テーブルにデータを送信する
     console.log('送信データ:', { title, datetime, capacity, tags, shop });
-    alert('予定を作成しました！（※現在はUIのみのモックです）');
+    
+    alert('予定を作成しました（※現在はUIのみのモックです）');
+    // TODO: 送信後、activeTab を 'home' に戻す処理などを追加
   };
 
   return (
