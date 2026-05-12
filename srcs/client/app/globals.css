@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme inline {
   --color-background: var(--background);
@@ -9,7 +11,6 @@
 
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -26,7 +27,6 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
-  
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
 
@@ -49,7 +49,7 @@
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
 
-/* =========================================
+  /* =========================================
     Primitive Colors
      ========================================= */
   --navy: #0a0e1a;
@@ -57,13 +57,13 @@
   --lime: #c3f933;
   --red: #f04452;
   --white: #ffffff;
-  
+
   --gray-100: #f5f6f8; /* background gray */
   --gray-200: #f1f3f5; /* input background */
   --gray-300: #eef0f3; /* secondary/muted */
   --gray-400: #cbced4; /* switch */
   --gray-500: #6b7280; /* muted text */
-  
+
   --navy-alpha: rgba(10, 14, 26, 0.08); /* border */
 
   /* =========================================
@@ -71,13 +71,13 @@
      ========================================= */
   --background: var(--gray-100);
   --foreground: var(--navy);
-  
+
   --card: var(--white);
   --card-foreground: var(--navy);
 
   --popover: var(--white);
   --popover-foreground: var(--navy);
-  
+
   --primary: var(--navy);
   --primary-foreground: var(--white);
 
@@ -86,23 +86,23 @@
 
   --muted: var(--gray-300);
   --muted-foreground: var(--gray-500);
-  
+
   --accent: var(--blue);
   --accent-foreground: var(--white);
-  
+
   --highlight: var(--lime);
   --highlight-foreground: var(--navy);
-  
+
   --destructive: var(--red);
   --destructive-foreground: var(--white);
-  
+
   --border: var(--navy-alpha);
 
   --input: transparent;
   --input-background: var(--gray-200);
-  
+
   --switch-background: var(--gray-400);
-  
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -123,4 +123,18 @@ body {
   color: var(--foreground);
   font-size: var(--font-size);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+  }
 }
