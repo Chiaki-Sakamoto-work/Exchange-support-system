@@ -1,0 +1,34 @@
+name: Deploy Database Schema
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'srcs/prisma/schema.prisma'
+      - 'srcs/prisma/migrations/**'
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./srcs
+
+    steps:
+      - name: 📥 コードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: 🟢 Node.js のセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 📦 パッケージのインストール
+        run: npm ci
+
+      - name: 🚀 本番DBへマイグレーションを適用 (Prisma Migrate deploy)
+        env:
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL}}
+        run: npx prisma migrate deploy

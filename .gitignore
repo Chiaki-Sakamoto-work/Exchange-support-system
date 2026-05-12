@@ -8,11 +8,12 @@
 !/srcs/client/**/
 !/srcs/supabase/
 !/srcs/supabase/**/
+!/.github/workflows/
+!/.github/workflows/**/
 
 # 3. 具体的な拡張子を許可
 !/srcs/**/*.ts
 !/srcs/**/*.tsx
-!/srcs/**/*.d.ts
 !/srcs/**/*.js
 !/srcs/**/*.mjs
 !/srcs/**/*.json
@@ -25,6 +26,7 @@
 !/srcs/**/*.toml
 !/srcs/**/*.prisma
 !/**/.gitkeep
+!/**/*.yml
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
@@ -33,7 +35,13 @@
 !**/.dockerignore
 !**/README.md
 
-# 5. セキュリティ上、絶対に無視するもの（ここは最後に書く）
+# 5. CI/CDの許可（git Action）
+!**/.prettierignore
+!/.github/
+!/.github/workflows
+!/.github/workflows/ci.yml
+
+# 6. セキュリティ上、絶対に無視するもの（ここは最後に書く）
 **/*.env
 **/*.env.local
 **/*.key
