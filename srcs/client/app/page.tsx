@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 // 相対パスで読み込む（エラー回避のため）
 import { BottomNav } from '../components/Layout/BottomNav';
 import { EventHome } from '../features/events/components/EventHome';

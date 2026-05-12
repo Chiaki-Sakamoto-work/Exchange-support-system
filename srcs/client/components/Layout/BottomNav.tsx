@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 // Propsの型定義：現在のタブと、タブを切り替えるための関数を受け取る
 type BottomNavProps = {
   activeTab: string;

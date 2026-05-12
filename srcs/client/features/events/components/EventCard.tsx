@@ -1,5 +1,3 @@
-import React from 'react';
-
 // カードに渡すデータの型定義
 export type EventCardProps = {
   title: string;

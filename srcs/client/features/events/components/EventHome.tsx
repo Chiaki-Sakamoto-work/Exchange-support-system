@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { EventCard } from './EventCard'; // 先ほど作ったカードを読み込む
 
 export const EventHome = () => {
