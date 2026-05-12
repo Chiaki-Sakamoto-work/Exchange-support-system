@@ -42,8 +42,8 @@ db-down:
 
 ##------ Prisma 操作 ------##
 db-migrate:
-	cd ${SRCDIR} && docker compose exec app npx prisma migrate dev
-# schema.prisma の変更をローカルDBに反映する（マイグレーション）
+	cd ${SRCDIR} && docker compose exec app /bin/sh -c "DATABASE_URL=\${DATABASE_URL} npx prisma migrate dev"
+	# schema.prisma の変更をローカルDBに反映する（マイグレーション）
 db-push:
 	cd ${SRCDIR} && docker compose exec app npx prisma db push
 
