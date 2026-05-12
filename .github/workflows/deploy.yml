@@ -12,7 +12,8 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    
+    environment: Production
+
     defaults:
       run:
         working-directory: ./srcs/client
