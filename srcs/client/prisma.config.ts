@@ -11,10 +11,5 @@ if (!process.env.DATABASE_URL) {
 export default defineConfig({
   earlyAccess: true, // Prisma 7 で推奨される場合があります
   schema: "prisma/schema.prisma",
-  datasource: {
-    // もし process.env["DATABASE_URL"] がダメなら、直接文字列を入れるテストもアリです
-    url: process.env.DATABASE_URL,
-    directUrl: process.env.DIRECT_URL, // これを忘れずに！
-  },
 });
 
