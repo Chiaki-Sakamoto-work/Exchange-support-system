@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EventCreateForm } from '@/features/events/components/event-create-form';
+import { EventCreateForm } from '@/features/events/components/EventCreateForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
 
