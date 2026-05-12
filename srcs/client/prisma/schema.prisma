@@ -1,13 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
 }
 
 model departments {
@@ -18,20 +14,19 @@ model departments {
 }
 
 model profiles {
-  id             String        @id @db.Uuid
-  email          String        @unique @db.VarChar
-  username       String?       @db.VarChar
-  department_id  Int?
-  user_type      String?       @db.VarChar
-  is_support_used Boolean?      @default(false)
-  is_admin       Boolean?      @default(false)
-  allergies      String[]      // PostgresのARRAY型
-  created_at     DateTime?     @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime?     @default(now()) @db.Timestamptz(6)
-  
-  departments    departments?  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  messages       messages[]
-  user_rooms     user_rooms[]
+  id              String       @id @db.Uuid
+  email           String       @unique @db.VarChar
+  username        String?      @db.VarChar
+  department_id   Int?
+  user_type       String?      @db.VarChar
+  is_support_used Boolean?     @default(false)
+  is_admin        Boolean?     @default(false)
+  allergies       String[]
+  created_at      DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?    @default(now()) @db.Timestamptz(6)
+  messages        messages[]
+  departments     departments? @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_rooms      user_rooms[]
 }
 
 model rooms {
@@ -49,31 +44,28 @@ model rooms {
   status                   String?      @default("募集中") @db.VarChar
   created_at               DateTime?    @default(now()) @db.Timestamptz(6)
   updated_at               DateTime?    @default(now()) @db.Timestamptz(6)
-  
   messages                 messages[]
   user_rooms               user_rooms[]
 }
 
 model messages {
-  id         Int        @id @default(autoincrement())
-  user_id    String?    @db.Uuid
+  id         Int       @id @default(autoincrement())
+  user_id    String?   @db.Uuid
   room_id    Int?
   content    String
-  created_at DateTime?  @default(now()) @db.Timestamptz(6)
-  
-  profiles   profiles?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  rooms      rooms?     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  rooms      rooms?    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_rooms {
-  user_id    String     @db.Uuid
+  user_id    String    @db.Uuid
   room_id    Int
-  is_owner   Boolean?   @default(false)
-  created_at DateTime?  @default(now()) @db.Timestamptz(6)
-  updated_at DateTime?  @default(now()) @db.Timestamptz(6)
-  
-  profiles   profiles   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  rooms      rooms      @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  is_owner   Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  rooms      rooms     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, room_id])
 }
