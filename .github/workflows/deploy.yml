@@ -15,7 +15,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./srcs
+        working-directory: ./srcs/client
 
     steps:
       - name: 📥 コードをチェックアウト
