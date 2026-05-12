@@ -9,7 +9,6 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default defineConfig({
-  earlyAccess: true, // Prisma 7 で推奨される場合があります
   schema: "prisma/schema.prisma",
 });
 
