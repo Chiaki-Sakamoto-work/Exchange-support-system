@@ -60,5 +60,5 @@ lint:
 		docker compose exec app npm run typecheck
 
 format:
-	cd ${SRCDIR} && docker compose exec npm run check:fix
+	cd ${SRCDIR} && docker compose exec app npm run check:fix
 
