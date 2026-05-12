@@ -5,9 +5,9 @@ import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
 
 export default function EventIndexPage() {
-  const [activeTab, setActiveTab] = useState<'home' | 'create' | 'join' | 'mypage'>(
-    'home'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'home' | 'create' | 'join' | 'mypage'
+  >('home');
 
   return (
     <div className='min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50'>
