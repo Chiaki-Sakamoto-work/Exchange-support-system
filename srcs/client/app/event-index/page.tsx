@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { EventCreateForm } from '@/features/events/components/event-create-form';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
 
@@ -21,11 +22,7 @@ export default function EventIndexPage() {
       <main className='max-w-md mx-auto p-4 pb-24'>
         {activeTab === 'home' && <EventHome />}
 
-        {activeTab === 'create' && (
-          <div className='text-xl font-bold mt-10 text-center'>
-            開催画面（作成中）
-          </div>
-        )}
+        {activeTab === 'create' && <EventCreateForm />}
         {activeTab === 'join' && (
           <div className='text-xl font-bold mt-10 text-center'>
             参加画面（作成中）
