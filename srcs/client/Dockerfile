@@ -17,6 +17,7 @@ RUN --mount=type=cache,target=/root/.npm \
   npm ci
 
 RUN chown -R node:node /usr/src/app
+RUN mkdir -p /usr/src/app/.next && chown -R node:node /usr/src/app/.next
 USER node
 
 COPY docker-entrypoint.sh /usr/local/bin/
