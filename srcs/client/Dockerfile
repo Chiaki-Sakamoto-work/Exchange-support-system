@@ -11,6 +11,7 @@ RUN apt-get update \
 WORKDIR /usr/src/app
 
 COPY package*.json .
+COPY prisma ./prisma/
 
 RUN --mount=type=cache,target=/root/.npm \
   npm ci

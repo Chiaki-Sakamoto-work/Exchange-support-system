@@ -5,7 +5,7 @@ SRCDIR = ./srcs/
 ##--------------------------##
 
 ##------ Next.js (App) 操作 ------##
-all: build up db-gene restart
+all: build up restart
 
 build:
 	cd ${SRCDIR} && docker compose build
@@ -20,7 +20,7 @@ down:
 restart:
 	cd ${SRCDIR} && docker compose restart app
 
-setup: db-gene db-migrate restart
+setup: db-migrate restart
 
 # エラーが起きた時にログを見る用
 logs:
@@ -41,9 +41,6 @@ db-down:
 
 
 ##------ Prisma 操作 ------##
-db-gene:
-	cd ${SRCDIR} && docker compose exec app npx prisma generate
-
 db-migrate:
 	cd ${SRCDIR} && docker compose exec app npx prisma migrate dev
 # schema.prisma の変更をローカルDBに反映する（マイグレーション）
