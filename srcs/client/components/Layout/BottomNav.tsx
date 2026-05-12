@@ -17,20 +17,21 @@ export const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   ] as const;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 px-6 py-3 pb-8 flex justify-around items-center z-50">
+    <nav className='fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 px-6 py-3 pb-8 flex justify-around items-center z-50'>
       {tabs.map((tab) => (
         <button
+          type='button'
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={`flex flex-col items-center gap-1 transition-all ${
             activeTab === tab.id ? 'text-orange-500 scale-110' : 'text-zinc-400'
           }`}
         >
-          <span className="text-xl">{tab.icon}</span>
-          <span className="text-[10px] font-bold">{tab.label}</span>
+          <span className='text-xl'>{tab.icon}</span>
+          <span className='text-[10px] font-bold'>{tab.label}</span>
           {/* アクティブな時だけ下にポチをつける演出 */}
           {activeTab === tab.id && (
-            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-in zoom-in" />
+            <div className='w-1.5 h-1.5 bg-orange-500 rounded-full animate-in zoom-in' />
           )}
         </button>
       ))}
