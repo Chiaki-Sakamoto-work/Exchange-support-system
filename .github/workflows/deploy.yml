@@ -6,8 +6,8 @@ on:
       - main
       - chore/27-prisma-introduction
     paths:
-      - 'srcs/prisma/schema.prisma'
-      - 'srcs/prisma/migrations/**'
+#      - 'srcs/prisma/schema.prisma'
+#      - 'srcs/prisma/migrations/**'
 
 jobs:
   migrate:
