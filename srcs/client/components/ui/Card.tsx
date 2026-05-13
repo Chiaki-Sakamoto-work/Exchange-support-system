@@ -47,7 +47,7 @@ function Card({
 
         'data-[size=default]:w-158 data-[size=default]:h-36.5 data-[size=default]:gap-4 data-[size=default]:py-4',
         'data-[size=sm]:w-91 data-[size=sm]:h-11 data-[size=sm]:gap-3 data-[size=sm]:py-3',
-        'data-[size=xs]:w-20 data-[size=xs]:h-6 data-[size=xs]:gap-2 data-[size=xs]:py-2',
+        'data-[size=xs]:w-20 data-[size=xs]:h-6 data-[size=xs]:gap-2 data-[size=xs]:py-0',
 
         'has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl',
         className,
