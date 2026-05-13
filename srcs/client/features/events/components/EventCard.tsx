@@ -24,18 +24,10 @@ export const EventCard = ({
 
         <div>
           <h3 className='font-bold text-lg'>{title}</h3>
-          <p className='text-s text-zinc-600 font-medium'>
-            📍 {shop}
-          </p>
-          <p className='text-s text-zinc-600 font-medium'>
-            📅 {date}
-          </p>
-          <p className='text-s text-zinc-600 font-medium'>
-            {owner}
-          </p>
-          <p className='text-xs text-zinc-600 font-medium'>
-            {detail}
-          </p>
+          <p className='text-s text-zinc-600 font-medium'>📍 {shop}</p>
+          <p className='text-s text-zinc-600 font-medium'>📅 {date}</p>
+          <p className='text-s text-zinc-600 font-medium'>{owner}</p>
+          <p className='text-xs text-zinc-600 font-medium'>{detail}</p>
         </div>
       </div>
 

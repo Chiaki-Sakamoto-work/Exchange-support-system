@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
-
 
 // 1. 環境変数からURLを取得
 const connectionString = process.env.DATABASE_URL;
