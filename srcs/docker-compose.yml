@@ -14,6 +14,7 @@ services:
     volumes:
       - ./client:/usr/src/app
       - exchange_support_system_app_node_module:/usr/src/app/node_modules
+      - /usr/src/app/.next
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s
