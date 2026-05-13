@@ -1,29 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getHostedEvents, getJoinedEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard'; // 先ほど作ったカードを読み込む
-import { getHostedEvents, getJoinedEvent } from '../actions/EventActions';
-import { routeModule } from 'next/dist/build/templates/pages';
+
+type HostedRoom = Awaited<ReturnType<typeof getHostedEvents>>[0];
+type JoinedRoom = Awaited<ReturnType<typeof getJoinedEvents>>[0];
 
 export const EventHome = () => {
   // ホーム画面内だけの状態（サブタブ）は、このコンポーネントで管理する
   const [subTab, setSubTab] = useState<'upcoming' | 'joined'>('upcoming');
 
   // データを保存するための「入れ物(State)」
-  const [hostedRooms, setHostedRooms] = useState<any[]>([]); 
-  const [joinedRooms, setjoinedRooms] = useState<any[]>([]); 
+  const [hostedRooms, setHostedRooms] = useState<HostedRoom[]>([]);
+  const [joinedRooms, setJoinedRooms] = useState<JoinedRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // 画面が開いた瞬間にデータを取ってくる
   useEffect(() => {
     async function loadData() {
       try {
         const [hosted, joined] = await Promise.all([
           getHostedEvents(),
-          getJoinedEvent()
+          getJoinedEvents(),
         ]);
         setHostedRooms(hosted);
-        setjoinedRooms(joined);
+        setJoinedRooms(joined);
       } catch (error) {
         console.error('データ取得エラー:', error);
       } finally {
@@ -37,12 +39,15 @@ export const EventHome = () => {
   const formatDate = (date: Date | null) => {
     if (!date) return '日時未定';
     return new Date(date).toLocaleString('ja-JP', {
-      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   if (isLoading) {
-    return <div className="text-center py-10 text-zinc-400">読み込み中...</div>;
+    return <div className='text-center py-10 text-zinc-400'>読み込み中...</div>;
   }
 
   return (
@@ -78,39 +83,41 @@ export const EventHome = () => {
         {subTab === 'upcoming' ? (
           // マイ開催
           hostedRooms.length > 0 ? (
-            hostedRooms.map(room => (
+            hostedRooms.map((room) => (
               <EventCard
                 key={room.id}
                 title={room.title}
-                shop={room.location_name}
+                shop={room.location_name || '未定'}
                 date={formatDate(room.event_start_at)}
                 detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
                 colorClass='bg-orange-500'
               />
             ))
           ) : (
-            <p className="text-center text-sm text-zinc-500 py-10">開催予定のイベントはありません</p>
+            <p className='text-center text-sm text-zinc-500 py-10'>
+              開催予定のイベントはありません
+            </p>
           )
+        ) : // 参加予定
+        joinedRooms.length > 0 ? (
+          joinedRooms.map((room) => {
+            const owner = room.user_rooms[0]?.profiles?.username || '不明';
+            return (
+              <EventCard
+                key={room.id}
+                title={room.title}
+                shop={room.location_name || '未定'}
+                date={formatDate(room.event_start_at)}
+                detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
+                owner={`👤 主催: ${owner}`}
+                colorClass='bg-blue-500'
+              />
+            );
+          })
         ) : (
-          // 参加予定
-          joinedRooms.length > 0 ? (
-            joinedRooms.map(room => {
-              const owner = room.user_rooms[0]?.profiles?.username || '不明';
-              return (
-                <EventCard
-                  key={room.id}
-                  title={room.title}
-                  shop={room.location_name || '未定'}
-                  date={formatDate(room.event_start_at)}
-                  detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
-                  owner={`👤 主催: ${owner}`}
-                  colorClass='bg-blue-500'
-                />
-              );
-            })
-          ) : (
-            <p className="text-center text-sm text-zinc-500 py-10">参加予定のイベントはありません</p>
-          )
+          <p className='text-center text-sm text-zinc-500 py-10'>
+            参加予定のイベントはありません
+          </p>
         )}
       </div>
     </div>
