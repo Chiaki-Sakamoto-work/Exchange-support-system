@@ -5,20 +5,36 @@ import type * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+// 1. 조합 가능한 variant 타입 정의
+type AvatarVariant = 'default' | 'rounded-full';
+
 function Avatar({
   className,
   size = 'default',
+  variant = 'default',
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
-  size?: 'default' | 'sm' | 'lg'; // 40x40 , 96.69x96.69, 24x24
+  size?: 'default' | 'sm' | 'lg';
+  variant?: AvatarVariant;
 }) {
+  const isRoundedFull = variant.includes('rounded-full');
+  const baseVariant = variant.split(' ')[0];
+
   return (
     <AvatarPrimitive.Root
       data-slot='avatar'
       data-size={size}
+      data-variant={baseVariant}
+      data-shape={isRoundedFull ? 'full' : 'default'}
       className={cn(
-        'group/avatar relative flex size-10 shrink-0 select-none data-[size=lg]:size-24 data-[size=sm]:size-6',
-        'rounded-full data-[size=default]:rounded-[14px]',
+        'group/avatar relative flex shrink-0 select-none',
+
+        // --- Sizes ---
+        'data-[size=default]:size-10 data-[size=lg]:size-24 data-[size=sm]:size-6',
+
+        'data-[shape=default]:rounded-[14px]',
+        'data-[shape=full]:rounded-full',
+
         className,
       )}
       {...props}
@@ -35,7 +51,10 @@ function AvatarImage({
       data-slot='avatar-image'
       className={cn(
         'aspect-square size-full object-cover',
-        'rounded-full group-data-[size=default]/avatar:rounded-[14px]',
+
+        'group-data-[shape=default]/avatar:rounded-[14px]',
+        'group-data-[shape=full]/avatar:rounded-full',
+
         className,
       )}
       {...props}
@@ -52,7 +71,10 @@ function AvatarFallback({
       data-slot='avatar-fallback'
       className={cn(
         'flex size-full items-center justify-center bg-primary text-primary-foreground text-sm group-data-[size=sm]/avatar:text-xs',
-        'rounded-full group-data-[size=default]/avatar:rounded-[14px]',
+
+        'group-data-[shape=default]/avatar:rounded-[14px]',
+        'group-data-[shape=full]/avatar:rounded-full',
+
         className,
       )}
       {...props}
