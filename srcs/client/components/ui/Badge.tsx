@@ -5,7 +5,7 @@ import type * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'group/badge inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none',
+  'group/badge inline-flex w-fit shrink-0 items-center justify-center gap-2 overflow-hidden rounded-4xl border border-transparent font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none',
   {
     variants: {
       variant: {
@@ -22,9 +22,10 @@ const badgeVariants = cva(
         accent: 'bg-accent text-accent-foreground [a]:hover:bg-accent/80',
       },
       size: {
-        default: 'min-h-6 px-2 py-0.5 text-xs [&>svg]:size-3!',
-        sm: 'min-h-4 px-1.5 py-0 text-[10px] [&>svg]:size-2.5!',
-        lg: 'min-h-7 px-3 py-1 text-sm [&>svg]:size-4!',
+        sm: 'min-h-6 px-2 py-0.5 text-xs [&>svg]:size-3!',
+        xs: 'min-h-4 px-1.5 py-0 text-[10px] [&>svg]:size-2.5!',
+        default: 'min-h-7 px-3 py-1 text-sm [&>svg]:size-4!',
+        lg: 'min-h-8 px-1.5 py-1 text-sm [&>svg]:size-4!',
       },
     },
     defaultVariants: {
