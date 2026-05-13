@@ -4,6 +4,7 @@ export type EventCardProps = {
   shop: string;
   date: string;
   detail: string;
+  owner?: string;
   colorClass: string;
 };
 
@@ -12,6 +13,7 @@ export const EventCard = ({
   shop,
   date,
   detail,
+  owner,
   colorClass,
 }: EventCardProps) => {
   return (
@@ -22,10 +24,16 @@ export const EventCard = ({
 
         <div>
           <h3 className='font-bold text-lg'>{title}</h3>
-          <p className='text-xs text-zinc-500 font-medium'>
-            📍 {shop} • 📅 {date}
+          <p className='text-s text-zinc-600 font-medium'>
+            📍 {shop}
           </p>
-          <p className='text-[10px] text-zinc-400 mt-1 font-bold tracking-wider'>
+          <p className='text-s text-zinc-600 font-medium'>
+            📅 {date}
+          </p>
+          <p className='text-s text-zinc-600 font-medium'>
+            {owner}
+          </p>
+          <p className='text-xs text-zinc-600 font-medium'>
             {detail}
           </p>
         </div>

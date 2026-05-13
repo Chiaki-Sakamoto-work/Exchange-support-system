@@ -1,11 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EventCard } from './EventCard'; // 先ほど作ったカードを読み込む
+import { getHostedEvents, getJoinedEvent } from '../actions/EventActions';
+import { routeModule } from 'next/dist/build/templates/pages';
 
 export const EventHome = () => {
   // ホーム画面内だけの状態（サブタブ）は、このコンポーネントで管理する
   const [subTab, setSubTab] = useState<'upcoming' | 'joined'>('upcoming');
+
+  // データを保存するための「入れ物(State)」
+  const [hostedRooms, setHostedRooms] = useState<any[]>([]); 
+  const [joinedRooms, setjoinedRooms] = useState<any[]>([]); 
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 画面が開いた瞬間にデータを取ってくる
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [hosted, joined] = await Promise.all([
+          getHostedEvents(),
+          getJoinedEvent()
+        ]);
+        setHostedRooms(hosted);
+        setjoinedRooms(joined);
+      } catch (error) {
+        console.error('データ取得エラー:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  // 日付を見やすく変換する関数 (2026-05-20T... -> 5/20 19:00)
+  const formatDate = (date: Date | null) => {
+    if (!date) return '日時未定';
+    return new Date(date).toLocaleString('ja-JP', {
+      month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-10 text-zinc-400">読み込み中...</div>;
+  }
 
   return (
     <div className='space-y-6 animate-in fade-in duration-500'>
@@ -38,39 +76,41 @@ export const EventHome = () => {
       {/* リスト表示エリア */}
       <div className='space-y-4'>
         {subTab === 'upcoming' ? (
-          <>
-            <EventCard
-              title='プロジェクト打ち上げ'
-              shop='肉の万世'
-              date='2024/05/20 19:00'
-              detail='👥 8名 / 主催: あなた'
-              colorClass='bg-orange-500'
-            />
-            <EventCard
-              title='金曜定例飲み'
-              shop='HUB 渋谷店'
-              date='2024/05/24 20:30'
-              detail='👥 4名 / 主催: あなた'
-              colorClass='bg-orange-500'
-            />
-          </>
+          // マイ開催
+          hostedRooms.length > 0 ? (
+            hostedRooms.map(room => (
+              <EventCard
+                key={room.id}
+                title={room.title}
+                shop={room.location_name}
+                date={formatDate(room.event_start_at)}
+                detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
+                colorClass='bg-orange-500'
+              />
+            ))
+          ) : (
+            <p className="text-center text-sm text-zinc-500 py-10">開催予定のイベントはありません</p>
+          )
         ) : (
-          <>
-            <EventCard
-              title='エンジニア交流会'
-              shop='代官山カフェ'
-              date='2024/05/18 18:00'
-              detail='👤 代表: 田中さん'
-              colorClass='bg-blue-500'
-            />
-            <EventCard
-              title='デザインチーム歓迎会'
-              shop='イタリアン バル'
-              date='2024/06/02 19:30'
-              detail='👤 代表: 佐藤さん'
-              colorClass='bg-blue-500'
-            />
-          </>
+          // 参加予定
+          joinedRooms.length > 0 ? (
+            joinedRooms.map(room => {
+              const owner = room.user_rooms[0]?.profiles?.username || '不明';
+              return (
+                <EventCard
+                  key={room.id}
+                  title={room.title}
+                  shop={room.location_name || '未定'}
+                  date={formatDate(room.event_start_at)}
+                  detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
+                  owner={`👤 主催: ${owner}`}
+                  colorClass='bg-blue-500'
+                />
+              );
+            })
+          ) : (
+            <p className="text-center text-sm text-zinc-500 py-10">参加予定のイベントはありません</p>
+          )
         )}
       </div>
     </div>
