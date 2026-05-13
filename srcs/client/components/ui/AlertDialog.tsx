@@ -76,7 +76,7 @@ function AlertDialogContent({
         data-slot='alert-dialog-content'
         data-size={size}
         className={cn(
-          'group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-0 rounded-2xl bg-popover p-6 text-popover-foreground duration-100 outline-none data-[size=default]:max-w-96 data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-w-[calc(100%-2rem)',
+          'group/alert-dialog-content fixed top-1/2 left-1/2 z-50 flex flex-col w-full -translate-x-1/2 -translate-y-1/2 gap-0 rounded-2xl bg-popover p-6 text-popover-foreground duration-100 outline-none data-[size=default]:max-w-96 data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-w-[calc(100%-2rem) max-h-172.5',
           'shadow-[inset_0_0_0_1px_rgba(10,14,26,0.08),0_10px_15px_-3px_rgba(10,14,26,0.10),0_4px_6px_-4px_rgba(10,14,26,0.10)]',
           className,
         )}
@@ -107,7 +107,8 @@ function AlertDialogBody({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='alert-dialog-body'
       className={cn(
-        'py-4 text-sm text-foreground flex flex-col items-center',
+        'flex flex-1 flex-col gap-4 min-h-0 overflow-y-auto py-4 text-sm text-foreground *:shrink-0',
+        'scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-muted-foreground/20',
         className,
       )}
       {...props}
