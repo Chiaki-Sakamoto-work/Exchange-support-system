@@ -43,6 +43,25 @@ function AlertDialogOverlay({
   );
 }
 
+function AlertDialogIconAction({
+  className,
+  variant = 'ghost',
+  size = 'icon',
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  return (
+    <Button
+      variant={variant}
+      size={size}
+      className={cn(
+        'absolute top-4 right-4 text-muted-foreground hover:bg-muted hover:text-foreground',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function AlertDialogContent({
   className,
   size = 'default',
@@ -57,7 +76,8 @@ function AlertDialogContent({
         data-slot='alert-dialog-content'
         data-size={size}
         className={cn(
-          'group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          'group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-0 rounded-2xl bg-popover p-6 text-popover-foreground duration-100 outline-none data-[size=default]:max-w-96 data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          'shadow-[inset_0_0_0_1px_rgba(10,14,26,0.08),0_10px_15px_-3px_rgba(10,14,26,0.10),0_4px_6px_-4px_rgba(10,14,26,0.10)]',
           className,
         )}
         {...props}
@@ -82,6 +102,19 @@ function AlertDialogHeader({
   );
 }
 
+function AlertDialogBody({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='alert-dialog-body'
+      className={cn(
+        'py-4 text-sm text-foreground flex flex-col items-center',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 function AlertDialogFooter({
   className,
   ...props
@@ -90,7 +123,7 @@ function AlertDialogFooter({
     <div
       data-slot='alert-dialog-footer'
       className={cn(
-        '-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end',
+        'flex flex-col-reverse sm:flex-row sm:justify-center gap-3 pt-4',
         className,
       )}
       {...props}
@@ -185,11 +218,13 @@ function AlertDialogCancel({
 export {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogIconAction,
   AlertDialogMedia,
   AlertDialogOverlay,
   AlertDialogPortal,
