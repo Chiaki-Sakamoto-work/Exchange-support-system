@@ -14,14 +14,7 @@ import {
 } from '@shared/ui/Card';
 import { Input } from '@shared/ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/ui/Tabs';
-import {
-  Bold,
-  Italic,
-  Mail,
-  MoreHorizontal,
-  Plus,
-  Underline,
-} from 'lucide-react';
+import { Mail, MoreHorizontal, Plus } from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -303,6 +296,7 @@ export default function TestPage() {
                   ⚠️ データ削除に関する重要事項
                 </h3>
                 {Array.from({ length: 15 }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: UI 테스트용 정적 더미 데이터이므로 인덱스 사용 허용
                   <p key={i} className='mb-4 text-muted-foreground'>
                     {i + 1}.
                     この操作を実行すると、関連するすべてのメタデータ、ログファイル、およびバックアップデータがシステムから完全に削除されます。
@@ -349,6 +343,7 @@ export default function TestPage() {
                   ⚠️ データ削除に関する重要事項
                 </h3>
                 {Array.from({ length: 15 }).map((_, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: UI 테스트용 정적 더미 데이터이므로 인덱스 사용 허용
                   <p key={i} className='mb-4 text-muted-foreground'>
                     {i + 1}.
                     この操作を実行すると、関連するすべてのメタデータ、ログファイル、およびバックアップデータがシステムから完全に削除されます。
