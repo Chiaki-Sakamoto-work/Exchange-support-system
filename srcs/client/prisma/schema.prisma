@@ -6,6 +6,27 @@ datasource db {
   provider = "postgresql"
 }
 
+// ----------------------------------------------
+// Enum 定義
+// ----------------------------------------------
+
+enum RoomStatus {
+  OPEN      // 募集中
+  CLOSED    // 締め切り
+  CANCELLED // 開催中止
+  COMPLETED // 開催終了
+}
+
+enum NotificationStatus {
+  pending
+  success
+  failed
+}
+
+// ----------------------------------------------
+// Models
+// ----------------------------------------------
+
 model departments {
   id         Int        @id @default(autoincrement())
   name       String     @db.VarChar
@@ -14,58 +35,93 @@ model departments {
 }
 
 model profiles {
-  id              String       @id @db.Uuid
-  email           String       @unique @db.VarChar
-  username        String?      @db.VarChar
+  id              String        @id @db.Uuid
+  email           String        @unique @db.VarChar
+  username        String?       @db.VarChar
+  avatar_url      String?       @db.VarChar
   department_id   Int?
-  user_type       String?      @db.VarChar
-  is_support_used Boolean?     @default(false)
-  is_admin        Boolean?     @default(false)
+  user_type       String?       @db.VarChar
+  is_support_used Boolean?      @default(false)
+  is_admin        Boolean?      @default(false)
   allergies       String[]
-  created_at      DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime?    @default(now()) @db.Timestamptz(6)
+  created_at      DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?     @default(now()) @db.Timestamptz(6)
   messages        messages[]
-  departments     departments? @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  departments     departments?  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_rooms      user_rooms[]
 }
 
 model rooms {
-  id                       Int          @id @default(autoincrement())
-  title                    String       @db.VarChar
+  id                       Int         @id @default(autoincrement())
+  title                    String      @db.VarChar
   description              String?
   capacity_limit           Int?
-  is_mandatory_new_recruit Boolean?     @default(false)
-  location_name            String?      @db.VarChar
-  location_address         String?      @db.VarChar
-  open_at                  DateTime?    @db.Timestamptz(6)
-  close_at                 DateTime?    @db.Timestamptz(6)
-  event_start_at           DateTime?    @db.Timestamptz(6)
-  event_end_at             DateTime?    @db.Timestamptz(6)
-  status                   String?      @default("募集中") @db.VarChar
-  created_at               DateTime?    @default(now()) @db.Timestamptz(6)
-  updated_at               DateTime?    @default(now()) @db.Timestamptz(6)
+  is_mandatory_new_recruit Boolean?    @default(false)
+  location_name            String?     @db.VarChar
+  location_address         String?     @db.VarChar
+  open_at                  DateTime?   @db.Timestamptz(6)
+  close_at                 DateTime?   @db.Timestamptz(6)
+  event_start_at           DateTime?   @db.Timestamptz(6)
+  event_end_at             DateTime?   @db.Timestamptz(6)
+  status                   RoomStatus  @default(OPEN) // Enumに変更
+  created_at               DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime?   @default(now()) @db.Timestamptz(6)
   messages                 messages[]
   user_rooms               user_rooms[]
+  room_tags                room_tags[] // タグとの紐付け
+}
+
+// タグマスター
+model tags {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar
+  created_at DateTime?   @default(now()) @db.Timestamptz(6)
+  room_tags  room_tags[]
+}
+
+// 中間テーブル：部屋とタグの紐付け
+model room_tags {
+  room_id Int
+  tag_id  Int
+  rooms   rooms @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  tags    tags  @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([room_id, tag_id])
 }
 
 model messages {
   id         Int       @id @default(autoincrement())
-  user_id    String?   @db.Uuid
-  room_id    Int?
+  user_id    String    @db.Uuid
+  room_id    Int
   content    String
   created_at DateTime? @default(now()) @db.Timestamptz(6)
-  rooms      rooms?    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profiles   profiles? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rooms      rooms     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_rooms {
   user_id    String    @db.Uuid
   room_id    Int
   is_owner   Boolean?  @default(false)
+  joined_at  DateTime? @default(now()) @db.Timestamptz(6) // 追加
+  left_at    DateTime? @db.Timestamptz(6) // 追加
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   updated_at DateTime? @default(now()) @db.Timestamptz(6)
   rooms      rooms     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles   profiles  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, room_id])
+  @@index([left_at]) // フィルタリング用のインデックス
+}
+
+model notification_histories {
+  id            BigInt             @id @default(autoincrement())
+  target_date   DateTime           @db.Date
+  status        NotificationStatus @default(pending)
+  room_count    Int
+  sent_at       DateTime?          @db.Timestamptz(6)
+  error_message String?            @db.Text
+  created_at    DateTime           @default(now()) @db.Timestamptz(6)
+
+  @@index([target_date])
 }
