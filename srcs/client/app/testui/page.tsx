@@ -1,5 +1,5 @@
 // app/test/page.tsx
-'use client'; // 페이지를 클라이언트 컴포넌트로 전환
+'use client'; // 状態管理（useState等）やイベントリスナー（onClick等）を使用するため、クライアントコンポーネントとして宣言
 
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/ui/Avatar';
 import { Badge } from '@shared/ui/Badge';
@@ -50,15 +50,22 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
+
 export default function TestPage() {
+  // Stepperコンポーネント用の状態管理
   const [quantity, setQuantity] = useState(1);
+
   return (
     <div className='p-10 space-y-10'>
       <h1 className='text-3xl font-bold border-b pb-4'>UI Component Gallery</h1>
-      {/* 1-1. Buttons */}
+
+      {/* =========================================
+          1-1. Buttons (ボタンのバリエーション)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>1-1. Buttons</h2>
         <div className='flex flex-wrap gap-4 items-center'>
+          {/* variantプロパティで用途に応じた色やスタイルを指定します */}
           <Button variant='default'>Default</Button>
           <Button variant='accent'>Accent</Button>
           <Button variant='destructive'>Destructive</Button>
@@ -68,7 +75,10 @@ export default function TestPage() {
           <Button variant='link'>Link</Button>
         </div>
       </section>
-      {/* 1.5. Button Sizes */}
+
+      {/* =========================================
+          1.5. Button Sizes (ボタンのサイズ展開)
+          ========================================= */}
       <section className='space-y-6'>
         <h2 className='text-xl font-semibold'>
           1.5. Button Sizes (ボタンサイズ)
@@ -79,6 +89,7 @@ export default function TestPage() {
             テキストボタン (Text Buttons)
           </h3>
           <div className='flex flex-wrap items-end gap-4'>
+            {/* sizeプロパティでボタンの大きさを制御します */}
             <Button size='xs'>xs</Button>
             <Button size='sm'>Size sm</Button>
             <Button size='default'>Size default</Button>
@@ -92,6 +103,9 @@ export default function TestPage() {
             アイコンボタン (Icon Buttons)
           </h3>
           <div className='flex flex-wrap items-end gap-4'>
+            {/* アイコンのみを配置する場合は 'icon' 系サイズを使用します。
+              自動的に正円（または正方形ベースの角丸）になります。
+            */}
             <Button variant='default' size='icon-xs'>
               <Plus />
             </Button>
@@ -107,10 +121,14 @@ export default function TestPage() {
           </div>
         </div>
       </section>
-      {/* 1-2. Badges */}
+
+      {/* =========================================
+          1-2. Badges (バッジ・タグ)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>1-2. Badges</h2>
         <div className='flex flex-wrap gap-4 items-center'>
+          {/* テキストのみのシンプルなバッジ */}
           <Badge variant='secondary' size='sm'>
             ワイワイ
           </Badge>
@@ -120,6 +138,7 @@ export default function TestPage() {
           <Badge variant='destructive' size='default'>
             牛乳
           </Badge>
+          {/* バッジの中にAvatar（画像）や他のBadgeを入れ子にして複雑なレイアウトも可能です */}
           <Badge variant='secondary' size='lg'>
             <Avatar size='sm'>
               <AvatarImage src='https://github.com/shadcn.png' />
@@ -132,26 +151,37 @@ export default function TestPage() {
           </Badge>
         </div>
       </section>
-      {/* 2. Inputs & Forms */}
+
+      {/* =========================================
+          2. Inputs & Forms (入力フォーム)
+          ========================================= */}
       <section className='space-y-4 max-w-sm'>
         <h2 className='text-xl font-semibold'>2. Inputs</h2>
         <div className='grid gap-4'>
+          {/* LabelとInputを紐付ける基本パターン */}
           <div className='group grid w-full items-center gap-1.5'>
+            {/* htmlFor と id を一致させることで、ラベルクリック時に入力欄にフォーカスが移動します */}
             <Label htmlFor='username'>User Name</Label>
             <Input type='text' id='username' placeholder='Input user name' />
           </div>
+          {/* アイコン付きの入力欄のパターン */}
           <div>
             <Input
               type='email'
               placeholder='Email Address'
-              icon={<Mail className='h-5 w-5' />}
+              icon={<Mail className='h-5 w-5' />} // 左側にメールアイコンを配置
             />
           </div>
         </div>
       </section>
-      {/* 3. Cards & Avatar */}
+
+      {/* =========================================
+          3. Cards & Avatar (カードとアバター)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>3-1. Cards & Avatar</h2>
+
+        {/* フル機能のカード (Avatar, タイトル, 説明, アクションボタン付き) */}
         <div className='flex gap-6'>
           <Card>
             <CardHeader className='flex flex-row items-center gap-4'>
@@ -163,6 +193,7 @@ export default function TestPage() {
                 <CardTitle>チーム打ち上げ</CardTitle>
                 <CardDescription>焼き鳥みやび</CardDescription>
               </div>
+              {/* CardActionに入れると自動的に右端に配置されます */}
               <CardAction>
                 <Button variant='ghost' size='icon'>
                   <MoreHorizontal className='h-5 w-5' />
@@ -173,6 +204,8 @@ export default function TestPage() {
             <CardContent>カードUIです</CardContent>
           </Card>
         </div>
+
+        {/* サイズ違いのカード */}
         <div className='flex gap-6'>
           <Card size='sm'>
             <CardContent>カードUIです</CardContent>
@@ -184,6 +217,8 @@ export default function TestPage() {
           </Card>
         </div>
       </section>
+
+      {/* カードのバリアント (スタイル) 違い */}
       <section className='space-y-4'>
         <div className='flex gap-6'>
           <Card variant='default' size='default'>
@@ -191,45 +226,54 @@ export default function TestPage() {
           </Card>
         </div>
         <div className='flex gap-6'>
+          {/* shadow-none をつけると影が消えてフラットなデザインになります */}
           <Card variant='default shadow-none' size='default'>
             <CardContent>村田</CardContent>
           </Card>
         </div>
-
         <div className='flex gap-6'>
           <Card variant='destructive' size='default'>
             <CardContent>村田</CardContent>
           </Card>
         </div>
       </section>
+
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>3-2. Avatar</h2>
+        {/* 画像あり（画像が読み込めない場合はFallbackが表示されます） */}
         <Avatar>
           <AvatarImage src='https://github.com/shadcn.png' />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
+        {/* 画像なし（初期状態から文字・色を設定） */}
         <Avatar size='sm'>
           <AvatarFallback className='bg-primary text-primary-foreground'>
             姫
           </AvatarFallback>
         </Avatar>
+        {/* 円形のアバター */}
         <Avatar size='lg' variant='rounded-full'>
           <AvatarImage src='https://github.com/shadcn.png' />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </section>
-      {/* 4. Tabs */}
+
+      {/* =========================================
+          4. Tabs (タブ切り替え)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>4. Tabs</h2>
         <Tabs
           defaultValue='account'
           className='flex flex-col w-[632px] h-[540px]'
         >
+          {/* タブのメニュー部分 */}
           <TabsList className='w-full h-[48px] shrink-0'>
             <TabsTrigger value='account'>Account</TabsTrigger>
             <TabsTrigger value='password'>Password</TabsTrigger>
           </TabsList>
 
+          {/* タブのコンテンツ部分 (gridで重ねて配置し、アニメーションで切り替えます) */}
           <div className='flex-1 grid grid-cols-1 grid-rows-1 mt-2'>
             <TabsContent
               value='account'
@@ -247,12 +291,17 @@ export default function TestPage() {
           </div>
         </Tabs>
       </section>
-      {/* 5. Dialog */}
+
+      {/* =========================================
+          5. Dialog (汎用モーダルダイアログ)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>
           5. Dialog (モーダルダイアログ)
         </h2>
+        {/* 基本的な短いコンテンツのダイアログ */}
         <Dialog>
+          {/* asChild をつけることで、Buttonがトリガーとしてそのまま機能します */}
           <DialogTrigger asChild>
             <Button variant='outline'>ダイアログを開く</Button>
           </DialogTrigger>
@@ -269,27 +318,30 @@ export default function TestPage() {
           </DialogContent>
         </Dialog>
       </section>
+
+      {/* スクロール可能な長文コンテンツのダイアログ */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>
-          6. AlertDialog (警告ダイアログ)
+          5-2. Dialog (長文スクロール対応)
         </h2>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant='destructive'>データを削除2</Button>
+            <Button variant='destructive'>利用規約を確認</Button>
           </DialogTrigger>
-          {/* max-h-[80vh] でダイアログ全体の高さを制限します */}
+          {/* max-h-[80vh] で画面の80%の高さを上限に設定します */}
           <DialogContent showCloseButton={false} className='max-h-[80vh]'>
             <DialogHeader>
               <DialogTitle>本当に削除しますか？</DialogTitle>
               <DialogDescription>
                 以下の利用規約と注意事項を最後まで読み、同意した上で削除を実行してください。
               </DialogDescription>
+              {/* カスタムの右上のアイコンボタン */}
               <DialogIconAction>
                 <MoreHorizontal className='h-5 w-5' />
               </DialogIconAction>
             </DialogHeader>
 
-            {/* DialogBody に overflow-y-auto が設定されている必要があります */}
+            {/* DialogBody を使うと、コンテンツが溢れた場合に内部だけがスクロール可能になります */}
             <DialogBody className='space-y-4'>
               <div className='rounded-lg bg-muted p-4 leading-relaxed'>
                 <h3 className='font-bold mb-2 text-red-600'>
@@ -310,6 +362,7 @@ export default function TestPage() {
               </div>
             </DialogBody>
 
+            {/* フッターはスクロールしても常に固定表示されます */}
             <DialogFooter showCloseButton={true}>
               <DialogAction variant='accent'>
                 確認しました。削除する
@@ -318,7 +371,10 @@ export default function TestPage() {
           </DialogContent>
         </Dialog>
       </section>
-      {/* 6. AlertDialog */}
+
+      {/* =========================================
+          6. AlertDialog (警告・確認特化ダイアログ)
+          ========================================= */}
       <section className='space-y-4'>
         <h2 className='text-xl font-semibold'>
           6. AlertDialog (警告ダイアログ)
@@ -348,15 +404,15 @@ export default function TestPage() {
                     {i + 1}.
                     この操作を実行すると、関連するすべてのメタデータ、ログファイル、およびバックアップデータがシステムから完全に削除されます。
                     一度削除されたデータは、いかなる技術的手段を用いても復元することはできません。
-                    このプロセスには時間がかかる場合があり、途中で中断することは不可能です。
                   </p>
                 ))}
                 <p className='font-bold text-destructive'>
                   【スクロール終点】ここまで表示されればスクロール成功です。
                 </p>
               </div>
+              {/* ダイアログ内に他のコンポーネント（カードなど）を埋め込むことも可能です */}
               <Card
-                className='!w-[334px] !h-[76px]'
+                className='!w-[334px] !h-[76px] mt-4'
                 variant='secondary shadow-none'
               >
                 <CardHeader>
@@ -369,9 +425,9 @@ export default function TestPage() {
                     <CardDescription>焼き鳥みやび</CardDescription>
                   </div>
                 </CardHeader>
-                <CardContent>カードUIです</CardContent>
               </Card>
             </AlertDialogBody>
+            {/* AlertDialogFooter はキャンセルと実行のアクションを並べるのに最適化されています */}
             <AlertDialogFooter>
               <AlertDialogCancel>キャンセル</AlertDialogCancel>
               <AlertDialogAction variant='accent'>削除する</AlertDialogAction>
@@ -379,34 +435,31 @@ export default function TestPage() {
           </AlertDialogContent>
         </AlertDialog>
       </section>
-      {/* 9. Radio Select */}
+
+      {/* =========================================
+          9. Radio Select (カード型のラジオボタン選択)
+          ========================================= */}
       <section className='space-y-4'>
+        <h2 className='text-xl font-semibold'>9. Radio Select (カード選択)</h2>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant='destructive'>データを削除2</Button>
+            <Button variant='default'>お店を選択</Button>
           </DialogTrigger>
-          {/* max-h-[80vh] でダイアログ全体の高さを制限します */}
           <DialogContent showCloseButton={false} className='max-h-[80vh]'>
             <DialogHeader>
-              <DialogTitle>本当に削除しますか？</DialogTitle>
+              <DialogTitle>お店の選択</DialogTitle>
               <DialogDescription>
-                以下の利用規約と注意事項を最後まで読み、同意した上で削除を実行してください。
+                打ち上げの会場となるお店を選んでください。
               </DialogDescription>
-              <DialogIconAction>
-                <MoreHorizontal className='h-5 w-5' />
-              </DialogIconAction>
             </DialogHeader>
 
-            {/* DialogBody に overflow-y-auto が設定されている必要があります */}
             <DialogBody className='space-y-4'>
               <div className='rounded-2xl bg-muted p-4 leading-relaxed'>
-                <h3 className='font-bold mb-2 text-red-600'>
-                  ⚠️ データ削除に関する重要事項
-                </h3>
                 <form>
                   <div className='mb-4 text-sm font-medium text-muted-foreground'>
                     お店を選ぶ (任意)
                   </div>
+                  {/* RadioGroupで全体を囲み、RadioCardで個別の選択肢を作ります */}
                   <RadioGroup defaultValue='shop-1'>
                     <RadioCard value='shop-1'>
                       <RadioCardHeader>
@@ -428,9 +481,9 @@ export default function TestPage() {
 
                     <RadioCard value='shop-3'>
                       <RadioCardHeader>
-                        <RadioCardTitle>焼き鳥みやび1</RadioCardTitle>
+                        <RadioCardTitle>焼き鳥みやび (2号店)</RadioCardTitle>
                         <RadioCardDescription>
-                          新宿・焼き鳥2・¥¥
+                          新宿・焼き鳥・¥¥
                         </RadioCardDescription>
                       </RadioCardHeader>
                     </RadioCard>
@@ -440,35 +493,44 @@ export default function TestPage() {
             </DialogBody>
 
             <DialogFooter showCloseButton={true}>
-              <DialogAction variant='accent'>
-                確認しました。削除する
-              </DialogAction>
+              <DialogAction variant='accent'>決定する</DialogAction>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </section>
-      <Stepper
-        size='sm'
-        value={quantity}
-        onChange={setQuantity}
-        min={1}
-        max={10}
-      />
-      <Stepper
-        size='default'
-        value={quantity}
-        onChange={setQuantity}
-        min={1}
-        max={10}
-      />
 
-      <Stepper
-        size='lg'
-        value={quantity}
-        onChange={setQuantity}
-        min={1}
-        max={10}
-      />
+      {/* =========================================
+          10. Stepper (数量選択)
+          ========================================= */}
+      <section className='space-y-4'>
+        <h2 className='text-xl font-semibold'>10. Stepper (数量選択)</h2>
+        <div className='flex flex-col gap-4 items-start'>
+          {/* valueとonChangeを渡すことで、外部のstate（ここではquantity）と連動します。
+            サイズ(size)を指定して見た目の大きさを変えられます。
+          */}
+          <Stepper
+            size='sm'
+            value={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={10}
+          />
+          <Stepper
+            size='default'
+            value={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={10}
+          />
+          <Stepper
+            size='lg'
+            value={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={10}
+          />
+        </div>
+      </section>
     </div>
   );
 }
