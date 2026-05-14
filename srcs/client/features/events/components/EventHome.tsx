@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getHostedEvents, getJoinedEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard'; // 先ほど作ったカードを読み込む
+import { EventDetailModal } from './EventDetailModal';
 
 type HostedRoom = Awaited<ReturnType<typeof getHostedEvents>>[0];
 type JoinedRoom = Awaited<ReturnType<typeof getJoinedEvents>>[0];
@@ -15,24 +16,28 @@ export const EventHome = () => {
   const [hostedRooms, setHostedRooms] = useState<HostedRoom[]>([]);
   const [joinedRooms, setJoinedRooms] = useState<JoinedRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+
+  // 🌟 1. データの読み込み処理を関数として独立させる
+  const fetchAllData = async () => {
+    setIsLoading(true);
+    try {
+      const [hosted, joined] = await Promise.all([
+        getHostedEvents(),
+        getJoinedEvents(),
+      ]);
+      setHostedRooms(hosted);
+      setJoinedRooms(joined);
+    } catch (error) {
+      console.error('データ取得エラー:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 画面が開いた瞬間にデータを取ってくる
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [hosted, joined] = await Promise.all([
-          getHostedEvents(),
-          getJoinedEvents(),
-        ]);
-        setHostedRooms(hosted);
-        setJoinedRooms(joined);
-      } catch (error) {
-        console.error('データ取得エラー:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadData();
+    fetchAllData();
   }, []);
 
   // 日付を見やすく変換する関数 (2026-05-20T... -> 5/20 19:00)
@@ -91,6 +96,7 @@ export const EventHome = () => {
                 date={formatDate(room.event_start_at)}
                 detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
                 colorClass='bg-orange-500'
+                onClick={() => setSelectedRoomId(room.id)}
               />
             ))
           ) : (
@@ -111,6 +117,7 @@ export const EventHome = () => {
                 detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
                 owner={`👤 主催: ${owner}`}
                 colorClass='bg-blue-500'
+                onClick={() => setSelectedRoomId(room.id)}
               />
             );
           })
@@ -120,6 +127,15 @@ export const EventHome = () => {
           </p>
         )}
       </div>
+      {/* モーダルの表示部分 */}
+      {selectedRoomId !== null && (
+        <EventDetailModal
+          roomId={selectedRoomId}
+          mode={subTab}
+          onClose={() => setSelectedRoomId(null)} // 閉じる時は箱を null（空っぽ）に戻す
+          onSuccess={fetchAllData}
+        />
+      )}
     </div>
   );
 };
