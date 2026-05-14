@@ -1,6 +1,7 @@
 // サーバー側で安全にDB操作を行う宣言
 'use server';
 
+import { RoomStatus } from '@prisma/client';
 import { prisma } from '../../../lib/prisma';
 
 // シードで作ったテストユーザーのID
@@ -63,7 +64,7 @@ export async function createEvent(formData: {
         capacity_limit: formData.capacity,
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
-        status: '募集中',
+        status: RoomStatus.OPEN,
         // 同時に、自分を「主催者」として user_rooms に登録する（シードと同じ手法）
         user_rooms: {
           create: {
