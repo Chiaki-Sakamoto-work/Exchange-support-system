@@ -4,6 +4,7 @@ import { useState } from 'react';
 // 相対パスで読み込む（エラー回避のため）
 import { BottomNav } from '../components/Layout/BottomNav';
 import { EventHome } from '../features/events/components/EventHome';
+// import { signOut } from './login/actions';
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<
@@ -44,6 +45,13 @@ export default function HomePage() {
 
       {/* フッターナビゲーション */}
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      {/*
+      <form>
+        <button type='submit' formAction={signOut}>
+          ログアウト
+        </button>
+      </form>
+      */}
     </div>
   );
 }
