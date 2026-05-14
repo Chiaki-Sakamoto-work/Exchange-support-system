@@ -337,6 +337,8 @@ enabled = true
 client_id = "env(AUTH_GOOGLE_CLIENT_ID)" # 環境変数から読み込む設定
 secret = "env(AUTH_GOOGLE_CLIENT_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback" # ローカルのURL
+skip_nonce_check = false
+
 [auth.web3.solana]
 enabled = false
 
