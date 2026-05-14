@@ -26,12 +26,12 @@ export async function signInWithGoogle() {
   if (data.url) {
     let browserUrl = data.url;
 
-if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development') {
       browserUrl = data.url.replace('host.docker.internal', 'localhost');
     }
-    
+
     console.log('🔗 Redirecting browser to:', browserUrl);
-    
+
     // 書き換えたURLでリダイレクト
     return redirect(browserUrl);
   }
