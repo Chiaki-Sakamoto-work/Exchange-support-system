@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@shared/ui/Button';
 import { Minus, Plus } from 'lucide-react';
 import type * as React from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/shared/ui/Button';
 
 /**
  * サイズごとのスタイリング設定
