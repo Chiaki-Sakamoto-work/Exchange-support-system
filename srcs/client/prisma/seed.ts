@@ -1,5 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RoomStatus } from '@prisma/client';
 import { Pool } from 'pg';
 
 // 1. 環境変数からURLを取得
@@ -57,7 +57,7 @@ async function main() {
       capacity_limit: 8,
       location_name: '肉の万世',
       event_start_at: new Date('2026-05-20T19:00:00Z'),
-      status: '募集中',
+      status: RoomStatus.OPEN,
       user_rooms: {
         create: {
           user_id: MOCK_USER_ID,
@@ -75,7 +75,7 @@ async function main() {
       capacity_limit: 10,
       location_name: '代官山カフェ',
       event_start_at: new Date('2026-05-18T18:00:00Z'),
-      status: '募集中',
+      status: RoomStatus.OPEN,
       user_rooms: {
         create: [
           {
