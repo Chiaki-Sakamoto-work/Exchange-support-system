@@ -3,6 +3,7 @@
 
 import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { fullEventInclude } from '@/app/types';
 import { prisma } from '../../../lib/prisma';
 
 // シードで作ったテストユーザーのID
@@ -14,16 +15,9 @@ const MY_USER_ID = '11111111-1111-1111-1111-111111111111';
 export async function getHostedEvents() {
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: {
-        some: { user_id: MOCK_USER_ID, is_owner: true },
-      },
+      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: true } },
     },
-    include: {
-      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
-      _count: {
-        select: { user_rooms: true },
-      },
-    },
+    include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
   });
 }
@@ -32,21 +26,9 @@ export async function getHostedEvents() {
 export async function getJoinedEvents() {
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: {
-        some: { user_id: MOCK_USER_ID, is_owner: false },
-      },
+      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: false } },
     },
-    include: {
-      // 主催者の名前も出す
-      user_rooms: {
-        where: { is_owner: true },
-        include: { profiles: true },
-      },
-      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
-      _count: {
-        select: { user_rooms: true },
-      },
-    },
+    include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
   });
 }

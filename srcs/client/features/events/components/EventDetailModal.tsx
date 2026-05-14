@@ -19,7 +19,7 @@ type EventWithDetails = rooms & {
 
 type Props = {
   roomId: number;
-  mode: 'upcoming' | 'joined' | 'explore';
+  mode: 'hosted' | 'joined' | 'explore';
   onClose: () => void;
   onSuccess: () => void;
 };
@@ -180,7 +180,7 @@ export const EventDetailModal = ({
             </div>
 
             <div className='pt-6 mt-6 border-t border-zinc-200 dark:border-zinc-800 space-y-3'>
-              {mode === 'upcoming' && (
+              {mode === 'hosted' && (
                 <>
                   <button
                     type='button'
