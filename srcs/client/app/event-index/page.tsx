@@ -5,6 +5,7 @@ import { EventExplore } from '@/features/events/components/EventExplore';
 import { EventForm } from '@/features/events/components/EventForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
+import { Profile } from '@features/profile/ProfileView'
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
