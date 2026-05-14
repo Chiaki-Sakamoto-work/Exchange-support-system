@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { EventCreateForm } from '@/features/events/components/EventCreateForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
+import { Profile } from '@features/profile/ProfileView'
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
