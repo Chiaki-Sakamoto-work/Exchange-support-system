@@ -1,22 +1,44 @@
 'use client';
 
 import { useState } from 'react';
+import { createEvent } from '../actions/eventActions';
 
-export const EventCreateForm = () => {
+type Props = {
+  onSuccess: () => void;
+};
+
+export const EventCreateForm = ({ onSuccess }: Props) => {
   const [title, setTitle] = useState('');
   const [datetime, setDatetime] = useState('');
   const [capacity, setCapacity] = useState<number | ''>('');
   const [tags, setTags] = useState('');
   const [shop, setShop] = useState('');
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (!capacity) return; //容量が空の場合は弾く
 
-    // TODO: ここで Supabase の rooms テーブルにデータを送信する
-    console.log('送信データ:', { title, datetime, capacity, tags, shop });
+    setIsSubmitting(true); // 送信中状態にする
 
-    alert('予定を作成しました（※現在はUIのみのモックです）');
-    // TODO: 送信後、activeTab を 'home' に戻す処理などを追加
+    // Server Actionを呼び出してDBに保存！
+    const result = await createEvent({
+      title,
+      datetime,
+      capacity: Number(capacity),
+      tags,
+      shop,
+    });
+
+    setIsSubmitting(false);
+
+    if (result.success) {
+      alert('予定を作成しました！');
+      onSuccess(); // 成功したら親に教えて、ホーム画面に切り替えてもらう
+    } else {
+      alert('エラーが発生しました。もう一度お試しください。');
+    }
   };
 
   return (
@@ -144,9 +166,10 @@ export const EventCreateForm = () => {
         <div className='pt-4'>
           <button
             type='submit'
+            disabled={isSubmitting} // 送信中はボタンを押せなくする
             className='w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none active:scale-95 transition-all'
           >
-            この内容で開催する
+            {isSubmitting ? '作成中...' : 'この内容で開催する'}
           </button>
         </div>
       </form>
