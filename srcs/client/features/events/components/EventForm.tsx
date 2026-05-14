@@ -1,24 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { createEvent } from '../actions/eventActions';
+import { createEvent, updateEventAction } from '../actions/eventActions';
 
 type Props = {
   // 作成に成功した時に、親(page.tsx)に「終わったよ！」と知らせるためのスイッチ
   onSuccess: () => void; 
+  initialData?: any;
+  roomId?: number;
 };
 
-export const EventCreateForm = ({ onSuccess }: Props) => {
+export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // ユーザーの入力を覚えておくための箱
   const [formData, setFormData] = useState({
-    title: '',
-    datetime: '',
-    capacity: 3, // 初期値は4人にしておく
-    tags: '',
-    shop: '',
+    title: initialData?.title || '',
+    // 日時を input[type="datetime-local"] が読める形式に変換
+    datetime: initialData?.event_start_at 
+      ? new Date(initialData.event_start_at).toISOString().slice(0, 16) 
+      : '',
+    capacity: initialData?.capacity_limit || 4,
+    tags: initialData?.description || '',
+    shop: initialData?.location_name || '',
   });
 
   // 入力欄が書き換えられた時に、箱の中身を更新する共通関数
@@ -27,25 +32,23 @@ export const EventCreateForm = ({ onSuccess }: Props) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 「作成する」ボタンが押された時の処理
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // 🌟 超重要：ブラウザの標準機能（画面の勝手なリロード）を止める！
+    e.preventDefault();
     setIsProcessing(true);
-    setError(null);
 
-    // 裏側の createEvent 関数に入力データを渡す
-    const result = await createEvent({
-      ...formData,
-      capacity: Number(formData.capacity), // ここだけ数字型に直してあげる
-    });
-
-    if (result.success) {
-      alert('予定を作成しました！');
-      onSuccess(); // 親に「終わったよ！(画面を切り替える等してね)」と報告
+    let result;
+    if (roomId) {
+      // roomId があれば「更新」
+      result = await updateEventAction(roomId, formData);
     } else {
-      setError(result.error || '作成に失敗しました');
+      // なければ「新規作成」
+      result = await createEvent(formData);
     }
 
+    if (result.success) {
+      alert(roomId ? '更新しました！' : '作成しました！');
+      onSuccess();
+    }
     setIsProcessing(false);
   };
 
@@ -119,9 +122,16 @@ export const EventCreateForm = ({ onSuccess }: Props) => {
       <button
         type="submit"
         disabled={isProcessing}
-        className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-orange-600 transition active:scale-95 disabled:opacity-50"
+        className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none transition active:scale-95 disabled:opacity-50 mt-4"
       >
-        {isProcessing ? '作成中...' : '予定を作成する'}
+        {isProcessing ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            処理中...
+          </span>
+        ) : (
+          roomId ? '変更を保存する' : '予定を作成する'
+        )}
       </button>
     </form>
   );

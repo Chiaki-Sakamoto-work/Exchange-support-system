@@ -144,6 +144,7 @@ export async function joinEventAction(roomId: number) {
   }
 }
 
+// 予定を作成する
 export async function createEvent(formData: {
   title: string;
   datetime: string;
@@ -179,5 +180,27 @@ export async function createEvent(formData: {
   } catch (error) {
     console.error('作成エラー:', error);
     return { success: false, error: '作成に失敗しました' };
+  }
+}
+
+// 予定を更新する（編集用）
+export async function updateEventAction(roomId: number, formData: any) {
+  try {
+    await prisma.rooms.update({
+      where: { id: roomId },
+      data: {
+        title: formData.title,
+        description: formData.tags || 'よろしくお願いします！',
+        capacity_limit: Number(formData.capacity),
+        location_name: formData.shop,
+        event_start_at: new Date(formData.datetime),
+      },
+    });
+
+    revalidatePath('/'); // キャッシュをクリアして画面を更新
+    return { success: true };
+  } catch (error) {
+    console.error('更新エラー:', error);
+    return { success: false, error: '更新に失敗しました' };
   }
 }
