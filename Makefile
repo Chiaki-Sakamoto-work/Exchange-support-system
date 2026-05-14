@@ -43,10 +43,7 @@ db-down:
 ##------ Prisma 操作 ------##
 db-migrate:
 	cd ${SRCDIR} && docker compose exec app npx prisma migrate dev
-# schema.prisma の変更をローカルDBに反映する（マイグレーション）
-db-push:
-	cd ${SRCDIR} && docker compose exec app npx prisma db push
-
+	# schema.prisma の変更をローカルDBに反映する（マイグレーション）
 
 ##------ お掃除 ------##
 # Next.jsもSupabaseも全部落として、コンテナを綺麗にする
