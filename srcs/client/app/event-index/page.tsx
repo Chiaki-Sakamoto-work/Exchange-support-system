@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EventCreateForm } from '@/features/events/components/EventCreateForm';
+import { EventForm } from '@/features/events/components/EventForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
 
@@ -23,7 +23,7 @@ export default function EventIndexPage() {
         {activeTab === 'home' && <EventHome />}
 
         {activeTab === 'create' && (
-          <EventCreateForm onSuccess={() => setActiveTab('home')} />
+          <EventForm onSuccess={() => setActiveTab('home')} />
         )}
         {activeTab === 'join' && (
           <div className='text-xl font-bold mt-10 text-center'>
