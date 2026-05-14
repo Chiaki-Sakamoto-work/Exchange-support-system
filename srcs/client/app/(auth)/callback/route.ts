@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     // 内部通信 (host.docker.internal) を使ってセッション交換
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    
+
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
@@ -23,4 +23,3 @@ export async function GET(request: Request) {
 
   return NextResponse.redirect(`${origin}/login?error=auth-callback-failed`);
 }
-
