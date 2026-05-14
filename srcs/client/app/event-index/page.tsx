@@ -22,7 +22,9 @@ export default function EventIndexPage() {
       <main className='max-w-md mx-auto p-4 pb-24'>
         {activeTab === 'home' && <EventHome />}
 
-        {activeTab === 'create' && <EventCreateForm />}
+        {activeTab === 'create' && (
+          <EventCreateForm onSuccess={() => setActiveTab('home')} />
+        )}
         {activeTab === 'join' && (
           <div className='text-xl font-bold mt-10 text-center'>
             参加画面（作成中）
