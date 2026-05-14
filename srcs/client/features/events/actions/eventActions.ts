@@ -46,3 +46,40 @@ export async function getJoinedEvents() {
     orderBy: { event_start_at: 'asc' },
   });
 }
+
+export async function createEvent(formData: {
+  title: string;
+  datetime: string;
+  capacity: number;
+  tags: string;
+  shop: string;
+}) {
+  try {
+    const newRoom = await prisma.rooms.create({
+      data: {
+        title: formData.title,
+        // tags はDBに専用カラムがないため、一旦 description に保存します
+        description: formData.tags || 'よろしくお願いします！',
+        capacity_limit: formData.capacity,
+        location_name: formData.shop,
+        event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
+        status: '募集中',
+        // 同時に、自分を「主催者」として user_rooms に登録する（シードと同じ手法）
+        user_rooms: {
+          create: {
+            user_id: MOCK_USER_ID,
+            is_owner: true,
+          },
+        },
+      },
+    });
+
+    // newRoomがlintに引っかからないように一時的に記述
+    console.log('新しく作成された部屋のID:', newRoom.id);
+
+    return { success: true };
+  } catch (error) {
+    console.error('作成エラー:', error);
+    return { success: false, error: '作成に失敗しました' };
+  }
+}
