@@ -28,6 +28,7 @@
       "@feature/*": ["./features/*"],
       "@components/*": ["./components/*"],
       "@shared/ui/*": ["./components/ui/*"],
+      "@/shared/layout/*": ["./components/layout/*"]
     }
   },
   "include": [

@@ -1,19 +1,6 @@
 // app/test/page.tsx
 'use client'; // 状態管理（useState等）やイベントリスナー（onClick等）を使用するため、クライアントコンポーネントとして宣言
 
-import { Avatar, AvatarFallback, AvatarImage } from '@shared/ui/Avatar';
-import { Badge } from '@shared/ui/Badge';
-import { Button } from '@shared/ui/Button';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@shared/ui/Card';
-import { Input } from '@shared/ui/Input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/ui/Tabs';
 import { Mail, MoreHorizontal, Plus } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -50,6 +37,20 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
+import { Badge } from '@/shared/ui/Badge';
+import { Button } from '@/shared/ui/Button';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/Card';
+import { Input } from '@/shared/ui/Input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
 
 export default function TestPage() {
   // Stepperコンポーネント用の状態管理
@@ -197,11 +198,12 @@ export default function TestPage() {
               <CardAction>
                 <Button variant='ghost' size='icon'>
                   <MoreHorizontal className='h-5 w-5' />
-                  <span className='sr-only'>더 보기</span>
+                  <span className='sr-only'>+</span>
                 </Button>
               </CardAction>
             </CardHeader>
             <CardContent>カードUIです</CardContent>
+            <CardFooter>test</CardFooter>
           </Card>
         </div>
 
