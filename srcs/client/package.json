@@ -69,5 +69,8 @@
     "extends": [
       "plugin:storybook/recommended"
     ]
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   }
 }
