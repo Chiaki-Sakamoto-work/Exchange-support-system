@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { EventForm } from '@/features/events/components/EventForm';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { EventHome } from '@/features/events/components/EventHome';
-import { BottomNav } from '@/shared/layout/BottomNav';
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
