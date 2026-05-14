@@ -6,30 +6,45 @@ import type * as React from 'react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
+/**
+ * Dialog: モーダルのルートコンテナ
+ */
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot='dialog' {...props} />;
 }
 
+/**
+ * DialogTrigger: モーダルを開くためのボタンや要素
+ */
 function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot='dialog-trigger' {...props} />;
 }
 
+/**
+ * DialogPortal: モーダルを DOM のルート（通常は body）に転送するコンポーネント
+ */
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot='dialog-portal' {...props} />;
 }
 
+/**
+ * DialogClose: モーダルを閉じるためのボタン（トリガー）
+ */
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot='dialog-close' {...props} />;
 }
 
+/**
+ * DialogOverlay: モーダル背後の半透明の背景（オーバーレイ）
+ */
 function DialogOverlay({
   className,
   ...props
@@ -46,6 +61,10 @@ function DialogOverlay({
   );
 }
 
+/**
+ * DialogContent: モーダルの本体
+ * @param showCloseButton - 右上の「✕」ボタンを表示するかどうか
+ */
 function DialogContent({
   className,
   children,
@@ -60,15 +79,19 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot='dialog-content'
         className={cn(
+          // 配置とサイズ
           'fixed top-1/2 left-1/2 z-50 flex flex-col w-full max-w-[calc(100%-2rem)] sm:max-w-md -translate-x-1/2 -translate-y-1/2',
           'max-h-172.5 rounded-[16px] bg-popover p-6 text-sm text-popover-foreground',
+          // スタイル（枠線・影）
           'ring-1 ring-inset ring-foreground/[8%] shadow-[0px_5.89px_17.66px] shadow-foreground/[8%]',
+          // アニメーション
           'duration-100 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
           className,
         )}
         {...props}
       >
         {children}
+        {/* 右上の閉じるボタン */}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot='dialog-close' asChild>
             <Button
@@ -86,6 +109,9 @@ function DialogContent({
   );
 }
 
+/**
+ * DialogHeader: モーダル上部のヘッダーエリア
+ */
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -96,6 +122,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
+/**
+ * DialogFooter: モーダル下部のアクションエリア（ボタンなど）
+ * @param showCloseButton - デフォルトの「キャンセル」ボタンを表示するかどうか
+ */
 function DialogFooter({
   className,
   showCloseButton = false,
@@ -127,6 +157,9 @@ function DialogFooter({
   );
 }
 
+/**
+ * DialogTitle: モーダルのタイトル（アクセシビリティに必須）
+ */
 function DialogTitle({
   className,
   ...props
@@ -140,6 +173,9 @@ function DialogTitle({
   );
 }
 
+/**
+ * DialogDescription: モーダルの説明文
+ */
 function DialogDescription({
   className,
   ...props
@@ -156,6 +192,10 @@ function DialogDescription({
   );
 }
 
+/**
+ * DialogBody: モーダル中央のコンテンツエリア
+ * 内容が長い場合にスクロール可能になります。
+ */
 function DialogBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -169,6 +209,10 @@ function DialogBody({ className, ...props }: React.ComponentProps<'div'>) {
     />
   );
 }
+
+/**
+ * DialogAction: モーダル内の「実行」ボタン用
+ */
 function DialogAction({
   className,
   variant = 'default',
@@ -186,6 +230,10 @@ function DialogAction({
   );
 }
 
+/**
+ * DialogCancel: モーダル内の「キャンセル」ボタン用
+ * 自動的にモーダルを閉じる挙動が含まれます。
+ */
 function DialogCancel({
   className,
   variant = 'outline',
@@ -206,6 +254,9 @@ function DialogCancel({
   );
 }
 
+/**
+ * DialogIconAction: 特定のアイコンアクション用（絶対配置）
+ */
 function DialogIconAction({
   className,
   variant = 'ghost',

@@ -7,6 +7,9 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * タブの状態を共有するためのコンテキスト
+ */
 const TabsContext = React.createContext<{ activeValue?: string }>({});
 
 interface TabsProps
@@ -15,6 +18,11 @@ interface TabsProps
   value?: string;
 }
 
+/**
+ * Tabs: ルートコンテナ
+ * 状態管理とアニメーションのためのコンテキストを提供します。
+ * @param orientation - "horizontal" (横) または "vertical" (縦) のレイアウトを指定
+ */
 function Tabs({
   className,
   orientation = 'horizontal',
@@ -51,13 +59,17 @@ function Tabs({
   );
 }
 
+/**
+ * TabsListのスタイル定義
+ * variant: "default" (背景ありのボックス型), "line" (下線・横線スタイル)
+ */
 const tabsListVariants = cva(
   'group/tabs-list inline-flex w-fit items-center justify-center rounded-2xl p-[3px] text-muted-foreground group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none',
   {
     variants: {
       variant: {
-        default: 'bg-muted',
-        line: 'gap-1 bg-transparent',
+        default: 'bg-muted', // 塗りつぶしの背景
+        line: 'gap-1 bg-transparent', // 背景なし、線のみのスタイル
       },
     },
     defaultVariants: {
@@ -82,6 +94,10 @@ function TabsList({
   );
 }
 
+/**
+ * TabsTrigger: タブの切り替えボタン
+ * アクティブなタブへの移動時には、背景のインジケーターがスライドするアニメーションが実行されます。
+ */
 function TabsTrigger({
   className,
   value,
@@ -97,13 +113,16 @@ function TabsTrigger({
       data-slot='tabs-trigger'
       className={cn(
         "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-[14px] border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // variant=line の時のスタイル
         'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent',
         'data-active:text-foreground dark:data-active:text-foreground',
+        // 下線(after要素)の制御
         'after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100',
         className,
       )}
       {...props}
     >
+      {/* isActiveの時のみmotion.divを表示し、layoutIdによってスライドアニメーションを実現 */}
       {isActive && (
         <motion.div
           layoutId='tabs-indicator'
@@ -118,6 +137,10 @@ function TabsTrigger({
   );
 }
 
+/**
+ * TabsContent: 各タブの中身
+ * 表示・非表示の切り替え時にフェードアニメーション（AnimatePresence）を適用します。
+ */
 function TabsContent({
   className,
   value,
@@ -128,10 +151,10 @@ function TabsContent({
   const isActive = activeValue === value;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode='wait'>
       {isActive && (
         <TabsPrimitive.Content value={value} forceMount asChild>
-          {/* @ts-expect-error: Radix UI와 Framer Motion의 onDrag 타입 충돌 무시 */}
+          {/* @ts-expect-error: Radix UIとFramer MotionのonDragタイプ競合回避 */}
           <motion.div
             key={value}
             initial={{ opacity: 0 }}
