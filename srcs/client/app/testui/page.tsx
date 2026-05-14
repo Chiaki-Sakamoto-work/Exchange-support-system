@@ -16,6 +16,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/AlertDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import {
   Dialog,
   DialogAction,
@@ -28,6 +40,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import {
   RadioCard,
@@ -37,20 +50,7 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/Avatar';
-import { Badge } from '@/shared/ui/Badge';
-import { Button } from '@/shared/ui/Button';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/shared/ui/Card';
-import { Input } from '@/shared/ui/Input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 export default function TestPage() {
   // Stepperコンポーネント用の状態管理

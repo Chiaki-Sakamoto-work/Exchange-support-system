@@ -2,8 +2,8 @@
 
 import { Minus, Plus } from 'lucide-react';
 import type * as React from 'react';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
-import { Button } from '@/shared/ui/Button';
 
 /**
  * サイズごとのスタイリング設定
