@@ -27,7 +27,7 @@
       "@/*": ["./*"],
       "@feature/*": ["./features/*"],
       "@components/*": ["./components/*"],
-      "@shared/ui/*": ["./components/ui/*"]
+      "@shared/ui/*": ["./components/ui/*"],
     }
   },
   "include": [
