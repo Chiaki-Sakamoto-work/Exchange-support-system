@@ -11,7 +11,7 @@ export default function EventIndexPage() {
   >('home');
 
   return (
-    <div className='min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50'>
+    <div className='min-h-screen'>
       <header className='p-6 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800'>
         <div className='w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold'>
           N
@@ -19,7 +19,7 @@ export default function EventIndexPage() {
         <h1 className='text-xl font-bold tracking-tight'>Nomikai Hub</h1>
       </header>
 
-      <main className='max-w-md mx-auto p-4 pb-24'>
+      <main className='w-full mx-auto p-4 pb-24'>
         {activeTab === 'home' && <EventHome />}
 
         {activeTab === 'create' && (
