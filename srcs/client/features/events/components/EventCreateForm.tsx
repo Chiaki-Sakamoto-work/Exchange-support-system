@@ -4,175 +4,125 @@ import { useState } from 'react';
 import { createEvent } from '../actions/eventActions';
 
 type Props = {
-  onSuccess: () => void;
+  // 作成に成功した時に、親(page.tsx)に「終わったよ！」と知らせるためのスイッチ
+  onSuccess: () => void; 
 };
 
 export const EventCreateForm = ({ onSuccess }: Props) => {
-  const [title, setTitle] = useState('');
-  const [datetime, setDatetime] = useState('');
-  const [capacity, setCapacity] = useState<number | ''>('');
-  const [tags, setTags] = useState('');
-  const [shop, setShop] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // ユーザーの入力を覚えておくための箱
+  const [formData, setFormData] = useState({
+    title: '',
+    datetime: '',
+    capacity: 3, // 初期値は4人にしておく
+    tags: '',
+    shop: '',
+  });
 
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (!capacity) return; //容量が空の場合は弾く
+  // 入力欄が書き換えられた時に、箱の中身を更新する共通関数
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    setIsSubmitting(true); // 送信中状態にする
+  // 「作成する」ボタンが押された時の処理
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // 🌟 超重要：ブラウザの標準機能（画面の勝手なリロード）を止める！
+    setIsProcessing(true);
+    setError(null);
 
-    // Server Actionを呼び出してDBに保存！
+    // 裏側の createEvent 関数に入力データを渡す
     const result = await createEvent({
-      title,
-      datetime,
-      capacity: Number(capacity),
-      tags,
-      shop,
+      ...formData,
+      capacity: Number(formData.capacity), // ここだけ数字型に直してあげる
     });
-
-    setIsSubmitting(false);
 
     if (result.success) {
       alert('予定を作成しました！');
-      onSuccess(); // 成功したら親に教えて、ホーム画面に切り替えてもらう
+      onSuccess(); // 親に「終わったよ！(画面を切り替える等してね)」と報告
     } else {
-      alert('エラーが発生しました。もう一度お試しください。');
+      setError(result.error || '作成に失敗しました');
     }
+
+    setIsProcessing(false);
   };
 
   return (
-    <div className='animate-in fade-in duration-500 space-y-6'>
-      <div className='mb-2'>
-        <h2 className='text-2xl font-bold'>飲み会を開催する</h2>
-        <p className='text-sm text-zinc-500'>
-          詳細を入力してメンバーを募集しましょう。
-        </p>
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+      
+      {error && <div className="p-3 bg-red-100 text-red-600 rounded-lg text-sm">{error}</div>}
+
+      <div>
+        <label className="block text-sm font-bold mb-2">イベント名 <span className="text-red-500">*</span></label>
+        <input
+          required
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="例：週末焼肉会！"
+          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className='space-y-5 bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm'
-      >
-        {/* タイトル */}
+      <div>
+        <label className="block text-sm font-bold mb-2">お店・場所 <span className="text-red-500">*</span></label>
+        <input
+          required
+          name="shop"
+          value={formData.shop}
+          onChange={handleChange}
+          placeholder="例：渋谷の〇〇苑"
+          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          {/* 追加: htmlFor='title' */}
-          <label
-            htmlFor='title'
-            className='block text-xs font-bold uppercase text-zinc-500 mb-1.5'
-          >
-            タイトル <span className='text-orange-500'>*</span>
-          </label>
+          <label className="block text-sm font-bold mb-2">日時 <span className="text-red-500">*</span></label>
           <input
-            id='title' // 追加: id='title'
-            type='text'
             required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder='例：【営業部】月末お疲れ様会🍻'
-            className='w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition-colors text-sm'
+            type="datetime-local" // 👈 カレンダーと時計が出る便利な入力欄
+            name="datetime"
+            value={formData.datetime}
+            onChange={handleChange}
+            className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
           />
         </div>
-
-        <div className='grid grid-cols-2 gap-4'>
-          {/* 開催日時 */}
-          <div>
-            {/* 追加: htmlFor='datetime' */}
-            <label
-              htmlFor='datetime'
-              className='block text-xs font-bold uppercase text-zinc-500 mb-1.5'
-            >
-              開催日時 <span className='text-orange-500'>*</span>
-            </label>
-            <input
-              id='datetime' // 追加: id='datetime'
-              type='datetime-local'
-              required
-              value={datetime}
-              onChange={(e) => setDatetime(e.target.value)}
-              className='w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition-colors text-sm'
-            />
-          </div>
-
-          {/* 参加人数の上限 */}
-          <div>
-            {/* 追加: htmlFor='capacity' */}
-            <label
-              htmlFor='capacity'
-              className='block text-xs font-bold uppercase text-zinc-500 mb-1.5'
-            >
-              上限人数 <span className='text-orange-500'>*</span>
-            </label>
-            <div className='relative'>
-              <input
-                id='capacity' // 追加: id='capacity'
-                type='number'
-                min='2'
-                required
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-                placeholder='4'
-                className='w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition-colors text-sm'
-              />
-              <span className='absolute right-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400'>
-                名
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* タグ */}
         <div>
-          {/* 追加: htmlFor='tags' */}
-          <label
-            htmlFor='tags'
-            className='block text-xs font-bold uppercase text-zinc-500 mb-1.5'
-          >
-            タグ
-          </label>
+          <label className="block text-sm font-bold mb-2">募集人数 <span className="text-red-500">*</span></label>
           <input
-            id='tags' // 追加: id='tags'
-            type='text'
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder='例：新人歓迎, 日本酒好き （カンマ区切り）'
-            className='w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition-colors text-sm'
+            required
+            type="number"
+            min="2"
+            max="100"
+            name="capacity"
+            value={formData.capacity}
+            onChange={handleChange}
+            className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
           />
         </div>
+      </div>
 
-        {/* お店選択（テキスト入力） */}
-        <div>
-          {/* 追加: htmlFor='shop' */}
-          <label
-            htmlFor='shop'
-            className='block text-xs font-bold uppercase text-zinc-500 mb-1.5 flex justify-between items-end'
-          >
-            <span>お店の名前</span>
-            <span className='text-[10px] text-orange-500 bg-orange-50 dark:bg-orange-950/30 px-2 py-0.5 rounded-full'>
-              ※API自動提案は後日実装
-            </span>
-          </label>
-          <input
-            id='shop' // 追加: id='shop'
-            type='text'
-            value={shop}
-            onChange={(e) => setShop(e.target.value)}
-            placeholder='例：炭火焼肉 おおた'
-            className='w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition-colors text-sm'
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-bold mb-2">一言メモ（タグなど）</label>
+        <textarea
+          name="tags"
+          value={formData.tags}
+          onChange={handleChange}
+          placeholder="例：予算4000円くらいです！"
+          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
+        />
+      </div>
 
-        {/* Component: 保存/作成ボタン */}
-        <div className='pt-4'>
-          <button
-            type='submit'
-            disabled={isSubmitting} // 送信中はボタンを押せなくする
-            className='w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none active:scale-95 transition-all'
-          >
-            {isSubmitting ? '作成中...' : 'この内容で開催する'}
-          </button>
-        </div>
-      </form>
-    </div>
+      <button
+        type="submit"
+        disabled={isProcessing}
+        className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-orange-600 transition active:scale-95 disabled:opacity-50"
+      >
+        {isProcessing ? '作成中...' : '予定を作成する'}
+      </button>
+    </form>
   );
 };
