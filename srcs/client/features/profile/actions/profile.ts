@@ -12,6 +12,7 @@ export async function updateProfile(userId: string, data: ProfileFormValues) {
       where: { id: userId },
       data: {
         username: validatedData.username,
+        bio: data.bio,
         department_id: validatedData.department_id,
         user_type: validatedData.user_type,
         allergies: validatedData.allergies,

@@ -1,22 +1,43 @@
-export const ProfileHeader = ({ user }: { user: UserProfile }) => (
-  <div className='bg-white dark:bg-zinc-900 p-8 rounded-[32px] flex flex-col items-center text-center shadow-sm'>
-    <div className='w-24 h-24 bg-zinc-900 rounded-full flex items-center justify-center text-white text-3xl mb-4'>
-      田
-    </div>
-    <h2 className='text-2xl font-bold mb-1'>{user.name}</h2>
-    <p className='text-zinc-500 text-sm mb-4 leading-relaxed'>
-      {user.role}です。{user.bio}
-    </p>
-    <div className='flex gap-2 mb-4'>
-      {user.tags.map(tag => (
-        <span key={tag} className='px-3 py-1 bg-zinc-100 rounded-full text-xs font-medium'>{tag}</span>
-      ))}
-    </div>
-    <div className='flex gap-2'>
-      {user.allergies.map(all => (
-        <span key={all} className='px-3 py-1 bg-red-50 text-red-500 rounded-full text-xs font-medium'>{all}</span>
-      ))}
-    </div>
-  </div>
-);
+export const ProfileHeader = ({ user }: { user: any }) => {
+  const tags = [
+    user.user_type,
+    user.bio,
+    user.departments?.name
+  ].filter(Boolean);
 
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-24 h-24 bg-zinc-900 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 relative">
+        {user.username?.charAt(0) || '無'}
+      </div>
+
+      <h2 className="text-xl font-bold text-zinc-900">{user.username || '名前未設定'}</h2>
+      <p className="text-zinc-400 text-sm mb-4">{user.email}</p>
+
+      <div className='flex gap-2 mb-4'>
+        {tags.map(tag => (
+          <span key={tag} className='px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-bold'>
+            {user.departments}
+          </span>
+        ))}
+      </div>
+
+      {user.allergies && user.allergies.length > 0 && (
+        <div className='flex flex-wrap justify-center gap-2 mb-4'>
+          {user.allergies.map((allergy: string) => (
+            <span 
+              key={allergy} 
+              className='px-3 py-1 bg-red-50 text-red-500 border border-red-100 rounded-full text-xs font-bold'
+            >
+              {allergy} アレルギー
+            </span>
+          ))}
+        </div>
+      )}
+
+      <p className="text-center text-sm text-zinc-500 max-w-[280px]">
+        {user.bio || '自己紹介がありません'}
+      </p>
+    </div>
+  );
+};
