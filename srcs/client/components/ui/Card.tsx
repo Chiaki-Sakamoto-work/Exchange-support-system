@@ -59,9 +59,9 @@ function Card({
         'data-[shadow=default]:data-[variant=destructive]:ring-destructive/25 data-[shadow=default]:data-[variant=destructive]:shadow-destructive/[4%]',
 
         // サイズ設定
-        'data-[size=default]:w-full data-[size=default]:min-h-36.5 data-[size=default]:gap-4 data-[size=default]:py-5',
-        'data-[size=sm]:w-91 data-[size=sm]:h-11 data-[size=sm]:gap-3 data-[size=sm]:py-3',
-        'data-[size=xs]:w-20 data-[size=xs]:h-6 data-[size=xs]:gap-2 data-[size=xs]:py-0',
+        'data-[size=default]:w-full data-[size=default]:min-h-36.5 data-[size=default]:gap-3 data-[size=default]:py-5',
+        'data-[size=sm]:w-91 data-[size=sm]:h-11 data-[size=sm]:gap-2 data-[size=sm]:py-3',
+        'data-[size=xs]:w-20 data-[size=xs]:h-6 data-[size=xs]:gap-1.5 data-[size=xs]:py-0',
 
         // 特殊なレイアウト調整（フッターがある場合、画像がある場合など）
         'has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl',
