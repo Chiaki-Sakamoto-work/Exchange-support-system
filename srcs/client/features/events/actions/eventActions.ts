@@ -1,15 +1,14 @@
 // サーバー側で安全にDB操作を行う宣言
 'use server';
 
-import { RoomStatus } from '@prisma/client';
-import { prisma } from '../../../lib/prisma';
+import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { prisma } from '../../../lib/prisma';
 
 // シードで作ったテストユーザーのID
 const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
 // 自分のユーザーID　ログイン機能ができたら、そこから取得するように変更
 const MY_USER_ID = '11111111-1111-1111-1111-111111111111';
-
 
 // 1. 自分が主催(is_owner: true)のイベントを取得
 export async function getHostedEvents() {
@@ -56,7 +55,7 @@ export async function getEventDetail(roomId: number) {
   try {
     const room = await prisma.rooms.findUnique({
       where: {
-        id: roomId
+        id: roomId,
       },
       // includeで関連するデータも引っ張ってくる
       include: {
@@ -70,13 +69,16 @@ export async function getEventDetail(roomId: number) {
 
     // もし予定が削除されていた時の安全装置
     if (!room) {
-      return { success: false, error: 'この予定は削除されたか、存在しません。'};
+      return {
+        success: false,
+        error: 'この予定は削除されたか、存在しません。',
+      };
     }
 
     return { success: true, room };
   } catch (error) {
     console.error('詳細取得エラー:', error);
-    return { success: false, error: 'データの取得に失敗しました。'}
+    return { success: false, error: 'データの取得に失敗しました。' };
   }
 }
 
@@ -94,10 +96,10 @@ export async function deleteEventAction(roomId: number) {
     });
 
     // 🌟 修正2: 画面の古い記憶（キャッシュ）を捨てて最新にする
-    revalidatePath('/'); 
+    revalidatePath('/');
 
     return { success: true };
-  } catch(error) {
+  } catch (error) {
     console.error('削除エラー:', error);
     return { success: false, error: '削除に失敗しました。' };
   }
@@ -119,7 +121,7 @@ export async function cancelParticipationAction(roomId: number) {
     return { success: true };
   } catch (error) {
     console.error('キャンセルエラー:', error);
-    return { success: false, error: 'キャンセルに失敗しました。'};
+    return { success: false, error: 'キャンセルに失敗しました。' };
   }
 }
 
@@ -140,7 +142,7 @@ export async function joinEventAction(roomId: number) {
     return { success: true };
   } catch (error) {
     console.error('参加エラー:', error);
-    return { success: false, error: '参加に失敗しました。'};
+    return { success: false, error: '参加に失敗しました。' };
   }
 }
 
@@ -161,7 +163,7 @@ export async function createEvent(formData: {
         capacity_limit: formData.capacity,
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
-        status: 'OPEN' as any,
+        status: 'OPEN' as RoomStatus,
         // 同時に、自分を「主催者」として user_rooms に登録する（シードと同じ手法）
         user_rooms: {
           create: {
@@ -184,7 +186,16 @@ export async function createEvent(formData: {
 }
 
 // 予定を更新する（編集用）
-export async function updateEventAction(roomId: number, formData: any) {
+export async function updateEventAction(
+  roomId: number,
+  formData: {
+    title: string;
+    datetime: string;
+    capacity: number;
+    tags: string;
+    shop: string;
+  },
+) {
   try {
     await prisma.rooms.update({
       where: { id: roomId },
