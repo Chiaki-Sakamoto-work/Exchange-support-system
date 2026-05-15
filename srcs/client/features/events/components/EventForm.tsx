@@ -19,6 +19,30 @@ import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
 import { createEvent, updateEventAction } from '../actions/eventActions';
 
+// テストデータ
+const MOCK_SHOPS = [
+  {
+    name: '居酒屋たぬき',
+    description: '渋谷・和食・¥¥',
+  },
+  {
+    name: '焼き鳥みやび',
+    description: '新宿・焼き鳥・¥¥',
+  },
+  {
+    name: '焼き鳥みやび (2号店)',
+    description: '新宿・焼き鳥・¥¥',
+  },
+  // {
+  //   name: '焼き鳥みやび (3号店)',
+  //   description: '新宿・和食・¥¥',
+  // },
+  // {
+  //   name: '焼き鳥みやび (4号店)',
+  //   description: '新宿・焼き鳥・¥¥',
+  // },
+];
+
 type Props = {
   onSuccess: () => void;
   initialData?: Room;
@@ -66,8 +90,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     setTagInput(e.target.value);
   };
 
-  const handleAddTag = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
 
     if (!trimmedTag || formData.tags.includes(trimmedTag)) return;
@@ -76,6 +99,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       ...prev,
       tags: [...prev.tags, trimmedTag],
     }));
+
     setTagInput('');
   };
 
@@ -196,16 +220,18 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
               buttonProps={{
                 variant: 'secondary',
                 size: 'xs',
-                onClick: handleAddTag,
+                onClick: (e) => {
+                  e.preventDefault();
+                  handleAddTag();
+                },
                 type: 'button',
               }}
               onKeyDown={(e) => {
+                if (e.nativeEvent.isComposing) return;
+
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  const fakeEvent = {
-                    preventDefault: () => {},
-                  } as React.MouseEvent;
-                  handleAddTag(fakeEvent);
+                  handleAddTag();
                 }
               }}
             />
@@ -240,26 +266,16 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
             </Label>
             {/* RadioGroupで全体を囲み、RadioCardで個別の選択肢を作ります */}
             <RadioGroup value={formData.shop} onValueChange={handleShopChange}>
-              <RadioCard value='shop-1' className='w-full'>
-                <RadioCardHeader>
-                  <RadioCardTitle>居酒屋たぬき</RadioCardTitle>
-                  <RadioCardDescription>渋谷・和食・¥¥</RadioCardDescription>
-                </RadioCardHeader>
-              </RadioCard>
-
-              <RadioCard value='shop-2' className='w-full'>
-                <RadioCardHeader>
-                  <RadioCardTitle>焼き鳥みやび</RadioCardTitle>
-                  <RadioCardDescription>新宿・焼き鳥・¥¥</RadioCardDescription>
-                </RadioCardHeader>
-              </RadioCard>
-
-              <RadioCard value='shop-3' className='w-full'>
-                <RadioCardHeader>
-                  <RadioCardTitle>焼き鳥みやび (2号店)</RadioCardTitle>
-                  <RadioCardDescription>新宿・焼き鳥・¥¥</RadioCardDescription>
-                </RadioCardHeader>
-              </RadioCard>
+              {MOCK_SHOPS.map((shop) => (
+                <RadioCard key={shop.name} value={shop.name} className='w-full'>
+                  <RadioCardHeader>
+                    <RadioCardTitle>{shop.name}</RadioCardTitle>
+                    <RadioCardDescription>
+                      {shop.description}
+                    </RadioCardDescription>
+                  </RadioCardHeader>
+                </RadioCard>
+              ))}
             </RadioGroup>
           </div>
         </CardContent>
