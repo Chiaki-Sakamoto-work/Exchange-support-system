@@ -1,14 +1,23 @@
 'use client';
 
+import type { Prisma } from '@prisma/client';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
 
+type ExploreEvent = Prisma.roomsGetPayload<{
+  include: {
+    user_rooms: {
+      include: { profiles: true };
+    };
+  };
+}>;
+
 export const EventExplore = () => {
   // explore専用のデータと状態
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [exploreEvents, setExploreEvents] = useState<any[]>([]);
+  const [exploreEvents, setExploreEvents] = useState<ExploreEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
@@ -49,7 +58,9 @@ export const EventExplore = () => {
       {/* 参加タブ専用のタイトルなど（お好みで調整してください） */}
       <div className='mb-6'>
         <h2 className='text-2xl font-bold'>新しい予定を探す</h2>
-        <p className='text-sm text-zinc-500 mt-1'>参加できるイベントの一覧です</p>
+        <p className='text-sm text-zinc-500 mt-1'>
+          参加できるイベントの一覧です
+        </p>
       </div>
 
       <div className='space-y-4'>
@@ -58,8 +69,9 @@ export const EventExplore = () => {
             // 主催者を探す（is_owner: true のユーザー）
             const owner =
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              room.user_rooms?.find((ur: any) => ur.is_owner)?.profiles?.username || '不明';
-              
+              room.user_rooms?.find((ur) => ur.is_owner)?.profiles?.username ||
+              '不明';
+
             return (
               <EventCard
                 key={room.id}
@@ -88,7 +100,7 @@ export const EventExplore = () => {
           onClose={() => setSelectedRoomId(null)}
           onSuccess={() => {
             setSelectedRoomId(null); // モーダルを閉じて
-            fetchExploreData();      // リストを再取得
+            fetchExploreData(); // リストを再取得
           }}
         />
       )}
