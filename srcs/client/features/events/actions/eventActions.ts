@@ -133,7 +133,7 @@ export async function createEvent(formData: {
   title: string;
   datetime: string;
   capacity: number;
-  tags: string;
+  tags: string[];
   shop: string;
 }) {
   try {
@@ -141,7 +141,6 @@ export async function createEvent(formData: {
       data: {
         title: formData.title,
         // tags はDBに専用カラムがないため、一旦 description に保存します
-        description: formData.tags || 'よろしくお願いします！',
         capacity_limit: formData.capacity,
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
@@ -152,6 +151,18 @@ export async function createEvent(formData: {
             user_id: MOCK_USER_ID,
             is_owner: true,
           },
+        },
+        room_tags: {
+          create: formData.tags.map((tagName) => ({
+            tags: {
+              connectOrCreate: {
+                // 중복 생성을 방지하기 위한 고유 조건 (schema.prisma의 @unique 설정 기준)
+                where: { name: tagName },
+                // 테이블에 해당 태그가 없을 경우 새로 생성할 데이터
+                create: { name: tagName },
+              },
+            },
+          })),
         },
       },
     });
@@ -174,7 +185,7 @@ export async function updateEventAction(
     title: string;
     datetime: string;
     capacity: number;
-    tags: string;
+    tags: string[];
     shop: string;
   },
 ) {
@@ -183,10 +194,23 @@ export async function updateEventAction(
       where: { id: roomId },
       data: {
         title: formData.title,
-        description: formData.tags || 'よろしくお願いします！',
         capacity_limit: Number(formData.capacity),
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime),
+        room_tags: {
+          deleteMany: {},
+
+          create: formData.tags.map((tagName) => ({
+            tags: {
+              connectOrCreate: {
+                // 중복 생성을 방지하기 위한 고유 조건 (schema.prisma의 @unique 설정 기준)
+                where: { name: tagName },
+                // 테이블에 해당 태그가 없을 경우 새로 생성할 데이터
+                create: { name: tagName },
+              },
+            },
+          })),
+        },
       },
     });
 
