@@ -1,5 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type RoomStatus } from '@prisma/client';
 import { Pool } from 'pg';
 
 // 1. 環境変数からURLを取得
@@ -11,16 +11,40 @@ const prisma = new PrismaClient({ adapter });
 // テスト用の固定UUID
 const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111'; // 自分
 const OTHER_USER_ID = '22222222-2222-2222-2222-222222222222'; // 田中さん
-const SATO_USER_ID = '33333333-3333-3333-3333-333333333333';  // 佐藤さん
+const SATO_USER_ID = '33333333-3333-3333-3333-333333333333'; // 佐藤さん
 
 // テスト用の追加ユーザー（一気に作成するためのリスト）
 const EXTRA_USERS = [
-  { id: '44444444-4444-4444-4444-444444444444', name: '鈴木さん', email: 'suzuki@example.com' },
-  { id: '55555555-5555-5555-5555-555555555555', name: '高橋さん', email: 'takahashi@example.com' },
-  { id: '66666666-6666-6666-6666-666666666666', name: '渡辺さん', email: 'watanabe@example.com' },
-  { id: '77777777-7777-7777-7777-777777777777', name: '伊藤さん', email: 'ito@example.com' },
-  { id: '88888888-8888-8888-8888-888888888888', name: '山本さん', email: 'yamamoto@example.com' },
-  { id: '99999999-9999-9999-9999-999999999999', name: '中村さん', email: 'nakamura@example.com' },
+  {
+    id: '44444444-4444-4444-4444-444444444444',
+    name: '鈴木さん',
+    email: 'suzuki@example.com',
+  },
+  {
+    id: '55555555-5555-5555-5555-555555555555',
+    name: '高橋さん',
+    email: 'takahashi@example.com',
+  },
+  {
+    id: '66666666-6666-6666-6666-666666666666',
+    name: '渡辺さん',
+    email: 'watanabe@example.com',
+  },
+  {
+    id: '77777777-7777-7777-7777-777777777777',
+    name: '伊藤さん',
+    email: 'ito@example.com',
+  },
+  {
+    id: '88888888-8888-8888-8888-888888888888',
+    name: '山本さん',
+    email: 'yamamoto@example.com',
+  },
+  {
+    id: '99999999-9999-9999-9999-999999999999',
+    name: '中村さん',
+    email: 'nakamura@example.com',
+  },
 ];
 
 async function main() {
@@ -31,27 +55,51 @@ async function main() {
   await prisma.rooms.deleteMany();
 
   // 1. 部署の作成
-  let devDept = await prisma.departments.findFirst({ where: { name: '開発部' } });
-  if (!devDept) devDept = await prisma.departments.create({ data: { name: '開発部' } });
+  let devDept = await prisma.departments.findFirst({
+    where: { name: '開発部' },
+  });
+  if (!devDept)
+    devDept = await prisma.departments.create({ data: { name: '開発部' } });
 
-  let salesDept = await prisma.departments.findFirst({ where: { name: '営業部' } });
-  if (!salesDept) salesDept = await prisma.departments.create({ data: { name: '営業部' } });
+  let salesDept = await prisma.departments.findFirst({
+    where: { name: '営業部' },
+  });
+  if (!salesDept)
+    salesDept = await prisma.departments.create({ data: { name: '営業部' } });
 
   // 2. プロフィール（ユーザー）の作成
   await prisma.profiles.upsert({
     where: { id: MOCK_USER_ID },
     update: {},
-    create: { id: MOCK_USER_ID, email: 'myuser@example.com', username: '姫城太一', department_id: devDept.id, user_type: '一般社員' },
+    create: {
+      id: MOCK_USER_ID,
+      email: 'myuser@example.com',
+      username: '姫城太一',
+      department_id: devDept.id,
+      user_type: '一般社員',
+    },
   });
   await prisma.profiles.upsert({
     where: { id: OTHER_USER_ID },
     update: {},
-    create: { id: OTHER_USER_ID, email: 'other@example.com', username: '田中さん', department_id: salesDept.id, user_type: '一般社員' },
+    create: {
+      id: OTHER_USER_ID,
+      email: 'other@example.com',
+      username: '田中さん',
+      department_id: salesDept.id,
+      user_type: '一般社員',
+    },
   });
   await prisma.profiles.upsert({
     where: { id: SATO_USER_ID },
     update: {},
-    create: { id: SATO_USER_ID, email: 'sato@example.com', username: '佐藤さん', department_id: devDept.id, user_type: '一般社員' },
+    create: {
+      id: SATO_USER_ID,
+      email: 'sato@example.com',
+      username: '佐藤さん',
+      department_id: devDept.id,
+      user_type: '一般社員',
+    },
   });
 
   // 追加ユーザー6人を一気に作成
@@ -59,7 +107,13 @@ async function main() {
     await prisma.profiles.upsert({
       where: { id: user.id },
       update: {},
-      create: { id: user.id, email: user.email, username: user.name, department_id: salesDept.id, user_type: '一般社員' },
+      create: {
+        id: user.id,
+        email: user.email,
+        username: user.name,
+        department_id: salesDept.id,
+        user_type: '一般社員',
+      },
     });
   }
 
@@ -73,7 +127,7 @@ async function main() {
       capacity_limit: 5,
       location_name: '渋谷コワーキング',
       event_start_at: new Date('2026-05-16T13:00:00Z'),
-      status: 'OPEN' as any,
+      status: 'OPEN' as RoomStatus,
       user_rooms: { create: { user_id: MOCK_USER_ID, is_owner: true } },
     },
   });
@@ -88,7 +142,7 @@ async function main() {
       capacity_limit: 6,
       location_name: '代官山カフェ',
       event_start_at: new Date('2026-05-18T12:00:00Z'),
-      status: 'OPEN' as any,
+      status: 'OPEN' as RoomStatus,
       user_rooms: {
         create: [
           { user_id: OTHER_USER_ID, is_owner: true }, // 田中さんが主催
@@ -101,7 +155,7 @@ async function main() {
   // ==========================================
   // 3-3. 探す用（まだ自分は参加していない）
   // ==========================================
-  
+
   // 🌟 パターンA：満員の予定（定員4人、すでに4人参加）
   await prisma.rooms.create({
     data: {
@@ -110,13 +164,13 @@ async function main() {
       capacity_limit: 4,
       location_name: '銀座 久兵衛',
       event_start_at: new Date('2026-05-28T12:00:00Z'),
-      status: 'OPEN' as any,
+      status: 'OPEN' as RoomStatus,
       user_rooms: {
         create: [
           { user_id: EXTRA_USERS[0].id, is_owner: true }, // 鈴木さん(主催)
-          { user_id: EXTRA_USERS[1].id, is_owner: false },// 高橋さん
-          { user_id: EXTRA_USERS[2].id, is_owner: false },// 渡辺さん
-          { user_id: EXTRA_USERS[3].id, is_owner: false },// 伊藤さん
+          { user_id: EXTRA_USERS[1].id, is_owner: false }, // 高橋さん
+          { user_id: EXTRA_USERS[2].id, is_owner: false }, // 渡辺さん
+          { user_id: EXTRA_USERS[3].id, is_owner: false }, // 伊藤さん
           // 自分は入っていない
         ],
       },
@@ -131,14 +185,14 @@ async function main() {
       capacity_limit: 6,
       location_name: '新宿ミステリーサーカス',
       event_start_at: new Date('2026-05-29T14:00:00Z'),
-      status: 'OPEN' as any,
+      status: 'OPEN' as RoomStatus,
       user_rooms: {
         create: [
           { user_id: EXTRA_USERS[4].id, is_owner: true }, // 山本さん(主催)
-          { user_id: EXTRA_USERS[5].id, is_owner: false },// 中村さん
-          { user_id: OTHER_USER_ID, is_owner: false },    // 田中さん
-          { user_id: SATO_USER_ID, is_owner: false },     // 佐藤さん
-          { user_id: EXTRA_USERS[0].id, is_owner: false },// 鈴木さん
+          { user_id: EXTRA_USERS[5].id, is_owner: false }, // 中村さん
+          { user_id: OTHER_USER_ID, is_owner: false }, // 田中さん
+          { user_id: SATO_USER_ID, is_owner: false }, // 佐藤さん
+          { user_id: EXTRA_USERS[0].id, is_owner: false }, // 鈴木さん
           // 5名参加、自分は入っていない
         ],
       },
@@ -153,7 +207,7 @@ async function main() {
       capacity_limit: 15,
       location_name: '代々木フットサルコート',
       event_start_at: new Date('2026-05-25T10:00:00Z'),
-      status: 'OPEN' as any,
+      status: 'OPEN' as RoomStatus,
       user_rooms: {
         create: [
           { user_id: OTHER_USER_ID, is_owner: true }, // 田中さんが主催
