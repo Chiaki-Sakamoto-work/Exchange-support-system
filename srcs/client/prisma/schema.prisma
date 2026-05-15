@@ -38,6 +38,7 @@ model profiles {
   id              String        @id @db.Uuid
   email           String        @unique @db.VarChar
   username        String?       @db.VarChar
+  bio             String?       @db.Text
   avatar_url      String?       @db.VarChar
   department_id   Int?
   user_type       String?       @db.VarChar
