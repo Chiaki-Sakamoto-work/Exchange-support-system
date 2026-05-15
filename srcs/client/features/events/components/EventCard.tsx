@@ -6,6 +6,7 @@ export type EventCardProps = {
   detail: string;
   owner?: string;
   colorClass: string;
+  onClick?: () => void;
 };
 
 export const EventCard = ({
@@ -15,9 +16,25 @@ export const EventCard = ({
   detail,
   owner,
   colorClass,
+  onClick,
 }: EventCardProps) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); // スペースで画面がスクロールするのを防ぐ
+      onClick?.();
+    }
+  };
+
   return (
-    <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex justify-between items-center group hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer'>
+    // biome-ignore lint/a11y/useSemanticElements: デザイン上の理由でdivである必要があるため
+    <div
+      role='button'
+      tabIndex={0}
+      aria-label={`${title}の詳細を表示`}
+      onKeyDown={handleKeyDown}
+      onClick={onClick}
+      className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex justify-between items-center group hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer'
+    >
       <div className='flex gap-4 items-center'>
         {/* 左側のカラーバー（視覚的なアクセント） */}
         <div className={`w-2 h-12 rounded-full ${colorClass}`} />
