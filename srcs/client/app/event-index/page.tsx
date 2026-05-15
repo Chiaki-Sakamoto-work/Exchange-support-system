@@ -5,7 +5,7 @@ import { EventExplore } from '@/features/events/components/EventExplore';
 import { EventForm } from '@/features/events/components/EventForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
-import { Profile } from '@features/profile/ProfileView'
+import Profile from '@/app/profile/page'
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
@@ -29,9 +29,7 @@ export default function EventIndexPage() {
         )}
         {activeTab === 'join' && <EventExplore />}
         {activeTab === 'mypage' && (
-          <div className='text-xl font-bold mt-10 text-center'>
-            マイページ（作成中）
-          </div>
+          <Profile />
         )}
       </main>
 
