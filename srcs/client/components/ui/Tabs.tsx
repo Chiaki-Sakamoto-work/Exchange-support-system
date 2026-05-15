@@ -7,21 +7,29 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+// 1. Variant 타입을 정의합니다.
+type TabsVariant = 'default' | 'line' | 'invert';
+
 /**
  * タブの状態を共有するためのコンテキスト
  */
-const TabsContext = React.createContext<{ activeValue?: string }>({});
+const TabsContext = React.createContext<{
+  activeValue?: string;
+  id?: string;
+  variant?: TabsVariant;
+  indicatorClassName?: string;
+}>({});
 
 interface TabsProps
   extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {
   defaultValue?: string;
   value?: string;
+  indicatorClassName?: string;
+  variant?: TabsVariant;
 }
 
 /**
  * Tabs: ルートコンテナ
- * 状態管理とアニメーションのためのコンテキストを提供します。
- * @param orientation - "horizontal" (横) または "vertical" (縦) のレイアウトを指定
  */
 function Tabs({
   className,
@@ -29,9 +37,12 @@ function Tabs({
   value,
   defaultValue,
   onValueChange,
+  indicatorClassName,
+  variant = 'default',
   ...props
 }: TabsProps) {
   const [activeTab, setActiveTab] = React.useState(value || defaultValue);
+  const id = React.useId();
 
   const handleValueChange = (val: string) => {
     setActiveTab(val);
@@ -43,7 +54,10 @@ function Tabs({
   }, [value]);
 
   return (
-    <TabsContext.Provider value={{ activeValue: activeTab }}>
+    <TabsContext.Provider
+      value={{ activeValue: activeTab, id, variant, indicatorClassName }}
+    >
+      {' '}
       <TabsPrimitive.Root
         value={activeTab}
         onValueChange={handleValueChange}
@@ -61,15 +75,16 @@ function Tabs({
 
 /**
  * TabsListのスタイル定義
- * variant: "default" (背景ありのボックス型), "line" (下線・横線スタイル)
  */
 const tabsListVariants = cva(
   'group/tabs-list inline-flex w-fit items-center justify-center rounded-2xl p-[3px] text-muted-foreground group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none',
   {
     variants: {
       variant: {
-        default: 'bg-muted', // 塗りつぶしの背景
-        line: 'gap-1 bg-transparent', // 背景なし、線のみのスタイル
+        default: 'bg-muted',
+        line: 'gap-1 bg-transparent',
+        // invert일 때 쓸데없는 테두리와 그림자 제거
+        invert: 'bg-white', // (BottomNav에서 bg-transparent를 주셨기 때문에 여기도 맞췄습니다)
       },
     },
     defaultVariants: {
@@ -80,10 +95,14 @@ const tabsListVariants = cva(
 
 function TabsList({
   className,
-  variant = 'default',
+  variant: propVariant,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
+  // Context에서 variant를 가져오고, props로 직접 넘긴 값이 있다면 우선 적용합니다.
+  const context = React.useContext(TabsContext);
+  const variant = propVariant || context.variant || 'default';
+
   return (
     <TabsPrimitive.List
       data-slot='tabs-list'
@@ -96,7 +115,6 @@ function TabsList({
 
 /**
  * TabsTrigger: タブの切り替えボタン
- * アクティブなタブへの移動時には、背景のインジケーターがスライドするアニメーションが実行されます。
  */
 function TabsTrigger({
   className,
@@ -104,7 +122,12 @@ function TabsTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
-  const { activeValue } = React.useContext(TabsContext);
+  const {
+    activeValue,
+    id,
+    variant = 'default',
+    indicatorClassName,
+  } = React.useContext(TabsContext);
   const isActive = activeValue === value;
 
   return (
@@ -113,20 +136,23 @@ function TabsTrigger({
       data-slot='tabs-trigger'
       className={cn(
         "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-[14px] border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // variant=line の時のスタイル
         'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent',
         'data-active:text-foreground dark:data-active:text-foreground',
-        // 下線(after要素)の制御
         'after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100',
         className,
       )}
       {...props}
     >
-      {/* isActiveの時のみmotion.divを表示し、layoutIdによってスライドアニメーションを実現 */}
       {isActive && (
         <motion.div
-          layoutId='tabs-indicator'
-          className='absolute inset-0 z-0 rounded-[14px] bg-background shadow-sm border border-transparent dark:border-input dark:bg-input/30 group-data-[variant=line]/tabs-list:hidden'
+          layoutId={`tabs-indicator-${id}`}
+          className={cn(
+            'absolute inset-0 z-0 rounded-[14px] border border-transparent transition-colors group-data-[variant=line]/tabs-list:hidden',
+            variant === 'invert'
+              ? 'bg-muted dark:bg-muted/50'
+              : 'bg-card shadow-sm dark:bg-input/30 dark:border-input',
+            indicatorClassName || 'inset-0',
+          )}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
         />
       )}
@@ -139,7 +165,6 @@ function TabsTrigger({
 
 /**
  * TabsContent: 各タブの中身
- * 表示・非表示の切り替え時にフェードアニメーション（AnimatePresence）を適用します。
  */
 function TabsContent({
   className,

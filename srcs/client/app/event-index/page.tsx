@@ -37,7 +37,11 @@ export default function EventIndexPage() {
         )}
       </main>
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav
+        activeTab={activeTab}
+        className='fixed max-w-[672px] bottom-0 mb-5'
+        onTabChange={setActiveTab}
+      />
     </div>
   );
 }
