@@ -10,7 +10,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <h1 className='text-xl font-bold tracking-tight'>Nomikai Hub</h1>
       </header>
 
-      {/* ここに各ページの中身が入る */}
       <main className='max-w-md mx-auto p-4 pb-24'>
         {children}
       </main>
