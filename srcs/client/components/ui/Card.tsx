@@ -59,7 +59,7 @@ function Card({
         'data-[shadow=default]:data-[variant=destructive]:ring-destructive/25 data-[shadow=default]:data-[variant=destructive]:shadow-destructive/[4%]',
 
         // サイズ設定
-        'data-[size=default]:w-158 data-[size=default]:h-36.5 data-[size=default]:gap-4 data-[size=default]:py-5',
+        'data-[size=default]:w-full data-[size=default]:min-h-36.5 data-[size=default]:gap-4 data-[size=default]:py-5',
         'data-[size=sm]:w-91 data-[size=sm]:h-11 data-[size=sm]:gap-3 data-[size=sm]:py-3',
         'data-[size=xs]:w-20 data-[size=xs]:h-6 data-[size=xs]:gap-2 data-[size=xs]:py-0',
 
