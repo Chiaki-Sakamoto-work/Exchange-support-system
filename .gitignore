@@ -23,6 +23,7 @@
 !/srcs/**/*.sh
 !/srcs/**/*.svg
 !/srcs/**/*.md
+!/srcs/**/*.mdx
 !/srcs/**/*.toml
 !/srcs/**/*.prisma
 !/**/.gitkeep
