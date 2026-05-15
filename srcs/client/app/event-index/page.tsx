@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { EventForm } from '@/features/events/components/EventForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
+import { EventExplore } from '@/features/events/components/EventExplore';
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
@@ -25,11 +26,7 @@ export default function EventIndexPage() {
         {activeTab === 'create' && (
           <EventForm onSuccess={() => setActiveTab('home')} />
         )}
-        {activeTab === 'join' && (
-          <div className='text-xl font-bold mt-10 text-center'>
-            参加画面（作成中）
-          </div>
-        )}
+        {activeTab === 'join' && <EventExplore />}
         {activeTab === 'mypage' && (
           <div className='text-xl font-bold mt-10 text-center'>
             マイページ（作成中）
