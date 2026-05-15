@@ -240,14 +240,16 @@ export async function getExploreEvents() {
         event_start_at: 'asc',
       },
     });
-    
+
     const availableEvents = events.filter(
-      (event) => event.capacity_limit === null || event.user_rooms.length < event.capacity_limit
+      (event) =>
+        event.capacity_limit === null ||
+        event.user_rooms.length < event.capacity_limit,
     );
 
     return { success: true, events: availableEvents };
   } catch (error) {
     console.error('未参加イベントの取得エラー:', error);
-    return { success: false, error: 'データの取得に失敗しました'};
+    return { success: false, error: 'データの取得に失敗しました' };
   }
 }

@@ -98,28 +98,26 @@ export const EventHome = () => {
               開催予定のイベントはありません
             </p>
           )
+        ) : joinedRooms.length > 0 ? (
+          joinedRooms.map((room) => {
+            const owner = room.user_rooms[0]?.profiles?.username || '不明';
+            return (
+              <EventCard
+                key={room.id}
+                title={room.title}
+                shop={room.location_name || '未定'}
+                date={formatDate(room.event_start_at)}
+                detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
+                owner={`👤 主催: ${owner}`}
+                colorClass='bg-blue-500'
+                onClick={() => setSelectedRoomId(room.id)}
+              />
+            );
+          })
         ) : (
-          joinedRooms.length > 0 ? (
-            joinedRooms.map((room) => {
-              const owner = room.user_rooms[0]?.profiles?.username || '不明';
-              return (
-                <EventCard
-                  key={room.id}
-                  title={room.title}
-                  shop={room.location_name || '未定'}
-                  date={formatDate(room.event_start_at)}
-                  detail={`👥 ${room._count.user_rooms} / ${room.capacity_limit}名`}
-                  owner={`👤 主催: ${owner}`}
-                  colorClass='bg-blue-500'
-                  onClick={() => setSelectedRoomId(room.id)}
-                />
-              );
-            })
-          ) : (
-            <p className='text-center text-sm text-zinc-500 py-10'>
-              参加予定のイベントはありません
-            </p>
-          )
+          <p className='text-center text-sm text-zinc-500 py-10'>
+            参加予定のイベントはありません
+          </p>
         )}
       </div>
 
