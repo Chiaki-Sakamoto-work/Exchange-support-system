@@ -241,7 +241,7 @@ export function DateTimePicker({
                 e.stopPropagation();
                 clearTime();
               }}
-              className='text-[11px] text-muted-foreground hover:text-accent transition-colors relative z-10'
+              className='mx-3 text-[11px] text-muted-foreground hover:text-accent transition-colors relative z-10'
               aria-label='時間をクリア'
             >
               クリア
