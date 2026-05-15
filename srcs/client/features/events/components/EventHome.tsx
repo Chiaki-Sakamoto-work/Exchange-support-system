@@ -42,7 +42,7 @@ export const EventHome = () => {
   }
 
   return (
-    <div className='w-full flex justify-center mt-2'>
+    <div className=''>
       <Tabs
         value={subTab}
         onValueChange={(val) => setSubTab(val as TabMode)} // defaultValue='hosted'
