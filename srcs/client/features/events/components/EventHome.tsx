@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getHostedEvents, getJoinedEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard'; // 先ほど作ったカードを読み込む
 import { EventDetailModal } from './EventDetailModal';
@@ -19,7 +19,7 @@ export const EventHome = () => {
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
   // 🌟 1. データの読み込み処理を関数として独立させる
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [hosted, joined] = await Promise.all([
@@ -33,12 +33,12 @@ export const EventHome = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // 画面が開いた瞬間にデータを取ってくる
   useEffect(() => {
     fetchAllData();
-  }, []);
+  }, [fetchAllData]);
 
   // 日付を見やすく変換する関数 (2026-05-20T... -> 5/20 19:00)
   const formatDate = (date: Date | null) => {

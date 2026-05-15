@@ -1,33 +1,32 @@
 'use client';
 
+import type { rooms } from '@prisma/client';
 import { useState } from 'react';
 import { createEvent, updateEventAction } from '../actions/eventActions';
 
 type Props = {
-  // 作成に成功した時に、親(page.tsx)に「終わったよ！」と知らせるためのスイッチ
-  onSuccess: () => void; 
-  initialData?: any;
+  onSuccess: () => void;
+  initialData?: rooms;
   roomId?: number;
 };
 
 export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, _setError] = useState<string | null>(null);
 
-  // ユーザーの入力を覚えておくための箱
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
-    // 日時を input[type="datetime-local"] が読める形式に変換
-    datetime: initialData?.event_start_at 
-      ? new Date(initialData.event_start_at).toISOString().slice(0, 16) 
+    datetime: initialData?.event_start_at
+      ? new Date(initialData.event_start_at).toISOString().slice(0, 16)
       : '',
     capacity: initialData?.capacity_limit || 4,
     tags: initialData?.description || '',
     shop: initialData?.location_name || '',
   });
 
-  // 入力欄が書き換えられた時に、箱の中身を更新する共通関数
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -36,16 +35,15 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     e.preventDefault();
     setIsProcessing(true);
 
-    let result;
+    let result: { success: boolean; error?: string } | undefined;
     if (roomId) {
-      // roomId があれば「更新」
       result = await updateEventAction(roomId, formData);
     } else {
-      // なければ「新規作成」
       result = await createEvent(formData);
     }
 
-    if (result.success) {
+    // 🌟 result?.success とすることで、undefined の可能性を考慮
+    if (result?.success) {
       alert(roomId ? '更新しました！' : '作成しました！');
       onSuccess();
     }
@@ -53,84 +51,117 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
-      
-      {error && <div className="p-3 bg-red-100 text-red-600 rounded-lg text-sm">{error}</div>}
+    <form
+      onSubmit={handleSubmit}
+      className='space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800'
+    >
+      {error && (
+        <div className='p-3 bg-red-100 text-red-600 rounded-lg text-sm'>
+          {error}
+        </div>
+      )}
 
+      {/* 1. イベント名 */}
       <div>
-        <label className="block text-sm font-bold mb-2">イベント名 <span className="text-red-500">*</span></label>
+        <label htmlFor='title' className='block text-sm font-bold mb-2'>
+          イベント名 <span className='text-red-500'>*</span>
+        </label>
         <input
+          id='title'
           required
-          name="title"
+          name='title'
           value={formData.title}
           onChange={handleChange}
-          placeholder="例：週末焼肉会！"
-          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+          placeholder='例：週末焼肉会！'
+          className='w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500'
         />
       </div>
 
+      {/* 2. お店・場所 */}
       <div>
-        <label className="block text-sm font-bold mb-2">お店・場所 <span className="text-red-500">*</span></label>
+        {/* 🌟 htmlFor='shop' を追加 */}
+        <label htmlFor='shop' className='block text-sm font-bold mb-2'>
+          お店・場所 <span className='text-red-500'>*</span>
+        </label>
         <input
+          id='shop'
           required
-          name="shop"
+          name='shop'
           value={formData.shop}
           onChange={handleChange}
-          placeholder="例：渋谷の〇〇苑"
-          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+          placeholder='例：渋谷の〇〇苑'
+          className='w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500'
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
+        {/* 3. 日時 */}
         <div>
-          <label className="block text-sm font-bold mb-2">日時 <span className="text-red-500">*</span></label>
+          {/* 🌟 htmlFor='datetime' を追加 */}
+          <label htmlFor='datetime' className='block text-sm font-bold mb-2'>
+            日時 <span className='text-red-500'>*</span>
+          </label>
           <input
+            id='datetime'
             required
-            type="datetime-local" // 👈 カレンダーと時計が出る便利な入力欄
-            name="datetime"
+            type='datetime-local'
+            name='datetime'
             value={formData.datetime}
             onChange={handleChange}
-            className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className='w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500'
           />
         </div>
+
+        {/* 4. 募集人数 */}
         <div>
-          <label className="block text-sm font-bold mb-2">募集人数 <span className="text-red-500">*</span></label>
+          {/* 🌟 htmlFor='capacity' を追加 */}
+          <label htmlFor='capacity' className='block text-sm font-bold mb-2'>
+            募集人数 <span className='text-red-500'>*</span>
+          </label>
           <input
+            id='capacity'
             required
-            type="number"
-            min="2"
-            max="100"
-            name="capacity"
+            type='number'
+            min='2'
+            max='100'
+            name='capacity'
             value={formData.capacity}
             onChange={handleChange}
-            className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className='w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500'
           />
         </div>
       </div>
 
+      {/* 5. メモ */}
       <div>
-        <label className="block text-sm font-bold mb-2">一言メモ（タグなど）</label>
+        {/* 🌟 htmlFor='tags' を追加 */}
+        <label htmlFor='tags' className='block text-sm font-bold mb-2'>
+          一言メモ（タグなど）
+        </label>
         <textarea
-          name="tags"
+          id='tags'
+          name='tags'
           value={formData.tags}
           onChange={handleChange}
-          placeholder="例：予算4000円くらいです！"
-          className="w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
+          placeholder='例：予算4000円くらいです！'
+          className='w-full p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]'
         />
       </div>
 
       <button
-        type="submit"
+        type='submit'
         disabled={isProcessing}
-        className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none transition active:scale-95 disabled:opacity-50 mt-4"
+        className='w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-200 dark:shadow-none transition active:scale-95 disabled:opacity-50 mt-4'
       >
         {isProcessing ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span className='flex items-center justify-center gap-2'>
+            <span className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />
             処理中...
           </span>
+        ) : roomId ? (
+          '変更を保存する'
         ) : (
-          roomId ? '変更を保存する' : '予定を作成する'
+          '予定を作成する'
         )}
       </button>
     </form>
