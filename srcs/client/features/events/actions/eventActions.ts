@@ -215,3 +215,41 @@ export async function updateEventAction(
     return { success: false, error: '更新に失敗しました' };
   }
 }
+
+export async function getExploreEvents() {
+  try {
+    // 1. まず「自分が参加していない」「OPEN」「未来の予定」をDBから取得
+    const events = await prisma.rooms.findMany({
+      where: {
+        status: 'OPEN',
+        event_start_at: {
+          gte: new Date(), // 今より未来のイベントだけを取得
+        },
+        user_rooms: {
+          none: {
+            user_id: MOCK_USER_ID, // 自分が未参加
+          },
+        },
+      },
+      include: {
+        user_rooms: {
+          include: { profiles: true },
+        },
+      },
+      orderBy: {
+        event_start_at: 'asc',
+      },
+    });
+
+    const availableEvents = events.filter(
+      (event) =>
+        event.capacity_limit === null ||
+        event.user_rooms.length < event.capacity_limit,
+    );
+
+    return { success: true, events: availableEvents };
+  } catch (error) {
+    console.error('未参加イベントの取得エラー:', error);
+    return { success: false, error: 'データの取得に失敗しました' };
+  }
+}
