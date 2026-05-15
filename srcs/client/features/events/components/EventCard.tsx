@@ -49,7 +49,10 @@ export const EventCard = ({
         'hover:scale-[1.02] focus-visible:scale-[1.02]',
         'active:scale-[0.98]',
         'focus-visible:outline-none',
+        'h-36.5',
+        // 'flex flex-col gap-3',
       )}
+      variant='default'
     >
       <CardHeader className='flex flex-row items-center gap-4'>
         {ownerProfile && (
@@ -69,9 +72,9 @@ export const EventCard = ({
         </CardAction>
       </CardHeader>
 
-      <CardContent className='flex flex-wrap gap-2'>
+      <CardContent className='flex flex-row flex-wrap gap-2 min-h-6'>
         {tags?.map((tag) => (
-          <Badge key={tag.id} variant='secondary'>
+          <Badge key={tag.id} variant='secondary' size='sm'>
             {tag.name}
           </Badge>
         ))}
