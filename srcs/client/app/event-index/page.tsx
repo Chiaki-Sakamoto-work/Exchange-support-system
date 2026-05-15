@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { EventCreateForm } from '@/features/events/components/EventCreateForm';
 import { BottomNav } from '../../components/Layout/BottomNav';
 import { EventHome } from '../../features/events/components/EventHome';
-import { Profile } from '@features/profile/ProfileView'
+import Profile from '@/app/profile/page'
 
 export default function EventIndexPage() {
   const [activeTab, setActiveTab] = useState<
@@ -32,9 +32,7 @@ export default function EventIndexPage() {
           </div>
         )}
         {activeTab === 'mypage' && (
-          <div className='text-xl font-bold mt-10 text-center'>
-            マイページ（作成中）
-          </div>
+          <Profile />
         )}
       </main>
 
