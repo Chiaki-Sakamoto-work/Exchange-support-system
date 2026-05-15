@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { BottomNav, type BottomTab } from '@/components/layout/BottomNav';
 import { EventForm } from '@/features/events/components/EventForm';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { EventHome } from '@/features/events/components/EventHome';
 
 export default function EventIndexPage() {
-  const [activeTab, setActiveTab] = useState<
-    'home' | 'create' | 'join' | 'mypage'
-  >('home');
+  const [activeTab, setActiveTab] = useState<BottomTab>('home');
 
   return (
     <div className='min-h-screen'>
@@ -19,7 +17,7 @@ export default function EventIndexPage() {
         <h1 className='text-xl font-bold tracking-tight'>Nomikai Hub</h1>
       </header>
 
-      <main className='w-full mx-auto p-4 pb-24'>
+      <main className='w-full mx-auto p-4 pb-24 flex justify-center mt-2'>
         {activeTab === 'home' && <EventHome />}
 
         {activeTab === 'create' && (

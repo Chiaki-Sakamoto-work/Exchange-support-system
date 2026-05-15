@@ -13,11 +13,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
+const tabs = [
+  { id: 'home', label: 'ホーム', icon: <House /> },
+  { id: 'create', label: '開催する', icon: <Plus /> },
+  { id: 'join', label: '参加する', icon: <UsersRound /> },
+  { id: 'mypage', label: 'マイページ', icon: <User /> },
+] as const;
+
+export type BottomTab = (typeof tabs)[number]['id'];
+
 // Propsの型定義：現在のタブと、タブを切り替えるための関数を受け取る
 type BottomNavProps = {
   className?: string;
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  activeTab: BottomTab;
+  onTabChange: (tab: BottomTab) => void;
 };
 
 export const BottomNav = ({
@@ -38,7 +47,7 @@ export const BottomNav = ({
     <nav>
       <Tabs
         value={activeTab}
-        onValueChange={(value) => onTabChange(value)}
+        onValueChange={(value) => onTabChange(value as BottomTab)}
         className='w-full'
         variant='invert'
         indicatorClassName='inset-1'
