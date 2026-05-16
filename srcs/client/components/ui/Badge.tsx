@@ -18,7 +18,7 @@ const badgeVariants = cva(
        * デザイン系統の設定
        */
       variant: {
-        default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80', // 標準（塗りつぶし）
+        default: 'bg-primary-foreground text-primary [a]:hover:bg-primary/80', // 標準（塗りつぶし）
         secondary:
           'bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80', // 補助・補足
         destructive:
