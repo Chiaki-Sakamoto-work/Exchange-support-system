@@ -19,6 +19,7 @@ type UserBadgeUser = {
 type UserBadgeProps = {
   user: UserBadgeUser;
   variant?: UserBadgeVariant;
+  label?: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
 };
@@ -46,6 +47,7 @@ const getFallback = (name: string) => name.slice(0, 1).toUpperCase();
 function UserBadge({
   user,
   variant = 'default',
+  label,
   onClick,
   className,
 }: UserBadgeProps) {
@@ -62,7 +64,7 @@ function UserBadge({
         )}
       >
         <button type='button' onClick={onClick}>
-          <UserBadgeContent user={user} />
+          <UserBadgeContent label={label} user={user} />
         </button>
       </Badge>
     );
@@ -78,12 +80,18 @@ function UserBadge({
         className,
       )}
     >
-      <UserBadgeContent user={user} />
+      <UserBadgeContent label={label} user={user} />
     </Badge>
   );
 }
 
-function UserBadgeContent({ user }: { user: UserBadgeUser }) {
+function UserBadgeContent({
+  user,
+  label,
+}: {
+  user: UserBadgeUser;
+  label?: React.ReactNode;
+}) {
   return (
     <>
       <Avatar size='sm' variant='rounded-full'>
@@ -95,7 +103,7 @@ function UserBadgeContent({ user }: { user: UserBadgeUser }) {
           </AvatarBadge>
         ) : null}
       </Avatar>
-      {user.name}
+      {label ?? user.name}
     </>
   );
 }

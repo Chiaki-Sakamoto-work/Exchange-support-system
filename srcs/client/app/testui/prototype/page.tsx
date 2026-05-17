@@ -2,8 +2,25 @@
 
 import type { profiles, rooms, user_rooms } from '@prisma/client';
 import { ArrowLeftRight } from 'lucide-react';
-import { AvatarGroupCount } from '@/components/ui/Avatar';
-import { Card, CardContent } from '@/components/ui/Card';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogBody,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from '@/components/ui/AlertDialog';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroupCount,
+  AvatarImage,
+} from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
   HoverCard,
   HoverCardContent,
@@ -235,6 +252,9 @@ const mockRooms: MockRoomWithUsers[] = [
 const getDisplayName = (profile: profiles | null) =>
   profile?.username ?? '名無しさん';
 
+const getFallback = (profile: profiles | null) =>
+  getDisplayName(profile).slice(0, 1).toUpperCase();
+
 const isNewRecruit = (profile: profiles | null) =>
   profile?.user_type === '新入社員';
 
@@ -244,21 +264,14 @@ const getUserBadgeUser = (profile: profiles | null) => ({
   isNewRecruit: isNewRecruit(profile),
 });
 
-const renderParticipantBadge = (
-  participant: MockRoomWithUsers['user_rooms'][number],
-) => {
-  const profile = participant.profiles;
-
-  return (
-    <UserBadge
-      key={`${participant.room_id}-${participant.user_id}`}
-      variant='default'
-      user={getUserBadgeUser(profile)}
-    />
-  );
-};
-
 export default function PrototypePage() {
+  const [selectedParticipant, setSelectedParticipant] = useState<
+    MockRoomWithUsers['user_rooms'][number] | null
+  >(null);
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [transferredHostUserId, setTransferredHostUserId] = useState<
+    string | null
+  >(null);
   const room = mockRooms[0];
   const participants = room.user_rooms.filter(
     (participant) => !participant.is_owner,
@@ -268,67 +281,169 @@ export default function PrototypePage() {
     ? participants.slice(0, 6)
     : participants;
   const overflowParticipants = shouldCollapse ? participants.slice(6) : [];
+  const selectedProfile = selectedParticipant?.profiles ?? null;
+
+  const handleSelectParticipant = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+  ) => {
+    setSelectedParticipant(participant);
+    setIsTransferDialogOpen(true);
+  };
+
+  const handleConfirmTransfer = () => {
+    if (selectedParticipant) {
+      setTransferredHostUserId(selectedParticipant.user_id);
+    }
+    setIsTransferDialogOpen(false);
+  };
+
+  const renderParticipantBadge = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+    variant: 'default' | 'secondary' = 'default',
+  ) => {
+    const profile = participant.profiles;
+
+    return (
+      <UserBadge
+        key={`${participant.room_id}-${participant.user_id}`}
+        variant={
+          transferredHostUserId === participant.user_id ? 'accept' : variant
+        }
+        user={getUserBadgeUser(profile)}
+        onClick={() => handleSelectParticipant(participant)}
+      />
+    );
+  };
 
   return (
-    <section className='w-[398px] mx-auto mt-10'>
-      <Card variant='secondary shadow-none' className='h-auto w-full min-h-0!'>
-        <CardContent>
-          <Label>
-            <ArrowLeftRight className='w-4 h-4' />
-            ホスト権限を移動
-          </Label>
-          <span className='py-1 text-[12px]'>
-            選ぶと自分は普通の参加者になり、その人がホストになります。
-          </span>
+    <>
+      <section className='w-[398px] mx-auto mt-10'>
+        <Card
+          variant='secondary shadow-none'
+          className='h-auto w-full min-h-0!'
+        >
+          <CardContent>
+            <Label>
+              <ArrowLeftRight className='w-4 h-4' />
+              ホスト権限を移動
+            </Label>
+            <span className='py-1 text-[12px]'>
+              選ぶと自分は普通の参加者になり、その人がホストになります。
+            </span>
 
-          <div className='py-2 flex flex-wrap gap-2'>
-            {visibleParticipants.map(renderParticipantBadge)}
-            {overflowParticipants.length > 0 ? (
-              <HoverCard openDelay={120} closeDelay={120}>
-                <HoverCardTrigger asChild>
-                  <AvatarGroupCount
-                    asChild
-                    variant='primary-foreground'
-                    className='size-6 cursor-pointer border-0 text-xs transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
-                  >
-                    <button
-                      type='button'
-                      aria-label={`残り${overflowParticipants.length}名を表示`}
+            <div className='py-2 flex flex-wrap gap-2'>
+              {visibleParticipants.map((participant) =>
+                renderParticipantBadge(participant),
+              )}
+              {overflowParticipants.length > 0 ? (
+                <HoverCard openDelay={120} closeDelay={120}>
+                  <HoverCardTrigger asChild>
+                    <AvatarGroupCount
+                      asChild
+                      variant='primary-foreground'
+                      className='size-6 cursor-pointer border-0 text-xs transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
                     >
-                      +{overflowParticipants.length}
-                    </button>
-                  </AvatarGroupCount>
-                </HoverCardTrigger>
-                <HoverCardContent
-                  align='start'
-                  className='w-auto min-w-40 bg-transparent p-0 shadow-none ring-0'
-                >
-                  <Card
-                    variant='default shadow-none'
-                    className='h-auto min-h-0! w-auto py-0!'
+                      <button
+                        type='button'
+                        aria-label={`残り${overflowParticipants.length}名を表示`}
+                      >
+                        +{overflowParticipants.length}
+                      </button>
+                    </AvatarGroupCount>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    align='start'
+                    className='w-auto min-w-40 bg-transparent p-0 shadow-none ring-0'
                   >
-                    <CardContent className='p-3'>
-                      <div className='flex flex-wrap gap-2'>
-                        {overflowParticipants.map((participant) => {
-                          const profile = participant.profiles;
+                    <Card
+                      variant='default shadow-none'
+                      className='h-auto min-h-0! w-auto py-0!'
+                    >
+                      <CardContent className='p-3'>
+                        <div className='flex flex-wrap gap-2'>
+                          {overflowParticipants.map((participant) =>
+                            renderParticipantBadge(participant, 'secondary'),
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </HoverCardContent>
+                </HoverCard>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
-                          return (
-                            <UserBadge
-                              key={`${participant.room_id}-${participant.user_id}`}
-                              variant='secondary'
-                              user={getUserBadgeUser(profile)}
-                            />
-                          );
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </HoverCardContent>
-              </HoverCard>
-            ) : null}
-          </div>
-        </CardContent>
-      </Card>
-    </section>
+      <AlertDialog
+        open={isTransferDialogOpen}
+        onOpenChange={setIsTransferDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogTitle className='text-xl'>
+            ホストを移動しますか？
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            この人にホスト権限を渡します。あなたは普通の参加者になり、このルームは「参加予定」に移ります。
+          </AlertDialogDescription>
+
+          <AlertDialogBody>
+            <Card variant='secondary shadow-none' className='min-h-0!'>
+            <CardHeader className='flex flex-row items-center gap-4 '>
+              <Avatar variant='rounded-full'>
+                <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
+                <AvatarFallback>
+                  {getFallback(selectedProfile)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
+                <CardDescription>さんを新しいホストにします</CardDescription>
+              </div>
+              {isNewRecruit(selectedProfile) ? (
+                <Badge variant='accent' size='xs'>
+                  新
+                </Badge>
+              ) : null}
+            </CardHeader>
+          </Card>
+            {/* <Card variant='secondary shadow-none'>
+              <Avatar variant='rounded-full'>
+                <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
+                <AvatarFallback>
+                  {getFallback(selectedProfile)}
+                </AvatarFallback>
+              </Avatar>
+              <CardContent>
+              
+                <CardHeader>
+                  {getDisplayName(selectedProfile)}
+                </CardHeader>
+                <CardDescription>
+                  さんを新しいホストにします
+                </CardDescription>
+              {isNewRecruit(selectedProfile) ? (
+                <Badge variant='accent' size='xs'>
+                  新
+                </Badge>
+              ) : null}
+              </CardContent>
+            </Card> */}
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel variant='outline'>
+              キャンセル
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant='accent'
+              onClick={handleConfirmTransfer}
+            >
+              ホストを移動
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
