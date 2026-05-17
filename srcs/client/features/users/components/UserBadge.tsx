@@ -22,11 +22,11 @@ type UserBadgeProps = {
 };
 
 const userBadgeVariantClasses: Record<UserBadgeVariant, string> = {
-  default: 'hover:bg-accent hover:text-accent-foreground',
+  default: '',
   accept: 'bg-accent text-accent-foreground hover:bg-accent/80',
   destructive:
     'bg-destructive text-destructive-foreground hover:bg-destructive/85',
-  secondary: 'hover:bg-accent hover:text-accent-foreground',
+  secondary: '',
 };
 
 const badgeVariantByUserBadgeVariant: Record<
