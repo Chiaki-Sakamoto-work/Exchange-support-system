@@ -49,6 +49,8 @@ function UserBadge({
   onClick,
   className,
 }: UserBadgeProps) {
+  const avatarSpacingClass = leadingVisual === 'avatar' ? 'pl-1' : undefined;
+
   if (onClick) {
     return (
       <Badge
@@ -57,6 +59,7 @@ function UserBadge({
         size='sm'
         className={cn(
           'cursor-pointer transition-colors',
+          avatarSpacingClass,
           userBadgeVariantClasses[variant],
           className,
         )}
@@ -78,6 +81,7 @@ function UserBadge({
       size='sm'
       className={cn(
         'cursor-pointer transition-colors',
+        avatarSpacingClass,
         userBadgeVariantClasses[variant],
         className,
       )}
