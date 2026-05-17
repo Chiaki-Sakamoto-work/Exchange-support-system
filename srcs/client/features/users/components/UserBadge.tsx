@@ -1,14 +1,10 @@
 import type * as React from 'react';
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
 
 type UserBadgeVariant = 'default' | 'accept' | 'destructive' | 'secondary';
+type UserBadgeLeadingVisual = 'avatar' | 'dot';
 
 type UserBadgeUser = {
   name: string;
@@ -20,6 +16,7 @@ type UserBadgeProps = {
   user: UserBadgeUser;
   variant?: UserBadgeVariant;
   label?: React.ReactNode;
+  leadingVisual?: UserBadgeLeadingVisual;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
 };
@@ -48,6 +45,7 @@ function UserBadge({
   user,
   variant = 'default',
   label,
+  leadingVisual = 'avatar',
   onClick,
   className,
 }: UserBadgeProps) {
@@ -64,7 +62,11 @@ function UserBadge({
         )}
       >
         <button type='button' onClick={onClick}>
-          <UserBadgeContent label={label} user={user} />
+          <UserBadgeContent
+            label={label}
+            leadingVisual={leadingVisual}
+            user={user}
+          />
         </button>
       </Badge>
     );
@@ -80,7 +82,11 @@ function UserBadge({
         className,
       )}
     >
-      <UserBadgeContent label={label} user={user} />
+      <UserBadgeContent
+        label={label}
+        leadingVisual={leadingVisual}
+        user={user}
+      />
     </Badge>
   );
 }
@@ -88,31 +94,48 @@ function UserBadge({
 function UserBadgeContent({
   user,
   label,
+  leadingVisual,
 }: {
   user: UserBadgeUser;
   label?: React.ReactNode;
+  leadingVisual: UserBadgeLeadingVisual;
 }) {
   return (
     <>
-      <Avatar size='sm' variant='rounded-full'>
-        <AvatarImage src={user.avatarUrl ?? undefined} />
-        <AvatarFallback
-          className={
-            user.isNewRecruit ? 'bg-accent text-accent-foreground' : undefined
-          }
-        >
-          {getFallback(user.name)}
-        </AvatarFallback>
-        {user.isNewRecruit ? (
-          <AvatarBadge className='size-3 bg-accent text-[8px] font-bold text-accent-foreground'>
-            新
-          </AvatarBadge>
-        ) : null}
-      </Avatar>
+      {leadingVisual === 'avatar' ? (
+        <Avatar size='sm' variant='rounded-full'>
+          <AvatarImage src={user.avatarUrl ?? undefined} />
+          <AvatarFallback
+            className={
+              user.isNewRecruit ? 'bg-accent text-accent-foreground' : undefined
+            }
+          >
+            {getFallback(user.name)}
+          </AvatarFallback>
+        </Avatar>
+      ) : (
+        <span
+          aria-hidden='true'
+          className={cn(
+            'size-1.5 shrink-0 rounded-full',
+            user.isNewRecruit ? 'bg-accent' : 'bg-muted-foreground',
+          )}
+        />
+      )}
       {label ?? user.name}
+      {user.isNewRecruit ? (
+        <Badge variant='accent' size='xs'>
+          新
+        </Badge>
+      ) : null}
     </>
   );
 }
 
-export type { UserBadgeProps, UserBadgeUser, UserBadgeVariant };
+export type {
+  UserBadgeLeadingVisual,
+  UserBadgeProps,
+  UserBadgeUser,
+  UserBadgeVariant,
+};
 export { UserBadge };

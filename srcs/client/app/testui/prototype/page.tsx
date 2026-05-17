@@ -313,6 +313,7 @@ export default function PrototypePage() {
     return (
       <UserBadge
         key={`${participant.room_id}-${participant.user_id}`}
+        leadingVisual='dot'
         variant={
           transferredHostUserId === participant.user_id ? 'accept' : variant
         }
@@ -395,8 +396,8 @@ export default function PrototypePage() {
           </AlertDialogDescription>
 
           <AlertDialogBody>
-            <Card variant='secondary shadow-none' className='min-h-0!'>
-              <CardHeader className='flex flex-row items-center gap-4'>
+            <Card variant='secondary shadow-none' className='min-h-0! py-4!'>
+              <CardHeader className='flex flex-row items-center gap-3 px-4'>
                 <Avatar variant='rounded-full'>
                   <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
                   <AvatarFallback
