@@ -20,7 +20,14 @@ import {
   AvatarImage,
 } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import {
   HoverCard,
   HoverCardContent,
@@ -389,24 +396,32 @@ export default function PrototypePage() {
 
           <AlertDialogBody>
             <Card variant='secondary shadow-none' className='min-h-0!'>
-            <CardHeader className='flex flex-row items-center gap-4 '>
-              <Avatar variant='rounded-full'>
-                <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
-                <AvatarFallback>
-                  {getFallback(selectedProfile)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
-                <CardDescription>さんを新しいホストにします</CardDescription>
-              </div>
-              {isNewRecruit(selectedProfile) ? (
-                <Badge variant='accent' size='xs'>
-                  新
-                </Badge>
-              ) : null}
-            </CardHeader>
-          </Card>
+              <CardHeader className='flex flex-row items-center gap-4'>
+                <Avatar variant='rounded-full'>
+                  <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
+                  <AvatarFallback
+                    className={
+                      isNewRecruit(selectedProfile)
+                        ? 'bg-accent text-accent-foreground'
+                        : undefined
+                    }
+                  >
+                    {getFallback(selectedProfile)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
+                  <CardDescription>さんを新しいホストにします</CardDescription>
+                </div>
+                {isNewRecruit(selectedProfile) ? (
+                  <CardAction className='self-center'>
+                    <Badge variant='accent' size='xs'>
+                      新
+                    </Badge>
+                  </CardAction>
+                ) : null}
+              </CardHeader>
+            </Card>
             {/* <Card variant='secondary shadow-none'>
               <Avatar variant='rounded-full'>
                 <AvatarImage src={selectedProfile?.avatar_url ?? undefined} />
@@ -432,13 +447,8 @@ export default function PrototypePage() {
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <AlertDialogCancel variant='outline'>
-              キャンセル
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant='accent'
-              onClick={handleConfirmTransfer}
-            >
+            <AlertDialogCancel variant='outline'>キャンセル</AlertDialogCancel>
+            <AlertDialogAction variant='accent' onClick={handleConfirmTransfer}>
               ホストを移動
             </AlertDialogAction>
           </AlertDialogFooter>
