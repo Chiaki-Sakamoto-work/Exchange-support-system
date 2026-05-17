@@ -80,5 +80,5 @@ make
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
 ## Design Artifacts
-![er](./architecture/er_diagram.drawio.svg)
+![er](./architecture/er_figure_review1_exchange_support_system.drawio.svg)
 
