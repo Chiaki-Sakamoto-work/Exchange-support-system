@@ -29,6 +29,7 @@
 !/**/.gitkeep
 !/**/*.yml
 !/**/*.nix
+!/**/*.lock
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
