@@ -9,7 +9,7 @@ import {
   Store,
   UsersRound,
 } from 'lucide-react';
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -372,6 +372,19 @@ export default function PrototypePage() {
     }
   };
 
+  const handleDetailDialogClick = (event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target;
+
+    if (
+      target instanceof Element &&
+      target.closest('[data-detail-participant-control]')
+    ) {
+      return;
+    }
+
+    setLeavingParticipantId(null);
+  };
+
   const renderAllergyTags = (userId: string, allergies: string[]) => {
     if (allergies.length <= 3) {
       return allergies.map((allergy) => (
@@ -432,17 +445,21 @@ export default function PrototypePage() {
     const isLeaving = leavingParticipantId === participant.user_id;
 
     return (
-      <UserBadge
+      <span
         key={`detail-${participant.room_id}-${participant.user_id}`}
-        className='transition-all duration-200 hover:scale-105 active:scale-95'
-        label={isLeaving ? '退室' : undefined}
-        variant={isLeaving ? 'destructive' : 'secondary'}
-        user={{
-          ...getUserBadgeUser(profile),
-          isNewRecruit: isLeaving ? false : isNewRecruit(profile),
-        }}
-        onClick={() => handleSelectDetailParticipant(participant)}
-      />
+        data-detail-participant-control='true'
+      >
+        <UserBadge
+          className='transition-all duration-200 hover:scale-105 active:scale-95'
+          label={isLeaving ? '退室' : undefined}
+          variant={isLeaving ? 'destructive' : 'secondary'}
+          user={{
+            ...getUserBadgeUser(profile),
+            isNewRecruit: isLeaving ? false : isNewRecruit(profile),
+          }}
+          onClick={() => handleSelectDetailParticipant(participant)}
+        />
+      </span>
     );
   };
 
@@ -602,7 +619,11 @@ export default function PrototypePage() {
 
       {/* 詳細popup */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent showCloseButton={false} className='max-h-[80vh]'>
+        <DialogContent
+          showCloseButton={false}
+          className='max-h-[80vh]'
+          onClick={handleDetailDialogClick}
+        >
           <DialogHeader className='gap-0.5'>
             <DialogTitle>{room.title}</DialogTitle>
             <DialogDescription>イベントの詳細情報</DialogDescription>
