@@ -96,7 +96,13 @@ function UserBadgeContent({
     <>
       <Avatar size='sm' variant='rounded-full'>
         <AvatarImage src={user.avatarUrl ?? undefined} />
-        <AvatarFallback>{getFallback(user.name)}</AvatarFallback>
+        <AvatarFallback
+          className={
+            user.isNewRecruit ? 'bg-accent text-accent-foreground' : undefined
+          }
+        >
+          {getFallback(user.name)}
+        </AvatarFallback>
         {user.isNewRecruit ? (
           <AvatarBadge className='size-3 bg-accent text-[8px] font-bold text-accent-foreground'>
             新
