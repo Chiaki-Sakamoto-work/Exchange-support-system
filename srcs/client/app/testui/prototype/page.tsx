@@ -1,7 +1,14 @@
 'use client';
 
 import type { profiles, rooms, user_rooms } from '@prisma/client';
-import { ArrowLeftRight } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  Calendar,
+  CircleAlert,
+  PenBoxIcon,
+  Store,
+  UsersRound,
+} from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -13,12 +20,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroupCount,
-  AvatarImage,
-} from '@/components/ui/Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -28,6 +30,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogIconAction,
+  DialogTitle,
+} from '@/components/ui/Dialog';
 import {
   HoverCard,
   HoverCardContent,
@@ -67,7 +78,7 @@ const mockUsers: profiles[] = [
     user_type: '一般社員',
     is_support_used: false,
     is_admin: false,
-    allergies: ['そば'],
+    allergies: ['そば', '甲殻類', '小麦', '乳製品'],
     created_at: mockDate,
     updated_at: mockDate,
   },
@@ -271,11 +282,29 @@ const getUserBadgeUser = (profile: profiles | null) => ({
   isNewRecruit: isNewRecruit(profile),
 });
 
+const formatDetailDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 export default function PrototypePage() {
   const [selectedParticipant, setSelectedParticipant] = useState<
     MockRoomWithUsers['user_rooms'][number] | null
   >(null);
+  const [leavingParticipantId, setLeavingParticipantId] = useState<
+    string | null
+  >(null);
+  const [leaveDialogParticipant, setLeaveDialogParticipant] = useState<
+    MockRoomWithUsers['user_rooms'][number] | null
+  >(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [transferredHostUserId, setTransferredHostUserId] = useState<
     string | null
   >(null);
@@ -288,7 +317,22 @@ export default function PrototypePage() {
     ? participants.slice(0, 6)
     : participants;
   const overflowParticipants = shouldCollapse ? participants.slice(6) : [];
+  const detailParticipants = room.user_rooms;
+  const shouldCollapseDetailParticipants = detailParticipants.length > 7;
+  const visibleDetailParticipants = shouldCollapseDetailParticipants
+    ? detailParticipants.slice(0, 6)
+    : detailParticipants;
+  const overflowDetailParticipants = shouldCollapseDetailParticipants
+    ? detailParticipants.slice(6)
+    : [];
   const selectedProfile = selectedParticipant?.profiles ?? null;
+  const leaveDialogProfile = leaveDialogParticipant?.profiles ?? null;
+  const allergyEntries = room.user_rooms
+    .map((participant) => ({
+      allergies: participant.profiles?.allergies ?? [],
+      participant,
+    }))
+    .filter(({ allergies }) => allergies.length > 0);
 
   const handleSelectParticipant = (
     participant: MockRoomWithUsers['user_rooms'][number],
@@ -304,6 +348,104 @@ export default function PrototypePage() {
     setIsTransferDialogOpen(false);
   };
 
+  const handleSelectDetailParticipant = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+  ) => {
+    if (leavingParticipantId === participant.user_id) {
+      setLeaveDialogParticipant(participant);
+      setIsLeaveDialogOpen(true);
+      return;
+    }
+
+    setLeavingParticipantId(participant.user_id);
+  };
+
+  const handleConfirmLeave = () => {
+    setIsLeaveDialogOpen(false);
+    setLeavingParticipantId(null);
+  };
+
+  const handleLeaveDialogOpenChange = (open: boolean) => {
+    setIsLeaveDialogOpen(open);
+    if (!open) {
+      setLeavingParticipantId(null);
+    }
+  };
+
+  const renderAllergyTags = (userId: string, allergies: string[]) => {
+    if (allergies.length <= 3) {
+      return allergies.map((allergy) => (
+        <Badge key={`${userId}-${allergy}`} variant='destructive' size='sm'>
+          {allergy}
+        </Badge>
+      ));
+    }
+
+    const visibleAllergies = allergies.slice(0, 2);
+    const overflowAllergies = allergies.slice(2);
+
+    return (
+      <>
+        {visibleAllergies.map((allergy) => (
+          <Badge key={`${userId}-${allergy}`} variant='destructive' size='sm'>
+            {allergy}
+          </Badge>
+        ))}
+        <HoverCard openDelay={120} closeDelay={120}>
+          <HoverCardTrigger asChild>
+            <Badge
+              asChild
+              variant='destructive'
+              size='sm'
+              className='cursor-pointer'
+            >
+              <button
+                type='button'
+                aria-label={`残り${overflowAllergies.length}件のアレルギーを表示`}
+              >
+                +{overflowAllergies.length}
+              </button>
+            </Badge>
+          </HoverCardTrigger>
+          <HoverCardContent align='end' className='w-auto'>
+            <div className='flex flex-wrap gap-2'>
+              {overflowAllergies.map((allergy) => (
+                <Badge
+                  key={`${userId}-overflow-${allergy}`}
+                  variant='destructive'
+                  size='sm'
+                >
+                  {allergy}
+                </Badge>
+              ))}
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+      </>
+    );
+  };
+
+  const renderDetailParticipantBadge = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+  ) => {
+    const profile = participant.profiles;
+    const isLeaving = leavingParticipantId === participant.user_id;
+
+    return (
+      <UserBadge
+        key={`detail-${participant.room_id}-${participant.user_id}`}
+        className='transition-all duration-200 hover:scale-105 active:scale-95'
+        label={isLeaving ? '退室' : undefined}
+        variant={isLeaving ? 'destructive' : 'secondary'}
+        user={{
+          ...getUserBadgeUser(profile),
+          isNewRecruit: isLeaving ? false : isNewRecruit(profile),
+        }}
+        onClick={() => handleSelectDetailParticipant(participant)}
+      />
+    );
+  };
+
   const renderParticipantBadge = (
     participant: MockRoomWithUsers['user_rooms'][number],
     variant: 'default' | 'secondary' = 'default',
@@ -317,6 +459,7 @@ export default function PrototypePage() {
         variant={
           transferredHostUserId === participant.user_id ? 'accept' : variant
         }
+        className='hover:bg-accent hover:text-accent-foreground'
         user={getUserBadgeUser(profile)}
         onClick={() => handleSelectParticipant(participant)}
       />
@@ -346,10 +489,11 @@ export default function PrototypePage() {
               {overflowParticipants.length > 0 ? (
                 <HoverCard openDelay={120} closeDelay={120}>
                   <HoverCardTrigger asChild>
-                    <AvatarGroupCount
+                    <Badge
                       asChild
-                      variant='primary-foreground'
-                      className='size-6 cursor-pointer border-0 text-xs transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50'
+                      variant='secondary'
+                      size='sm'
+                      className='translate-y-0.5 cursor-pointer border-0 focus-visible:border-transparent focus-visible:ring-0'
                     >
                       <button
                         type='button'
@@ -357,7 +501,7 @@ export default function PrototypePage() {
                       >
                         +{overflowParticipants.length}
                       </button>
-                    </AvatarGroupCount>
+                    </Badge>
                   </HoverCardTrigger>
                   <HoverCardContent
                     align='start'
@@ -450,6 +594,176 @@ export default function PrototypePage() {
           <AlertDialogFooter>
             <AlertDialogCancel variant='outline'>キャンセル</AlertDialogCancel>
             <AlertDialogAction variant='accent' onClick={handleConfirmTransfer}>
+              ホストを移動
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 詳細popup */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent showCloseButton={false} className='max-h-[80vh]'>
+          <DialogHeader className='gap-0.5'>
+            <DialogTitle>{room.title}</DialogTitle>
+            <DialogDescription>イベントの詳細情報</DialogDescription>
+            <DialogIconAction variant='secondary' className='top-6 right-6'>
+              <PenBoxIcon className='h-5 w-5' />
+            </DialogIconAction>
+          </DialogHeader>
+
+          <DialogBody className='flex flex-col gap-6'>
+            <Card
+              size='default'
+              variant='secondary shadow-none'
+              className='min-h-0! overflow-visible! py-2!'
+            >
+              <CardContent className='flex-none! gap-0'>
+                <div className='flex items-center gap-3 border-b border-border py-3'>
+                  <Store className='size-4' />
+                  <span>お店</span>
+                  <span className='ml-auto text-foreground'>
+                    {room.location_name}
+                  </span>
+                </div>
+                <div className='flex items-center gap-3 border-b border-border py-3'>
+                  <Calendar className='size-4' />
+                  <span>日時</span>
+                  <span className='ml-auto text-foreground'>
+                    {formatDetailDate(room.event_start_at ?? mockDate)}
+                  </span>
+                </div>
+                <div className='flex items-center gap-3 py-3'>
+                  <UsersRound className='size-4' />
+                  <span>参加人数</span>
+                  <span className='ml-auto text-foreground'>
+                    {room.user_rooms.length}/{room.capacity_limit}人
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className='flex flex-col gap-3'>
+              <p className='text-muted-foreground'>参加者</p>
+              <div className='flex flex-wrap gap-2'>
+                {visibleDetailParticipants.map((participant) =>
+                  renderDetailParticipantBadge(participant),
+                )}
+                {overflowDetailParticipants.length > 0 ? (
+                  <HoverCard openDelay={120} closeDelay={120}>
+                    <HoverCardTrigger asChild>
+                      <Badge
+                        asChild
+                        variant='secondary'
+                        size='sm'
+                        className='cursor-pointer'
+                      >
+                        <button
+                          type='button'
+                          aria-label={`残り${overflowDetailParticipants.length}名を表示`}
+                        >
+                          +{overflowDetailParticipants.length}
+                        </button>
+                      </Badge>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      align='start'
+                      className='w-auto min-w-40 bg-transparent p-0 shadow-none ring-0'
+                    >
+                      <Card
+                        variant='default shadow-none'
+                        className='h-auto min-h-0! w-auto py-0!'
+                      >
+                        <CardContent className='p-3'>
+                          <div className='flex flex-wrap gap-2'>
+                            {overflowDetailParticipants.map((participant) =>
+                              renderDetailParticipantBadge(participant),
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </HoverCardContent>
+                  </HoverCard>
+                ) : null}
+              </div>
+            </div>
+
+            {allergyEntries.length > 0 ? (
+              <Card variant='destructive' className='gap-2'>
+                <CardHeader className='gap-2'>
+                  <CircleAlert className='size-4' />
+                  <CardTitle>アレルギー情報</CardTitle>
+                </CardHeader>
+                <CardContent className='gap-2'>
+                  {allergyEntries.map(({ allergies, participant }) => (
+                    <Card
+                      key={`allergy-${participant.user_id}`}
+                      size='sm'
+                      variant='default shadow-none'
+                    >
+                      <CardContent className='flex-row items-center text-foreground'>
+                        <span className='mr-auto text-foreground'>
+                          {getDisplayName(participant.profiles)}
+                        </span>
+                        <span className='ml-auto flex flex-wrap justify-end gap-2'>
+                          {renderAllergyTags(participant.user_id, allergies)}
+                        </span>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </CardContent>
+              </Card>
+            ) : null}
+          </DialogBody>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={isLeaveDialogOpen}
+        onOpenChange={handleLeaveDialogOpenChange}
+      >
+        <AlertDialogContent>
+          <AlertDialogTitle className='text-xl'>
+            ホストを移動しますか？
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            この人にホスト権限を渡します。あなたは普通の参加者になり、このルームは「参加予定」に移ります。
+          </AlertDialogDescription>
+
+          <AlertDialogBody>
+            <Card variant='secondary shadow-none' className='min-h-0! py-4!'>
+              <CardHeader className='flex flex-row items-center gap-3 px-4'>
+                <Avatar variant='rounded-full'>
+                  <AvatarImage
+                    src={leaveDialogProfile?.avatar_url ?? undefined}
+                  />
+                  <AvatarFallback
+                    className={
+                      isNewRecruit(leaveDialogProfile)
+                        ? 'bg-accent text-accent-foreground'
+                        : undefined
+                    }
+                  >
+                    {getFallback(leaveDialogProfile)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <CardTitle>{getDisplayName(leaveDialogProfile)}</CardTitle>
+                  <CardDescription>さんを新しいホストにします</CardDescription>
+                </div>
+                {isNewRecruit(leaveDialogProfile) ? (
+                  <CardAction className='self-center'>
+                    <Badge variant='accent' size='xs'>
+                      新
+                    </Badge>
+                  </CardAction>
+                ) : null}
+              </CardHeader>
+            </Card>
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel variant='outline'>キャンセル</AlertDialogCancel>
+            <AlertDialogAction variant='accent' onClick={handleConfirmLeave}>
               ホストを移動
             </AlertDialogAction>
           </AlertDialogFooter>
