@@ -18,12 +18,36 @@ const OTHER_USER_ID = '22222222-2222-2222-2222-222222222222'; // 田中さん
 const SATO_USER_ID = '33333333-3333-3333-3333-333333333333'; // 佐藤さん
 
 const EXTRA_USERS = [
-  { id: '44444444-4444-4444-4444-444444444444', name: '鈴木さん', email: 'suzuki@example.com' },
-  { id: '55555555-5555-5555-5555-555555555555', name: '高橋さん', email: 'takahashi@example.com' },
-  { id: '66666666-6666-6666-6666-666666666666', name: '渡辺さん', email: 'watanabe@example.com' },
-  { id: '77777777-7777-7777-7777-777777777777', name: '伊藤さん', email: 'ito@example.com' },
-  { id: '88888888-8888-8888-8888-888888888888', name: '山本さん', email: 'yamamoto@example.com' },
-  { id: '99999999-9999-9999-9999-999999999999', name: '中村さん', email: 'nakamura@example.com' },
+  {
+    id: '44444444-4444-4444-4444-444444444444',
+    name: '鈴木さん',
+    email: 'suzuki@example.com',
+  },
+  {
+    id: '55555555-5555-5555-5555-555555555555',
+    name: '高橋さん',
+    email: 'takahashi@example.com',
+  },
+  {
+    id: '66666666-6666-6666-6666-666666666666',
+    name: '渡辺さん',
+    email: 'watanabe@example.com',
+  },
+  {
+    id: '77777777-7777-7777-7777-777777777777',
+    name: '伊藤さん',
+    email: 'ito@example.com',
+  },
+  {
+    id: '88888888-8888-8888-8888-888888888888',
+    name: '山本さん',
+    email: 'yamamoto@example.com',
+  },
+  {
+    id: '99999999-9999-9999-9999-999999999999',
+    name: '中村さん',
+    email: 'nakamura@example.com',
+  },
 ];
 
 async function main() {
@@ -40,20 +64,46 @@ async function main() {
   // --------------------------------------------------
   // 部署の作成
   // --------------------------------------------------
-  let devDept = await prisma.departments.findFirst({ where: { name: '開発部' } });
-  if (!devDept) devDept = await prisma.departments.create({ data: { name: '開発部' } });
+  let devDept = await prisma.departments.findFirst({
+    where: { name: '開発部' },
+  });
+  if (!devDept)
+    devDept = await prisma.departments.create({ data: { name: '開発部' } });
 
-  let salesDept = await prisma.departments.findFirst({ where: { name: '営業部' } });
-  if (!salesDept) salesDept = await prisma.departments.create({ data: { name: '営業部' } });
+  let salesDept = await prisma.departments.findFirst({
+    where: { name: '営業部' },
+  });
+  if (!salesDept)
+    salesDept = await prisma.departments.create({ data: { name: '営業部' } });
 
   // --------------------------------------------------
   // プロフィール（ユーザー）の作成（upsertで安全に）
   // --------------------------------------------------
   const usersToCreate = [
-    { id: MOCK_USER_ID, email: 'myuser@example.com', username: '姫城太一', department_id: devDept.id },
-    { id: OTHER_USER_ID, email: 'other@example.com', username: '田中さん', department_id: salesDept.id },
-    { id: SATO_USER_ID, email: 'sato@example.com', username: '佐藤さん', department_id: devDept.id },
-    ...EXTRA_USERS.map(u => ({ id: u.id, email: u.email, username: u.name, department_id: salesDept.id }))
+    {
+      id: MOCK_USER_ID,
+      email: 'myuser@example.com',
+      username: '姫城太一',
+      department_id: devDept.id,
+    },
+    {
+      id: OTHER_USER_ID,
+      email: 'other@example.com',
+      username: '田中さん',
+      department_id: salesDept.id,
+    },
+    {
+      id: SATO_USER_ID,
+      email: 'sato@example.com',
+      username: '佐藤さん',
+      department_id: devDept.id,
+    },
+    ...EXTRA_USERS.map((u) => ({
+      id: u.id,
+      email: u.email,
+      username: u.name,
+      department_id: salesDept.id,
+    })),
   ];
 
   for (const u of usersToCreate) {
@@ -88,7 +138,10 @@ async function main() {
       status: 'OPEN' as RoomStatus,
       user_rooms: { create: { user_id: MOCK_USER_ID, is_owner: true } },
       room_tags: {
-        create: [{ tags: { connect: { name: 'ランチ' } } }, { tags: { connect: { name: '雑談' } } }],
+        create: [
+          { tags: { connect: { name: 'ランチ' } } },
+          { tags: { connect: { name: '雑談' } } },
+        ],
       },
     },
   });
@@ -109,7 +162,10 @@ async function main() {
         ],
       },
       room_tags: {
-        create: [{ tags: { connect: { name: 'もくもく会' } } }, { tags: { connect: { name: '初心者歓迎' } } }],
+        create: [
+          { tags: { connect: { name: 'もくもく会' } } },
+          { tags: { connect: { name: '初心者歓迎' } } },
+        ],
       },
     },
   });

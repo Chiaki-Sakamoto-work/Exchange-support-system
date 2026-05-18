@@ -4,12 +4,13 @@ import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { fullEventInclude } from '@/app/types';
 import { prisma } from '@/lib/prisma';
-import { createClient } from '@/lib/supabase/server'
-
+import { createClient } from '@/lib/supabase/server';
 
 export async function getHostedEvents() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) return [];
 
@@ -25,7 +26,9 @@ export async function getHostedEvents() {
 // 2. 自分が参加(is_owner: false)のイベントを取得
 export async function getJoinedEvents() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     console.log('⚠️ ログインユーザーが見つかりません');
@@ -108,10 +111,15 @@ export async function deleteEventAction(roomId: number) {
 // 参加のキャンセル
 export async function cancelParticipationAction(roomId: number) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     await prisma.user_rooms.deleteMany({
       where: {
         room_id: roomId,
-        user_id: MY_USER_ID,
+        user_id: user?.id,
       },
     });
 
@@ -128,10 +136,17 @@ export async function cancelParticipationAction(roomId: number) {
 // 新しく参加する（参加タブ用）
 export async function joinEventAction(roomId: number) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: 'ログインが必要です' };
+
     await prisma.user_rooms.create({
       data: {
         room_id: roomId,
-        user_id: MY_USER_ID,
+        user_id: user.id,
         is_owner: false,
       },
     });
@@ -156,7 +171,9 @@ export async function createEvent(formData: {
 }) {
   try {
     const supabase = await createClient();
-    const { data : { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return { success: false, error: 'ログインが必要です' };
@@ -244,6 +261,11 @@ export async function updateEventAction(
 
 export async function getExploreEvents() {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
@@ -252,7 +274,7 @@ export async function getExploreEvents() {
         },
         user_rooms: {
           none: {
-            user_id: user.id,
+            user_id: user?.id,
           },
         },
       },

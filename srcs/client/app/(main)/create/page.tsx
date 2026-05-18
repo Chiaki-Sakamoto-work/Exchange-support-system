@@ -4,8 +4,5 @@ import { MyEvents } from '@/features/events/components/MyEvents';
 export default async function CreatePage() {
   const events = await getHostedEvents();
 
-
-  return (
-    <MyEvents events={events} />
-  );
+  return <MyEvents events={events} />;
 }
