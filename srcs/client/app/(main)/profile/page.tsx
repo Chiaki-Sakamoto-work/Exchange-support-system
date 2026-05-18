@@ -12,11 +12,12 @@ export default async function ProfilePage() {
 
   const profile = await prisma.profiles.findUnique({
     where: { id: session.user.id },
+    include: { departments: true },
   });
 
-  return (
-    <main className='p-4'>
-      <ProfileDashboard user={profile} />
-    </main>
-  );
+  if (!profile) {
+    return <div>プロフィールが見つかりません。</div>;
+  }
+
+  return <ProfileDashboard user={profile} />;
 }

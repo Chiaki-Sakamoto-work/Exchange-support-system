@@ -5,6 +5,10 @@ import { auth } from '@/lib/supabase/auth';
 export default async function ProfileEditPage() {
   const session = await auth();
 
+  if (!session?.user) {
+    return <div>ログインが必要です</div>;
+  }
+
   const profile = await prisma.profiles.findUnique({
     where: { id: session.user.id },
     include: { departments: true },
@@ -12,10 +16,14 @@ export default async function ProfileEditPage() {
 
   if (!profile) return <div>読み込みエラー</div>;
 
-  return (
-    <div className='container mx-auto max-w-2xl py-10'>
-      <h1 className='text-2xl font-bold mb-8'>プロフィール編集</h1>
-      <ProfileEditForm initialData={profile} />
-    </div>
-  );
+  const initialData = {
+    ...profile,
+    username: profile.username ?? '', // 💡 null なら空文字にする
+    bio: profile.bio ?? '', // 💡 null なら空文字にする
+    is_support_used: profile.is_support_used ?? false,
+    user_type: profile.user_type as '一般社員' | '新卒' | null, // スキーマの型に合わせる
+  };
+
+  // 3. 整形した initialData を渡す
+  return <ProfileEditForm initialData={initialData} />;
 }

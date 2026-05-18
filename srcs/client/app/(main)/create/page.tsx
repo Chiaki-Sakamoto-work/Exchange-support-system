@@ -1,10 +1,19 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { EventCreateForm } from '@/features/events/components/EventCreateForm';
 
-export default function EventCreatePage() {
+export default function CreatePage() {
+  const router = useRouter();
+
+  const handleSuccess = () => {
+    router.push('/');
+    router.refresh();
+  };
+
   return (
-    <div>
-      <h2 className='text-xl font-bold mb-6'>イベントを作成</h2>
-      <EventCreateForm />
+    <div className='p-6'>
+      <EventCreateForm onSuccess={handleSuccess} />
     </div>
   );
 }
