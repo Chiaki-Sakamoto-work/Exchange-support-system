@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { departments } from '@prisma/client';
 import { Building2, CircleAlert, Sparkles, UserRoundCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { type KeyboardEvent, useState } from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
@@ -57,6 +57,8 @@ export function ProfileEditForm({
   const [departmentSelectOpen, setDepartmentSelectOpen] = useState(false);
   const [newDepartmentName, setNewDepartmentName] = useState('');
   const [isAddingDepartment, setIsAddingDepartment] = useState(false);
+  const [isSaveLocked, setIsSaveLocked] = useState(false);
+  const saveLockRef = useRef(false);
 
   // 1. フォームの初期化
   const {
@@ -83,6 +85,7 @@ export function ProfileEditForm({
   const isSupportUsed = watch('is_support_used') || false;
   const userType = watch('user_type') || '一般社員';
   const departmentId = watch('department_id');
+  const isSaving = isSubmitting || isSaveLocked;
 
   // 3. チップをクリックした時の追加/削除ロジック（ここが抜けていた部分です）
   const toggleAllergy = (allergy: string) => {
@@ -160,6 +163,18 @@ export function ProfileEditForm({
 
   // 4. 保存（送信）処理
   const onSubmit = async (data: ProfileFormValues) => {
+    if (saveLockRef.current) {
+      return;
+    }
+
+    saveLockRef.current = true;
+    setIsSaveLocked(true);
+
+    const releaseSaveLock = () => {
+      saveLockRef.current = false;
+      setIsSaveLocked(false);
+    };
+
     try {
       const result = await updateProfile(
         initialData.id,
@@ -173,9 +188,11 @@ export function ProfileEditForm({
         router.refresh();
       } else {
         toast.error('保存に失敗しました');
+        releaseSaveLock();
       }
     } catch {
       toast.error('予期せぬエラーが発生しました');
+      releaseSaveLock();
     }
   };
 
@@ -241,7 +258,10 @@ export function ProfileEditForm({
                       ?.name ?? '部署を選択してください')
                   : '所属なし'}
               </SelectTrigger>
-              <SelectContent inlineMaxHeightClassName='max-h-40' className='text-muted-foreground'>
+              <SelectContent
+                inlineMaxHeightClassName='max-h-40'
+                className='text-muted-foreground'
+              >
                 <SelectItem value='none'>所属なし</SelectItem>
                 {departmentOptions.map((dept) => (
                   <SelectItem key={dept.id} value={String(dept.id)}>
@@ -392,9 +412,9 @@ export function ProfileEditForm({
           variant='default'
           className='flex-1 py-7 bg-zinc-950 text-white rounded-2xl font-bold'
           type='submit'
-          disabled={isSubmitting}
+          disabled={isSaving}
         >
-          {isSubmitting ? '保存中...' : '保存する'}
+          {isSaving ? '保存中...' : '保存する'}
         </Button>
       </div>
     </form>
