@@ -1,37 +1,41 @@
-import { type CookieOptionsWithName, createServerClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // クッキー名はブラウザが使う公開URLから生成されるため NEXT_PUBLIC_SUPABASE_URL を使う
+  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // 実際のAPIリクエストはDocker内部から到達できるURLへリライトする
+  const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // ブラウザがアクセス可能なURLを定義
+  const PublicUrl = process.env.NEXT_PROG_URL || process.env.FRONTEND;
+
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables');
+  // 1. 環境変数チェック
+  if (!publicUrl || !supabaseAnonKey) {
+    console.error('⚠️ Missing Supabase environment variables');
+    return supabaseResponse;
   }
 
-  // With Fluid compute, don't put this client in a global environment
-  // variable. Always create a new one on each request.
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+  // 2. Supabase クライアント作成
+  const supabase = createServerClient(publicUrl, supabaseAnonKey, {
+    global: {
+      fetch: (url, options) =>
+        fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(
-        cookiesToSet: {
-          name: string;
-          value: string;
-          options: CookieOptionsWithName;
-        }[],
-      ) {
+      setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
-        supabaseResponse = NextResponse.next({
-          request,
-        });
+        supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => {
           supabaseResponse.cookies.set(name, value, options);
         });
@@ -39,41 +43,30 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // 3. ユーザー取得
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
+  const url = request.nextUrl.clone();
 
-  const user = data?.claims;
-  // lint回避で一時的に記述
-  console.log(user);
+  // 4. 除外設定
+  const isAuthPage =
+    url.pathname.startsWith('/login') || url.pathname === '/callback';
+  if (isAuthPage) {
+    return supabaseResponse;
+  }
 
-  // if (
-  //   !user &&
-  //   !request.nextUrl.pathname.startsWith('/login') &&
-  //   !request.nextUrl.pathname.startsWith('/auth')
-  // ) {
-  //   // no user, potentially respond by redirecting the user to the login page
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = '/login';
-  //   return NextResponse.redirect(url);
-  // }
+  // 5. 未ログイン時のガード（リダイレクト先を PUBLIC_URL に固定）
+  if (!user) {
+    // 🔴 request.url ではなく、明示的に localhost:3000 を指定してリダイレクト
+    return NextResponse.redirect(new URL('/login', PublicUrl));
+  }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+  // 6. ログイン済みで /login にアクセスした場合
+  if (user && url.pathname === '/login') {
+    return NextResponse.redirect(new URL('/', PublicUrl));
+  }
 
   return supabaseResponse;
 }

@@ -23,10 +23,14 @@
 !/srcs/**/*.sh
 !/srcs/**/*.svg
 !/srcs/**/*.md
+!/srcs/**/*.mdx
 !/srcs/**/*.toml
 !/srcs/**/*.prisma
 !/**/.gitkeep
 !/**/*.yml
+!/**/*.nix
+!/**/*.lock
+!/**/*.svg
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
