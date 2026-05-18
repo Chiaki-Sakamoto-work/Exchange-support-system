@@ -11,6 +11,8 @@ import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 export interface ProfileEditFormProps {
   initialData: ProfileFormValues & {
     id: string;
+    email: string;
+    avatar_url: string | null;
   };
 }
 
@@ -69,7 +71,12 @@ export function ProfileEditForm({ initialData }: ProfileEditFormProps) {
   // 4. 保存（送信）処理
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      const result = await updateProfile(initialData.id, data);
+      const result = await updateProfile(
+        initialData.id,
+        initialData.email,
+        initialData.avatar_url,
+        data,
+      );
       if (result.success) {
         toast.success('プロフィールを保存しました！');
         router.push('/profile');
