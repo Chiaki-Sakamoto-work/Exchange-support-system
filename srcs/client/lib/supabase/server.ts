@@ -14,7 +14,7 @@ export async function createClient() {
   return createServerClient(publicUrl, supabaseAnonKey, {
     global: {
       fetch: (url, options) =>
-        fetch(url.toString().replace(publicUrl, internalUrl!), options),
+        fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
     },
     cookies: {
       getAll() {

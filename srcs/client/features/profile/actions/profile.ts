@@ -1,8 +1,8 @@
-'use server'
+'use server';
 
-import { prisma } from '@/lib/prisma';
-import { profileSchema, ProfileFormValues } from '../schemas/profile';
 import { revalidatePath } from 'next/cache';
+import { prisma } from '@/lib/prisma';
+import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 
 export async function updateProfile(userId: string, data: ProfileFormValues) {
   const validatedData = profileSchema.parse(data);

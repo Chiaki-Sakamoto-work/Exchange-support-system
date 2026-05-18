@@ -34,9 +34,8 @@ export default function RootLayout({
         {children}
 
         {/* 魔法のフラッシュメッセージ装置（bodyの末尾に1つだけ置く） */}
-        <Toaster position="top-center" richColors />
+        <Toaster position='top-center' richColors />
       </body>
     </html>
   );
 }
-
