@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { EventCreateForm } from '@/features/events/components/EventCreateForm';
+import { EventForm } from '@/features/events/components/EventForm';
 
 export default function CreatePage() {
   const router = useRouter();
@@ -12,8 +12,8 @@ export default function CreatePage() {
   };
 
   return (
-    <div className='p-6'>
-      <EventCreateForm onSuccess={handleSuccess} />
-    </div>
+    // <div className='p-6'>
+    <EventForm onSuccess={handleSuccess} />
+    // </div>
   );
 }

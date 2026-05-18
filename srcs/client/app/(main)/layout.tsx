@@ -1,4 +1,4 @@
-import { BottomNav } from '@/components/Layout/BottomNav';
+import { BottomNav } from '@components/layout/BottomNav';
 
 export default function MainLayout({
   children,
@@ -14,7 +14,7 @@ export default function MainLayout({
         <h1 className='text-xl font-bold tracking-tight'>Nomikai Hub</h1>
       </header>
 
-      <main className='max-w-md mx-auto p-4 pb-24'>{children}</main>
+      <main className='max-w-md mx-auto pb-24'>{children}</main>
 
       <BottomNav />
     </div>

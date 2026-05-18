@@ -1,74 +1,102 @@
 'use client';
-import {
-  House,
-  LayoutDashboard,
-  Plus,
-  PlusCircle,
-  User,
-  UserCircle,
-  Users,
-  UsersRound,
-} from 'lucide-react';
+import { LayoutDashboard, PlusCircle, UserCircle, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 
-const tabs = [
-  { id: 'home', label: 'ホーム', icon: <House /> },
-  { id: 'create', label: '開催する', icon: <Plus /> },
-  { id: 'join', label: '参加する', icon: <UsersRound /> },
-  { id: 'mypage', label: 'マイページ', icon: <User /> },
-] as const;
+export const BottomNav = () => {
+  const pathname = usePathname();
 
-export type BottomTab = (typeof tabs)[number]['id'];
-
-// Propsの型定義：現在のタブと、タブを切り替えるための関数を受け取る
-type BottomNavProps = {
-  className?: string;
-  activeTab: BottomTab;
-  onTabChange: (tab: BottomTab) => void;
-};
-
-export const BottomNav = ({
-  className = '',
-  activeTab,
-  // onTabChange,
-}: BottomNavProps) => {
-  // const pathname = usePathname();
-
-  const tabs = [
-    { id: 'home', label: 'ホーム', icon: <House />, href: '/' },
-    { id: 'create', label: '開催する', icon: <Plus />, href: '/create' },
-    { id: 'join', label: '参加する', icon: <UsersRound />, href: '/join' },
-    { id: 'mypage', label: 'マイページ', icon: <User />, href: '/mypage' },
-  ] as const;
-  // active={pathname === '/'}
   return (
-    <nav>
-      <Tabs
-        value={activeTab}
-        // onValueChange={(value) => onTabChange(value as BottomTab)}
-        className='w-full'
-        variant='invert'
-        indicatorClassName='inset-1'
-      >
-        <TabsList
-          className={`fixed inset-x-0 mx-auto w-full justify-around ${className}`}
-        >
-          {tabs.map((tab) => (
-            <Link key={tab.id} href={tab.href}>
-              <TabsTrigger value={tab.id} className='h-[64px] p-2'>
-                <div className='flex flex-col items-center justify-center gap-1 '>
-                  <span className='flex-shrink-0 [&_svg]:w-6 [&_svg]:h-6 [&_svg]:stroke-current'>
-                    {tab.icon}
-                  </span>
-                  <span className='text-[10px] font-bold'>{tab.label}</span>
-                </div>
-              </TabsTrigger>
-            </Link>
-          ))}
-        </TabsList>
-      </Tabs>
-    </nav>
+    <Tabs defaultValue='account' className='flex flex-col w-[632px] h-[540px]'>
+      {/* タブのメニュー部分 */}
+      <TabsList className='w-full h-[48px] shrink-0'>
+        <TabsTrigger value='/'>
+          <NavItem
+            href='/'
+            icon={<LayoutDashboard size={22} />}
+            label='ホーム'
+            active={pathname === '/'}
+          />
+        </TabsTrigger>
+        <TabsTrigger value='/create'>
+          <NavItem
+            href='/create'
+            icon={<LayoutDashboard size={22} />}
+            label='ホーム'
+            active={pathname === '/'}
+          />
+        </TabsTrigger>
+        <TabsTrigger value='/join'>
+          <NavItem
+            href='/'
+            icon={<LayoutDashboard size={22} />}
+            label='ホーム'
+            active={pathname === '/'}
+          />
+        </TabsTrigger>
+        <TabsTrigger value='/profile'>
+          <NavItem
+            href='/'
+            icon={<LayoutDashboard size={22} />}
+            label='ホーム'
+            active={pathname === '/'}
+          />
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+    // <nav className='fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/90 backdrop-blur-lg border border-zinc-200 rounded-[32px] p-2 shadow-2xl z-50 flex justify-around items-center h-20'>
+    //   {/* pathname と href が一致している時だけ active を true にする */}
+    //   <NavItem
+    //     href='/'
+    //     icon={<LayoutDashboard size={22} />}
+    //     label='ホーム'
+    //     active={pathname === '/'}
+    //   />
+    //   <NavItem
+    //     href='/create'
+    //     icon={<PlusCircle size={22} />}
+    //     label='開催する'
+    //     active={pathname === '/create'}
+    //   />
+    //   <NavItem
+    //     href='/join'
+    //     icon={<Users size={22} />}
+    //     label='参加する'
+    //     active={pathname === '/join'}
+    //   />
+    //   <NavItem
+    //     href='/profile'
+    //     icon={<UserCircle size={22} />}
+    //     label='マイページ'
+    //     active={pathname === '/profile'}
+    //   />
+    // </nav>
   );
 };
+
+const NavItem = ({
+  href,
+  icon,
+  label,
+  active,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+}) => (
+  <Link
+    href={href}
+    className={`flex flex-col items-center justify-center gap-1 w-full h-full rounded-2xl transition-all duration-300 ${
+      active
+        ? 'bg-zinc-100 text-zinc-950 scale-105'
+        : 'text-zinc-400 hover:text-zinc-600'
+    }`}
+  >
+    <div className={`${active ? 'animate-in zoom-in duration-300' : ''}`}>
+      {icon}
+    </div>
+    <span className='text-[10px] font-bold tracking-tighter'>{label}</span>
+  </Link>
+);
