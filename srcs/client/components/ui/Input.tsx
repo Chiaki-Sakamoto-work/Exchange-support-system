@@ -58,7 +58,7 @@ function Input({
         className={cn(
           // 基本スタイル: 高さ48px、角丸14px、背景白、枠線など
           'h-12 w-full min-w-0 rounded-[14px] border border-input bg-white px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground md:text-sm',
-          'hover:border-blue-500 dark:hover:border-blue-400',
+          'hover:border-accent',
           // ファイル入力時のスタイル
           'file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
 

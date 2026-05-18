@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { departments } from '@prisma/client';
 import { Building2, CircleAlert, Sparkles, UserRoundCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { KeyboardEvent } from 'react';
+import { type KeyboardEvent, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
@@ -18,13 +18,13 @@ import { RadioGroup } from '@/components/ui/RadioGroup';
 import {
   Select,
   SelectContent,
+  SelectInlineFooter,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { cn } from '@/lib/utils';
-import { updateProfile } from '../actions/profile';
+import { createDepartment, updateProfile } from '../actions/profile';
 import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 
 export interface ProfileEditFormProps {
@@ -53,6 +53,10 @@ export function ProfileEditForm({
   departments,
 }: ProfileEditFormProps) {
   const router = useRouter();
+  const [departmentOptions, setDepartmentOptions] = useState(departments);
+  const [departmentSelectOpen, setDepartmentSelectOpen] = useState(false);
+  const [newDepartmentName, setNewDepartmentName] = useState('');
+  const [isAddingDepartment, setIsAddingDepartment] = useState(false);
 
   // 1. フォームの初期化
   const {
@@ -104,6 +108,54 @@ export function ProfileEditForm({
       event.preventDefault();
       toggleSupport();
     }
+  };
+
+  const selectDepartment = (departmentId: number | null) => {
+    setValue('department_id', departmentId, { shouldDirty: true });
+    setDepartmentSelectOpen(false);
+  };
+
+  const handleAddDepartment = async () => {
+    const trimmedName = newDepartmentName.trim();
+
+    if (!trimmedName || isAddingDepartment) {
+      return;
+    }
+
+    const existingDepartment = departmentOptions.find(
+      (department) =>
+        department.name.trim().toLocaleLowerCase() ===
+        trimmedName.toLocaleLowerCase(),
+    );
+
+    if (existingDepartment) {
+      selectDepartment(existingDepartment.id);
+      setNewDepartmentName('');
+      return;
+    }
+
+    setIsAddingDepartment(true);
+    const result = await createDepartment(trimmedName);
+    setIsAddingDepartment(false);
+
+    if (!result.success || !result.department) {
+      toast.error(result.error ?? '部署の追加に失敗しました');
+      return;
+    }
+
+    setDepartmentOptions((currentDepartments) => {
+      if (
+        currentDepartments.some(
+          (department) => department.id === result.department.id,
+        )
+      ) {
+        return currentDepartments;
+      }
+
+      return [...currentDepartments, result.department];
+    });
+    selectDepartment(result.department.id);
+    setNewDepartmentName('');
   };
 
   // 4. 保存（送信）処理
@@ -160,7 +212,7 @@ export function ProfileEditForm({
           {...register('bio')}
           rows={3}
           placeholder='自己紹介を入力してください'
-          className='w-full p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all resize-none'
+          className='w-full p-4 bg-card border border-zinc-200 rounded-[14px] focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all resize-none'
         />
       </div>
 
@@ -171,7 +223,10 @@ export function ProfileEditForm({
           </CardDescription>
           <div className='w-full py-2'>
             <Select
+              inline
               value={departmentId ? String(departmentId) : 'none'}
+              inlineOpen={departmentSelectOpen}
+              onInlineOpenChange={setDepartmentSelectOpen}
               onValueChange={(value) => {
                 setValue(
                   'department_id',
@@ -180,16 +235,40 @@ export function ProfileEditForm({
                 );
               }}
             >
-              <SelectTrigger className='w-full bg-muted border'>
-                <SelectValue placeholder='部署を選択してください' />
+              <SelectTrigger className='w-full bg-muted text-foreground border'>
+                {departmentId
+                  ? (departmentOptions.find((dept) => dept.id === departmentId)
+                      ?.name ?? '部署を選択してください')
+                  : '所属なし'}
               </SelectTrigger>
-              <SelectContent inline inlineMaxHeightClassName='max-h-40'>
+              <SelectContent inlineMaxHeightClassName='max-h-40' className='text-muted-foreground'>
                 <SelectItem value='none'>所属なし</SelectItem>
-                {departments.map((dept) => (
+                {departmentOptions.map((dept) => (
                   <SelectItem key={dept.id} value={String(dept.id)}>
                     {dept.name}
                   </SelectItem>
                 ))}
+                <SelectInlineFooter>
+                  <div className='flex items-center gap-2'>
+                    <Input
+                      value={newDepartmentName}
+                      onChange={(event) =>
+                        setNewDepartmentName(event.target.value)
+                      }
+                      placeholder='新しい部署を追加'
+                      className='h-9 flex-1'
+                    />
+                    <Button
+                      type='button'
+                      size='sm'
+                      onClick={() => void handleAddDepartment()}
+                      disabled={!newDepartmentName.trim() || isAddingDepartment}
+                      className='shrink-0'
+                    >
+                      追加
+                    </Button>
+                  </div>
+                </SelectInlineFooter>
               </SelectContent>
             </Select>
           </div>
@@ -210,10 +289,16 @@ export function ProfileEditForm({
               })
             }
           >
-            <RadioCard value='一般社員' className='h-auto! bg-muted py-3!'>
+            <RadioCard
+              value='一般社員'
+              className='h-auto! bg-muted py-3!  data-[state=checked]:text-foreground'
+            >
               <p className='text-sm!'>一般社員</p>
             </RadioCard>
-            <RadioCard value='新卒' className='h-auto! bg-muted  py-3!'>
+            <RadioCard
+              value='新卒'
+              className='h-auto! bg-muted  py-3!  data-[state=checked]:text-foreground'
+            >
               <p>新卒</p>
             </RadioCard>
           </RadioGroup>
