@@ -1,7 +1,7 @@
 'use client';
 
 // 1. インポートの順番をアルファベット順に (p -> r -> u)
-import type { profiles, rooms, user_rooms } from '@prisma/client';
+import type { profiles } from '@prisma/client';
 import {
   Calendar,
   CircleAlert,
@@ -16,14 +16,7 @@ import type { Participant, Room } from '@/app/types';
 // import type { User } from '@/app/types'; // 실제 Prisma 데이터 타입을 사용할 것이므로 주석처리
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
   Dialog,
   DialogBody,
@@ -38,15 +31,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/HoverCard';
-import { ExitParticipantAlertDialog } from '@/features/events/components/ExitParticipantAlertDialog';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import { getDisplayName } from '@/features/users/lib/profile';
 import { formatDate } from '@/lib/date';
 import {
   cancelParticipationAction,
-  deleteEventAction,
   getEventDetail,
-  joinEventAction,
 } from '../actions/eventActions';
 import { EventForm } from './EventForm';
 import { ExitEventAlertDialog } from './ExitEventAlertDialog';
@@ -71,9 +61,6 @@ export const EventDetailModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [leavingParticipantId, setLeavingParticipantId] = useState<
-    string | null
-  >(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
@@ -141,8 +128,6 @@ export const EventDetailModal = ({
     ) {
       return;
     }
-
-    setLeavingParticipantId(null);
   };
 
   const handleExitAction = async () => {
@@ -163,9 +148,6 @@ export const EventDetailModal = ({
 
   const handleLeaveDialogOpenChange = (open: boolean) => {
     setIsLeaveDialogOpen(open);
-    if (!open) {
-      setLeavingParticipantId(null);
-    }
   };
 
   const renderDetailParticipantBadge = (participant: Participant) => {
@@ -385,6 +367,7 @@ export const EventDetailModal = ({
         isLeaveDialogOpen={isLeaveDialogOpen}
         handleLeaveDialogOpenChange={handleLeaveDialogOpenChange}
         handleConfirmLeave={handleExitAction}
+        disabled={isProcessing}
       />
     </>
 

@@ -1,5 +1,4 @@
 import type { profiles } from '@prisma/client';
-import type { MouseEventHandler } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,

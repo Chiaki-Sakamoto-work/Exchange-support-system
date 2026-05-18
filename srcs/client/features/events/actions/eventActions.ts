@@ -214,9 +214,7 @@ export async function updateEventAction(
           create: formData.tags.map((tagName) => ({
             tags: {
               connectOrCreate: {
-                // 중복 생성을 방지하기 위한 고유 조건 (schema.prisma의 @unique 설정 기준)
                 where: { name: tagName },
-                // 테이블에 해당 태그가 없을 경우 새로 생성할 데이터
                 create: { name: tagName },
               },
             },
@@ -235,16 +233,16 @@ export async function updateEventAction(
 
 export async function getExploreEvents() {
   try {
-    // 1. まず「自分が参加していない」「OPEN」「未来の予定」をDBから取得
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
         event_start_at: {
-          gte: new Date(), // 今より未来のイベントだけを取得
+          gte: new Date(),
         },
         user_rooms: {
           none: {
-            user_id: MOCK_USER_ID, // 自分が未参加
+            // MOCK_USER_ID가 정의되어 있다고 가정합니다
+            user_id: MOCK_USER_ID,
           },
         },
       },
@@ -252,7 +250,15 @@ export async function getExploreEvents() {
         user_rooms: {
           include: { profiles: true },
         },
+        room_tags: {
+          include: { tags: true },
+        },
+        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+        _count: {
+          select: { user_rooms: true },
+        },
       },
+      // 👆 여기까지 수정
       orderBy: {
         event_start_at: 'asc',
       },

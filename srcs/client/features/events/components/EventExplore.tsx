@@ -1,23 +1,15 @@
 'use client';
 
-import type { Prisma } from '@prisma/client';
 import { useCallback, useEffect, useState } from 'react';
+import type { Room } from '@/app/types';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
 
-type ExploreEvent = Prisma.roomsGetPayload<{
-  include: {
-    user_rooms: {
-      include: { profiles: true };
-    };
-  };
-}>;
-
 export const EventExplore = () => {
   // explore専用のデータと状態
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [exploreEvents, setExploreEvents] = useState<ExploreEvent[]>([]);
+  const [exploreEvents, setExploreEvents] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
@@ -67,20 +59,23 @@ export const EventExplore = () => {
         {exploreEvents.length > 0 ? (
           exploreEvents.map((room) => {
             // 主催者を探す（is_owner: true のユーザー）
-            const owner =
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              room.user_rooms?.find((ur) => ur.is_owner)?.profiles?.username ||
-              '不明';
+            const ownerProfile = {
+              name: room.user_rooms[0]?.profiles?.username || '不明',
+            };
+            const formattedTags = room.room_tags.map((rt) => ({
+              id: rt.tags.id,
+              name: rt.tags.name,
+            }));
 
             return (
               <EventCard
                 key={room.id}
+                tags={formattedTags}
                 title={room.title}
                 shop={room.location_name || '未定'}
                 date={formatDate(room.event_start_at)}
-                detail={`👥 ${room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
-                owner={`👤 主催: ${owner}`}
-                colorClass='bg-zinc-400' // 探すタブ用のアクセントカラー
+                participants={`👥 ${room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
+                ownerProfile={ownerProfile}
                 onClick={() => setSelectedRoomId(room.id)}
               />
             );
