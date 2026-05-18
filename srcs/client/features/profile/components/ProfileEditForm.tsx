@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { departments } from '@prisma/client';
 import { Building2, CircleAlert, Sparkles, UserRoundCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import type { KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
@@ -22,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { cn } from '@/lib/utils';
 import { updateProfile } from '../actions/profile';
 import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 
@@ -95,6 +97,13 @@ export function ProfileEditForm({
 
   const toggleSupport = () => {
     setValue('is_support_used', !isSupportUsed, { shouldDirty: true });
+  };
+
+  const handleSupportKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleSupport();
+    }
   };
 
   // 4. 保存（送信）処理
@@ -259,17 +268,26 @@ export function ProfileEditForm({
 
           <Card
             variant='default shadow-none'
-            className='min-h-0! bg-accent/[0.08]! border! border-accent/[0.4]! py-2.5!'
+            role='button'
+            tabIndex={0}
+            aria-pressed={isSupportUsed}
+            onClick={toggleSupport}
+            onKeyDown={handleSupportKeyDown}
+            className={cn(
+              'min-h-0! cursor-pointer select-none border! py-2.5! focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+              isSupportUsed
+                ? 'bg-accent/[0.08]! border-accent/[0.4]!'
+                : 'bg-muted! border-border!',
+            )}
           >
             <CardContent className='flex-row! justify-between! items-center! text-foreground! w-full!'>
               <span className='text-sm'>飲み会補助</span>
               <Badge
-                variant={isSupportUsed ? 'accent' : 'default'}
+                variant={isSupportUsed ? 'accent' : 'secondary'}
                 size='sm'
-                onClick={toggleSupport}
-                className='cursor-pointer select-none w-20'
+                className='w-20 cursor-pointer'
               >
-                {isSupportUsed ? '利用済み' : '未利用'}{' '}
+                {isSupportUsed ? '利用済み' : '未利用'}
               </Badge>
             </CardContent>
           </Card>

@@ -33,7 +33,7 @@ export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
         <ProfileHeader user={user} />
 
         {/* 福利厚生セクション */}
-        <WelfareStatus />
+        <WelfareStatus is_support_used={user.is_support_used} />
 
         {/* アクションボタン */}
         <div className='flex flex-col gap-3 mt-2'>
