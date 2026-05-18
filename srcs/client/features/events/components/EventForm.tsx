@@ -2,6 +2,7 @@
 
 import { Calendar1, FileText, Store, Tag, UserRound } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import type { Room } from '@/app/types';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -130,7 +131,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     // 🌟 result?.success とすることで、undefined の可能性を考慮
     if (result?.success) {
-      alert(roomId ? '更新しました！' : '作成しました！');
+      toast.success(roomId ? '更新しました！' : '作成しました！');
       onSuccess();
     } else if (result?.error) {
       _setError(result.error);
