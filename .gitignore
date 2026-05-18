@@ -28,6 +28,9 @@
 !/srcs/**/*.prisma
 !/**/.gitkeep
 !/**/*.yml
+!/**/*.nix
+!/**/*.lock
+!/**/*.svg
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile
