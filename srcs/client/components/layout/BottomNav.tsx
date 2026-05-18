@@ -32,9 +32,9 @@ type BottomNavProps = {
 export const BottomNav = ({
   className = '',
   activeTab,
-  onTabChange,
+  // onTabChange,
 }: BottomNavProps) => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
   const tabs = [
     { id: 'home', label: 'ホーム', icon: <House />, href: '/' },
@@ -42,12 +42,12 @@ export const BottomNav = ({
     { id: 'join', label: '参加する', icon: <UsersRound />, href: '/join' },
     { id: 'mypage', label: 'マイページ', icon: <User />, href: '/mypage' },
   ] as const;
-
+  // active={pathname === '/'}
   return (
     <nav>
       <Tabs
         value={activeTab}
-        onValueChange={(value) => onTabChange(value as BottomTab)}
+        // onValueChange={(value) => onTabChange(value as BottomTab)}
         className='w-full'
         variant='invert'
         indicatorClassName='inset-1'
