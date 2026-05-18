@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 
 /generated/prisma
+
+*storybook.log
+storybook-static
