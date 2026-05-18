@@ -45,6 +45,9 @@
 !/.github/workflows
 !/.github/workflows/ci.yml
 
+# test folder
+**/srcs/client/app/testui/
+
 # 6. セキュリティ上、絶対に無視するもの（ここは最後に書く）
 **/*.env
 **/*.env.local
