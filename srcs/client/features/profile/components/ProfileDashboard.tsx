@@ -1,3 +1,4 @@
+import { signOut } from '@feature/auth/actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ProfileHeader } from './ProfileHeader';
@@ -45,13 +46,14 @@ export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
               <span className='mr-2'>📝</span> プロフィールを編集
             </Link>
           </Button>
-
-          <Button
-            variant='outline'
-            className='w-full py-7 bg-white text-zinc-600 rounded-2xl border-zinc-200'
-          >
-            <span className='mr-2'>↪</span> ログアウト
-          </Button>
+          <form action={signOut}>
+            <button
+              type='submit'
+              className='w-full py-7 bg-white text-zinc-600 rounded-2xl border-zinc-200'
+            >
+              <span className='mr-2'>↪</span> ログアウト
+            </button>
+          </form>
         </div>
       </div>
     </div>
