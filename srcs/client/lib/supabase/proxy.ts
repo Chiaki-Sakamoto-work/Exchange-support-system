@@ -2,8 +2,10 @@ import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  const supabaseUrl =
-    process.env.SUPABASE_INTERNAL_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // クッキー名はブラウザが使う公開URLから生成されるため NEXT_PUBLIC_SUPABASE_URL を使う
+  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // 実際のAPIリクエストはDocker内部から到達できるURLへリライトする
+  const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // ブラウザがアクセス可能なURLを定義
@@ -13,14 +15,18 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  // 1. 環境変数チェック（ログの場所を修正）
-  if (!supabaseUrl || !supabaseAnonKey) {
+  // 1. 環境変数チェック
+  if (!publicUrl || !supabaseAnonKey) {
     console.error('⚠️ Missing Supabase environment variables');
     return supabaseResponse;
   }
 
   // 2. Supabase クライアント作成
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient(publicUrl, supabaseAnonKey, {
+    global: {
+      fetch: (url, options) =>
+        fetch(url.toString().replace(publicUrl, internalUrl!), options),
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
