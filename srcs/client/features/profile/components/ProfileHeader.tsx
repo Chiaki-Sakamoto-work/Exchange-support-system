@@ -11,7 +11,7 @@ export interface ProfileHeaderProps {
   };
 }
 
-export const ProfileHeader = ({ user }: { user: ProfileHeaderProps }) => {
+export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
   const tags = [user.user_type, user.bio, user.departments?.name].filter(
     Boolean,
   );
@@ -33,7 +33,7 @@ export const ProfileHeader = ({ user }: { user: ProfileHeaderProps }) => {
             key={tag}
             className='px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-bold'
           >
-            {user.departments}
+            {tag}
           </span>
         ))}
       </div>

@@ -5,15 +5,16 @@ import { WelfareStatus } from './WelfareStatus';
 
 export interface UserProfileProps {
   id: string;
-  username: string;
+  username: string | null; // 💡 「| null」を追加して、nullも受け取れるようにします
+  email: string;
   bio?: string | null;
-  department_id: string;
-  user_type: string;
+  department_id: number | null;
+  user_type: string | null;
   allergies: string[];
-  is_support_used: boolean;
+  is_support_used: boolean | null;
   departments?: {
     name: string;
-  };
+  } | null;
 }
 
 export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
