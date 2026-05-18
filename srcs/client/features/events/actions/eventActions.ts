@@ -1,21 +1,21 @@
-// サーバー側で安全にDB操作を行う宣言
 'use server';
 
 import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { fullEventInclude } from '@/app/types';
-import { prisma } from '../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server'
 
-// シードで作ったテストユーザーのID
-const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
-// 自分のユーザーID　ログイン機能ができたら、そこから取得するように変更
-const MY_USER_ID = '11111111-1111-1111-1111-111111111111';
 
-// 1. 自分が主催(is_owner: true)のイベントを取得
 export async function getHostedEvents() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: true } },
+      user_rooms: { some: { user_id: user.id, is_owner: true } },
     },
     include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
@@ -24,9 +24,16 @@ export async function getHostedEvents() {
 
 // 2. 自分が参加(is_owner: false)のイベントを取得
 export async function getJoinedEvents() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    console.log('⚠️ ログインユーザーが見つかりません');
+    return [];
+  }
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: false } },
+      user_rooms: { some: { user_id: user.id, is_owner: false } },
     },
     include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
@@ -148,18 +155,23 @@ export async function createEvent(formData: {
   shop: string;
 }) {
   try {
+    const supabase = await createClient();
+    const { data : { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'ログインが必要です' };
+    }
+
     const newRoom = await prisma.rooms.create({
       data: {
         title: formData.title,
-        // tags はDBに専用カラムがないため、一旦 description に保存します
         capacity_limit: formData.capacity,
         location_name: formData.shop,
-        event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
+        event_start_at: new Date(formData.datetime),
         status: 'OPEN' as RoomStatus,
-        // 同時に、自分を「主催者」として user_rooms に登録する（シードと同じ手法）
         user_rooms: {
           create: {
-            user_id: MOCK_USER_ID,
+            user_id: user.id,
             is_owner: true,
           },
         },
@@ -178,7 +190,6 @@ export async function createEvent(formData: {
       },
     });
 
-    // newRoomがlintに引っかからないように一時的に記述
     console.log('新しく作成された部屋のID:', newRoom.id);
     revalidatePath('/');
 
@@ -241,8 +252,7 @@ export async function getExploreEvents() {
         },
         user_rooms: {
           none: {
-            // MOCK_USER_ID가 정의되어 있다고 가정합니다
-            user_id: MOCK_USER_ID,
+            user_id: user.id,
           },
         },
       },
