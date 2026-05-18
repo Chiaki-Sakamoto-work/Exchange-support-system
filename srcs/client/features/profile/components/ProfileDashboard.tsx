@@ -1,4 +1,5 @@
 import { signOut } from '@feature/auth/actions';
+import { LogOut, PenBox } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ProfileHeader } from './ProfileHeader';
@@ -28,31 +29,23 @@ export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
 
       <div className='px-4 flex flex-col gap-4'>
         {/* メインカード (ProfileHeaderをラップ) */}
-        <div className='bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm border-b-4 border-b-blue-500'>
-          <ProfileHeader user={user} />
-        </div>
+
+        <ProfileHeader user={user} />
 
         {/* 福利厚生セクション */}
         <WelfareStatus />
 
         {/* アクションボタン */}
         <div className='flex flex-col gap-3 mt-2'>
-          <Button
-            asChild
-            variant='default'
-            className='w-full py-7 bg-zinc-950 rounded-2xl shadow-lg'
-          >
+          <Button asChild variant='default' className='w-full'>
             <Link href='/profile/edit'>
-              <span className='mr-2'>📝</span> プロフィールを編集
+              <PenBox /> プロフィールを編集
             </Link>
           </Button>
           <form action={signOut}>
-            <button
-              type='submit'
-              className='w-full py-7 bg-white text-zinc-600 rounded-2xl border-zinc-200'
-            >
-              <span className='mr-2'>↪</span> ログアウト
-            </button>
+            <Button variant='outline' className='w-full' type='submit'>
+              <LogOut /> ログアウト
+            </Button>
           </form>
         </div>
       </div>
