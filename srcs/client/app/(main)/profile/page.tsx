@@ -1,7 +1,7 @@
+import { redirect } from 'next/navigation';
 import { ProfileDashboard } from '@/features/profile/components/ProfileDashboard';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
-import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -15,7 +15,7 @@ export default async function ProfilePage() {
   });
 
   return (
-    <main className="p-4">
+    <main className='p-4'>
       <ProfileDashboard user={profile} />
     </main>
   );

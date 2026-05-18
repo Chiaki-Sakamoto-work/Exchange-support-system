@@ -9,11 +9,29 @@ const meta: Meta<typeof Button> = {
     // 画面上で選択肢として表示するための設定
     variant: {
       control: 'select',
-      options: ['default', 'accent', 'outline', 'secondary', 'ghost', 'destructive', 'link'],
+      options: [
+        'default',
+        'accent',
+        'outline',
+        'secondary',
+        'ghost',
+        'destructive',
+        'link',
+      ],
     },
     size: {
       control: 'select',
-      options: ['default', 'xs', 'sm', 'lg', 'xl', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'],
+      options: [
+        'default',
+        'xs',
+        'sm',
+        'lg',
+        'xl',
+        'icon',
+        'icon-xs',
+        'icon-sm',
+        'icon-lg',
+      ],
     },
   },
 };
