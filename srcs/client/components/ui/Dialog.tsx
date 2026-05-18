@@ -267,10 +267,7 @@ function DialogIconAction({
     <Button
       variant={variant}
       size={size}
-      className={cn(
-        'absolute top-4 right-4 text-muted-foreground hover:bg-muted hover:text-foreground',
-        className,
-      )}
+      className={cn('absolute top-4 right-4', className)}
       {...props}
     />
   );
