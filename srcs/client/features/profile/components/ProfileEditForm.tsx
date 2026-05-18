@@ -169,7 +169,7 @@ export function ProfileEditForm({
           <CardDescription className='flex items-center text-sm gap-2'>
             <Building2 className='w-4 h-4' /> 部署
           </CardDescription>
-          <CardContent>
+          <div className='w-full py-2'>
             <Select
               value={departmentId ? String(departmentId) : 'none'}
               onValueChange={(value) => {
@@ -183,7 +183,7 @@ export function ProfileEditForm({
               <SelectTrigger className='w-full bg-muted border'>
                 <SelectValue placeholder='部署を選択してください' />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent inline inlineMaxHeightClassName='max-h-40'>
                 <SelectItem value='none'>所属なし</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={String(dept.id)}>
@@ -192,12 +192,12 @@ export function ProfileEditForm({
                 ))}
               </SelectContent>
             </Select>
-          </CardContent>
+          </div>
         </CardContent>
       </Card>
 
       <Card className='min-h-0! shadow-none!'>
-        <CardContent className='flex flex-col gap-1'>
+        <CardContent className='flex flex-col gap-2'>
           <CardDescription className='flex items-center text-sm gap-2'>
             <UserRoundCheck className='w-4 h-4' /> 区分
           </CardDescription>
