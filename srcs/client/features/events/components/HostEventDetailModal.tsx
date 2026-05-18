@@ -5,17 +5,15 @@ import type { profiles, rooms, user_rooms } from '@prisma/client';
 import {
   Calendar,
   CircleAlert,
-  LogOut,
   PenBoxIcon,
   Store,
   UsersRound,
 } from 'lucide-react';
 // import { getDisplayName } from 'next/dist/shared/lib/utils';
 import { type MouseEvent, useEffect, useState } from 'react';
-import type { Participant, Room } from '@/app/types';
+import type { EventWithDetails, Participant } from '@/app/types';
 // import type { User } from '@/app/types'; // 실제 Prisma 데이터 타입을 사용할 것이므로 주석처리
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardAction,
@@ -49,7 +47,6 @@ import {
   joinEventAction,
 } from '../actions/eventActions';
 import { EventForm } from './EventForm';
-import { ExitEventAlertDialog } from './ExitEventAlertDialog';
 
 type Props = {
   roomId: number;
@@ -58,23 +55,31 @@ type Props = {
   onSuccess: () => void;
 };
 
-export const EventDetailModal = ({
+export const HostEventDetailModal = ({
   roomId,
   mode,
   onClose,
   onSuccess,
 }: Props) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [eventData, setEventData] = useState<Room>();
+  // const [isEditing, setIsEditing] = useState(false);
+  // const [isProcessing, setIsProcessing] = useState(false);
+  const [eventData, setEventData] = useState<EventWithDetails>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [selectedParticipant, setSelectedParticipant] =
+    useState<Participant | null>(null);
+  const [leaveDialogParticipant, setLeaveDialogParticipant] =
+    useState<Participant | null>(null);
   const [leavingParticipantId, setLeavingParticipantId] = useState<
     string | null
   >(null);
+  const [transferredHostUserId, setTransferredHostUserId] = useState<
+    string | null
+  >(null);
+
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -107,6 +112,15 @@ export const EventDetailModal = ({
     );
   }
 
+  const participants = eventData.user_rooms.filter(
+    (participant) => !participant.is_owner,
+  );
+  const shouldCollapse = participants.length > 7;
+  const visibleParticipants = shouldCollapse
+    ? participants.slice(0, 6)
+    : participants;
+  const overflowParticipants = shouldCollapse ? participants.slice(6) : [];
+
   const detailParticipants = eventData.user_rooms;
   const shouldCollapseDetailParticipants = detailParticipants.length > 7;
   const visibleDetailParticipants = shouldCollapseDetailParticipants
@@ -115,6 +129,9 @@ export const EventDetailModal = ({
   const overflowDetailParticipants = shouldCollapseDetailParticipants
     ? detailParticipants.slice(6)
     : [];
+
+  const selectedProfile = selectedParticipant?.profiles ?? null;
+  const leaveDialogProfile = leaveDialogParticipant?.profiles ?? null;
 
   const allergyEntries = eventData.user_rooms
     .map((participant) => ({
@@ -145,20 +162,100 @@ export const EventDetailModal = ({
     setLeavingParticipantId(null);
   };
 
-  const handleExitAction = async () => {
-    setIsProcessing(true);
-    let result: { success: boolean; error?: string } | undefined;
+  const handleSelectParticipant = (participant: Participant) => {
+    setSelectedParticipant(participant);
+    setIsTransferDialogOpen(true);
+  };
 
-    result = await cancelParticipationAction(roomId);
-
-    if (result?.success) {
-      alert('処理が完了しました！');
-      onSuccess();
-      onClose();
-    } else {
-      alert(result?.error || 'エラーが発生しました');
+  const handleConfirmTransfer = () => {
+    if (selectedParticipant) {
+      setTransferredHostUserId(selectedParticipant.user_id);
     }
-    setIsProcessing(false);
+    setIsTransferDialogOpen(false);
+  };
+
+  const handleSelectDetailParticipant = (participant: Participant) => {
+    if (leavingParticipantId === participant.user_id) {
+      setLeaveDialogParticipant(participant);
+      setIsLeaveDialogOpen(true);
+      return;
+    }
+
+    setLeavingParticipantId(participant.user_id);
+  };
+
+  // const handleAction = async (actionType: 'delete' | 'cancel' | 'join') => {
+  //   if (actionType === 'delete') {
+  //     if (
+  //       !window.confirm(
+  //         'この予定を完全に削除しますか？\n（この操作は取り消せません）',
+  //       )
+  //     )
+  //       return;
+  //   }
+  //   if (actionType === 'cancel') {
+  //     if (!window.confirm('この予定への参加をキャンセルしますか？')) return;
+  //   }
+
+  //   setIsProcessing(true);
+  //   let result: { success: boolean; error?: string } | undefined;
+
+  //   if (actionType === 'delete') result = await deleteEventAction(roomId);
+  //   if (actionType === 'cancel')
+  //     result = await cancelParticipationAction(roomId);
+  //   if (actionType === 'join') result = await joinEventAction(roomId);
+
+  //   if (result?.success) {
+  //     alert('処理が完了しました！');
+  //     onSuccess();
+  //     onClose();
+  //   } else {
+  //     alert(result?.error || 'エラーが発生しました');
+  //   }
+  //   setIsProcessing(false);
+  // };
+
+  // // 🌟 編集モード
+  // if (isEditing) {
+  //   return (
+  //     <div className='fixed inset-0 bg-black/60 z-[100] flex justify-center items-center p-4'>
+  //       <div
+  //         role='dialog'
+  //         aria-modal='true'
+  //         className='bg-white dark:bg-zinc-900 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl p-6 pb-12 shadow-2xl relative'
+  //         onClick={(e) => e.stopPropagation()}
+  //         onKeyDown={(e) => {
+  //           if (e.key === 'Escape') {
+  //             setIsEditing(false);
+  //           }
+  //         }}
+  //       >
+  //         <h2 className='text-xl font-bold mb-6'>予定を編集</h2>
+
+  //         <EventForm
+  //           roomId={roomId}
+  //           initialData={eventData || undefined}
+  //           onSuccess={() => {
+  //             onSuccess();
+  //             setIsEditing(false);
+  //           }}
+  //         />
+
+  //         <button
+  //           type='button'
+  //           onClick={() => setIsEditing(false)}
+  //           className='w-full mt-2 py-4 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold rounded-xl transition hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95'
+  //         >
+  //           キャンセルして戻る
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  const handleConfirmLeave = () => {
+    setIsLeaveDialogOpen(false);
+    setLeavingParticipantId(null);
   };
 
   const handleLeaveDialogOpenChange = (open: boolean) => {
@@ -170,17 +267,30 @@ export const EventDetailModal = ({
 
   const renderDetailParticipantBadge = (participant: Participant) => {
     const profile = participant.profiles;
+    const isLeaving = leavingParticipantId === participant.user_id;
+    const isOwner = participant.is_owner;
     return (
       <span
         key={`detail-${participant.room_id}-${participant.user_id}`}
         data-detail-participant-control='true'
       >
         <UserBadge
-          variant={'secondary'}
+          className={
+            isOwner
+              ? ''
+              : 'transition-all duration-200 hover:scale-105 active:scale-95'
+          }
+          label={isLeaving ? '退室' : undefined}
+          variant={isLeaving ? 'destructive' : 'secondary'}
           user={{
             ...getUserBadgeUser(profile),
-            isNewRecruit: isNewRecruit(profile),
+            isNewRecruit: isLeaving ? false : isNewRecruit(profile),
           }}
+          onClick={
+            isOwner
+              ? undefined
+              : () => handleSelectDetailParticipant(participant)
+          }
         />
       </span>
     );
@@ -209,27 +319,6 @@ export const EventDetailModal = ({
     );
   };
 
-  if (isEditing) {
-    <Dialog>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{eventData.title}を編集</DialogTitle>
-          <DialogDescription>内容を更新できます</DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <EventForm
-            roomId={roomId}
-            initialData={eventData || undefined}
-            onSuccess={() => {
-              onSuccess();
-              setIsEditing(false);
-            }}
-          />
-        </DialogBody>
-      </DialogContent>
-    </Dialog>;
-  }
-
   return (
     <>
       <Dialog
@@ -249,28 +338,9 @@ export const EventDetailModal = ({
           <DialogHeader className='gap-0.5'>
             <DialogTitle>{eventData.title}</DialogTitle>
             <DialogDescription>イベントの詳細情報</DialogDescription>
-            {mode === 'hosted' && (
-              <DialogIconAction variant='secondary' className='top-6 right-6'>
-                <PenBoxIcon
-                  className='h-5 w-5'
-                  onClick={() => setIsEditing(true)}
-                />
-              </DialogIconAction>
-            )}
-            {mode === 'joined' && (
-              <DialogIconAction
-                variant='destructive'
-                className='top-6 right-6'
-                onClick={() => setIsLeaveDialogOpen(true)}
-              >
-                <LogOut className='h-5 w-5' />
-              </DialogIconAction>
-            )}
-            {mode === 'explore' && (
-              <Button size='sm' variant='default' className='top-6 right-6'>
-                参加
-              </Button>
-            )}
+            <DialogIconAction variant='secondary' className='top-6 right-6'>
+              <PenBoxIcon className='h-5 w-5' />
+            </DialogIconAction>
           </DialogHeader>
 
           <DialogBody className='flex flex-col gap-6'>
@@ -381,12 +451,72 @@ export const EventDetailModal = ({
         </DialogContent>
       </Dialog>
 
-      <ExitEventAlertDialog
+      <ExitParticipantAlertDialog
         isLeaveDialogOpen={isLeaveDialogOpen}
         handleLeaveDialogOpenChange={handleLeaveDialogOpenChange}
-        handleConfirmLeave={handleExitAction}
+        handleConfirmLeave={handleConfirmLeave}
+        leaveDialogProfile={leaveDialogProfile}
       />
     </>
+    // // biome-ignore lint/a11y/useSemanticElements: 背景クリックで閉じる挙動をdivで実装するため
+    // <div
+    //   role='button'
+    //   tabIndex={-1}
+    //   aria-label='モーダルを閉じる'
+    //   className='fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4'
+    //   onClick={onClose}
+    //   onKeyDown={(e) => e.key === 'Escape' && onClose()}
+    // >
+    //   <div
+    //     role='dialog'
+    //     aria-modal='true'
+    //     className='bg-white dark:bg-zinc-900 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl relative'
+    //     onClick={(e) => e.stopPropagation()}
+    //     onKeyDown={(e) => e.stopPropagation()}
+    //   >
+    //     <button
+    //       type='button'
+    //       onClick={onClose}
+    //       className='absolute top-4 right-4 text-zinc-400 hover:text-zinc-600'
+    //     >
+    //       ✕
+    //     </button>
+
+    //     {isLoading ? (
+    //       <div className='py-20 text-center text-zinc-500'>読み込み中...</div>
+    //     ) : error || !eventData ? (
+    //       <div className='py-20 text-center text-red-500'>
+    //         {error || 'データの取得に失敗しました'}
+    //       </div>
+    //     ) : (
+    //       <div className='space-y-6'>
+    //         <h2 className='text-2xl font-bold'>{eventData.title}</h2>
+
+    //         <div className='space-y-2 text-sm text-zinc-600 dark:text-zinc-400'>
+    //           <p>📍 場所: {eventData.location_name || '未定'}</p>
+    //           <p>
+    //             👥 人数: {eventData.user_rooms?.length || 0} /{' '}
+    //             {eventData.capacity_limit}名
+    //           </p>
+    //           <p>🏷 タグ: {eventData.description || 'なし'}</p>
+    //         </div>
+
+    //         <div className='border-t border-zinc-200 dark:border-zinc-800 pt-4'>
+    //           <h3 className='font-bold mb-3'>参加者</h3>
+    //           <div className='space-y-2'>
+    //             {eventData.user_rooms?.map((ur) => (
+    //               <div
+    //                 key={ur.user_id}
+    //                 className='flex items-center gap-2 text-sm'
+    //               >
+    //                 <div className='w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center'>
+    //                   👤
+    //                 </div>
+    //                 <span>{ur.profiles?.username || '名無しさん'}</span>
+    //               </div>
+    //             ))}
+    //           </div>
+    //         </div>
 
     //         <div className='pt-6 mt-6 border-t border-zinc-200 dark:border-zinc-800 space-y-3'>
     //           {mode === 'hosted' && (
@@ -419,5 +549,21 @@ export const EventDetailModal = ({
     //               参加をキャンセルする
     //             </button>
     //           )}
+
+    //           {mode === 'explore' && (
+    //             <button
+    //               type='button'
+    //               onClick={() => handleAction('join')}
+    //               disabled={isProcessing}
+    //               className='w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg'
+    //             >
+    //               この予定に参加する
+    //             </button>
+    //           )}
+    //         </div>
+    //       </div>
+    //     )}
+    //   </div>
+    // </div>
   );
 };

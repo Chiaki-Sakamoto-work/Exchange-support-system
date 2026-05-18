@@ -46,6 +46,17 @@ export async function getEventDetail(roomId: number) {
             profiles: true, // 参加者のプロフィール情報（名前など）も一緒に取得
           },
         },
+        room_tags: {
+          include: {
+            tags: true,
+          },
+        },
+        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+        _count: {
+          select: {
+            user_rooms: true,
+          },
+        },
       },
     });
 

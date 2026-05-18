@@ -17,3 +17,5 @@ export const fullEventInclude = {
 export type Room = Prisma.roomsGetPayload<{
   include: typeof fullEventInclude;
 }>;
+
+export type Participant = Room['user_rooms'][number];
