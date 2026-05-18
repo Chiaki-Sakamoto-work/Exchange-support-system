@@ -16,7 +16,7 @@ export const EventHome = () => {
   const [joinedRooms, setJoinedRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
-  
+
   const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -46,7 +46,7 @@ export const EventHome = () => {
       <Tabs
         value={subTab}
         onValueChange={(val) => setSubTab(val as TabMode)} // defaultValue='hosted'
-        className='flex flex-col w-[632px]'
+        className='flex flex-col w-full'
       >
         {/* タブのメニュー部分 */}
         <TabsList className='w-full h-[48px] shrink-0'>
