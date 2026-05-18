@@ -3,6 +3,7 @@
 
 import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import { fullEventInclude } from '@/app/types';
 import { prisma } from '../../../lib/prisma';
 
 // シードで作ったテストユーザーのID
@@ -14,16 +15,9 @@ const MY_USER_ID = '11111111-1111-1111-1111-111111111111';
 export async function getHostedEvents() {
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: {
-        some: { user_id: MOCK_USER_ID, is_owner: true },
-      },
+      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: true } },
     },
-    include: {
-      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
-      _count: {
-        select: { user_rooms: true },
-      },
-    },
+    include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
   });
 }
@@ -32,21 +26,9 @@ export async function getHostedEvents() {
 export async function getJoinedEvents() {
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: {
-        some: { user_id: MOCK_USER_ID, is_owner: false },
-      },
+      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: false } },
     },
-    include: {
-      // 主催者の名前も出す
-      user_rooms: {
-        where: { is_owner: true },
-        include: { profiles: true },
-      },
-      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
-      _count: {
-        select: { user_rooms: true },
-      },
-    },
+    include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
   });
 }
@@ -62,6 +44,17 @@ export async function getEventDetail(roomId: number) {
         user_rooms: {
           include: {
             profiles: true, // 参加者のプロフィール情報（名前など）も一緒に取得
+          },
+        },
+        room_tags: {
+          include: {
+            tags: true,
+          },
+        },
+        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+        _count: {
+          select: {
+            user_rooms: true,
           },
         },
       },
@@ -151,7 +144,7 @@ export async function createEvent(formData: {
   title: string;
   datetime: string;
   capacity: number;
-  tags: string;
+  tags: string[];
   shop: string;
 }) {
   try {
@@ -159,7 +152,6 @@ export async function createEvent(formData: {
       data: {
         title: formData.title,
         // tags はDBに専用カラムがないため、一旦 description に保存します
-        description: formData.tags || 'よろしくお願いします！',
         capacity_limit: formData.capacity,
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
@@ -170,6 +162,18 @@ export async function createEvent(formData: {
             user_id: MOCK_USER_ID,
             is_owner: true,
           },
+        },
+        room_tags: {
+          create: formData.tags.map((tagName) => ({
+            tags: {
+              connectOrCreate: {
+                // 중복 생성을 방지하기 위한 고유 조건 (schema.prisma의 @unique 설정 기준)
+                where: { name: tagName },
+                // 테이블에 해당 태그가 없을 경우 새로 생성할 데이터
+                create: { name: tagName },
+              },
+            },
+          })),
         },
       },
     });
@@ -192,7 +196,7 @@ export async function updateEventAction(
     title: string;
     datetime: string;
     capacity: number;
-    tags: string;
+    tags: string[];
     shop: string;
   },
 ) {
@@ -201,10 +205,21 @@ export async function updateEventAction(
       where: { id: roomId },
       data: {
         title: formData.title,
-        description: formData.tags || 'よろしくお願いします！',
         capacity_limit: Number(formData.capacity),
         location_name: formData.shop,
         event_start_at: new Date(formData.datetime),
+        room_tags: {
+          deleteMany: {},
+
+          create: formData.tags.map((tagName) => ({
+            tags: {
+              connectOrCreate: {
+                where: { name: tagName },
+                create: { name: tagName },
+              },
+            },
+          })),
+        },
       },
     });
 
@@ -218,16 +233,16 @@ export async function updateEventAction(
 
 export async function getExploreEvents() {
   try {
-    // 1. まず「自分が参加していない」「OPEN」「未来の予定」をDBから取得
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
         event_start_at: {
-          gte: new Date(), // 今より未来のイベントだけを取得
+          gte: new Date(),
         },
         user_rooms: {
           none: {
-            user_id: MOCK_USER_ID, // 自分が未参加
+            // MOCK_USER_ID가 정의되어 있다고 가정합니다
+            user_id: MOCK_USER_ID,
           },
         },
       },
@@ -235,7 +250,15 @@ export async function getExploreEvents() {
         user_rooms: {
           include: { profiles: true },
         },
+        room_tags: {
+          include: { tags: true },
+        },
+        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+        _count: {
+          select: { user_rooms: true },
+        },
       },
+      // 👆 여기까지 수정
       orderBy: {
         event_start_at: 'asc',
       },

@@ -1,7 +1,7 @@
 'use client';
 
-import { Avatar as AvatarPrimitive } from 'radix-ui';
-import type * as React from 'react';
+import { Avatar as AvatarPrimitive, Slot } from 'radix-ui';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
  * rounded-full: 完全な円形
  */
 type AvatarVariant = 'default' | 'rounded-full';
+
+type AvatarGroupCountVariant = 'default' | 'primary-foreground';
 
 /**
  * Avatar: メインコンテナ
@@ -137,21 +139,33 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * AvatarGroupCount: グループ表示で「+5」などの残り人数を表示する用
  */
-function AvatarGroupCount({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
+const AvatarGroupCount = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<'div'> & {
+    asChild?: boolean;
+    variant?: AvatarGroupCountVariant;
+  }
+>(function AvatarGroupCount(
+  { className, asChild = false, variant = 'default', ...props },
+  ref,
+) {
+  const Comp = asChild ? Slot.Root : 'div';
+
   return (
-    <div
+    <Comp
+      ref={ref}
       data-slot='avatar-group-count'
+      data-variant={variant}
       className={cn(
-        'relative flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-24 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3',
+        'relative flex size-10 shrink-0 items-center justify-center rounded-full text-sm ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-24 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3',
+        'data-[variant=default]:bg-muted data-[variant=default]:text-muted-foreground',
+        'data-[variant=primary-foreground]:bg-primary-foreground data-[variant=primary-foreground]:text-foreground',
         className,
       )}
       {...props}
     />
   );
-}
+});
 
 export {
   Avatar,

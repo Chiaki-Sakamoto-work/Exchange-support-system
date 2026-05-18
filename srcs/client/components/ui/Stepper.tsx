@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@shared/ui/Button';
 import { Minus, Plus } from 'lucide-react';
 import type * as React from 'react';
+import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 /**

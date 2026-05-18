@@ -1,22 +1,35 @@
-// カードに渡すデータの型定義
+import { ChevronRight, UsersRound } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
+import { cn } from '@/lib/utils';
+
 export type EventCardProps = {
   title: string;
   shop: string;
   date: string;
-  detail: string;
-  owner?: string;
-  colorClass: string;
   onClick?: () => void;
+  tags: { id: number; name: string }[];
+  participants: string;
+  ownerProfile?: { image?: string; name: string };
 };
 
 export const EventCard = ({
   title,
   shop,
   date,
-  detail,
-  owner,
-  colorClass,
   onClick,
+  tags,
+  participants,
+  ownerProfile,
 }: EventCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -26,30 +39,54 @@ export const EventCard = ({
   };
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: デザイン上の理由でdivである必要があるため
-    <div
+    <Card
       role='button'
       tabIndex={0}
-      aria-label={`${title}の詳細を表示`}
       onKeyDown={handleKeyDown}
       onClick={onClick}
-      className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex justify-between items-center group hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer'
+      className={cn(
+        'cursor-pointer',
+        'hover:scale-[1.02] focus-visible:scale-[1.02]',
+        'active:scale-[0.98]',
+        'focus-visible:outline-none',
+        'h-36.5',
+        // 'flex flex-col gap-3',
+      )}
+      variant='default'
     >
-      <div className='flex gap-4 items-center'>
-        {/* 左側のカラーバー（視覚的なアクセント） */}
-        <div className={`w-2 h-12 rounded-full ${colorClass}`} />
-
-        <div>
-          <h3 className='font-bold text-lg'>{title}</h3>
-          <p className='text-s text-zinc-600 font-medium'>📍 {shop}</p>
-          <p className='text-s text-zinc-600 font-medium'>📅 {date}</p>
-          <p className='text-s text-zinc-600 font-medium'>{owner}</p>
-          <p className='text-xs text-zinc-600 font-medium'>{detail}</p>
+      <CardHeader className='flex flex-row items-center gap-4'>
+        {ownerProfile && (
+          <Avatar>
+            <AvatarImage src={ownerProfile.image} alt={ownerProfile.name} />
+            <AvatarFallback>{ownerProfile.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        )}
+        <div className='flex-1'>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{shop}</CardDescription>
         </div>
-      </div>
+        <CardAction>
+          {/* <Button variant='ghost' size='icon'> */}
+          <ChevronRight className='h-5 w-5 text-muted-foreground' />
+          {/* </Button> */}
+        </CardAction>
+      </CardHeader>
 
-      {/* 矢印アイコンの代わり（シンプルにテキストで表現） */}
-      <div className='text-zinc-300 dark:text-zinc-700 font-bold'>&gt;</div>
-    </div>
+      <CardContent className='flex flex-row flex-wrap gap-2 min-h-6'>
+        {tags?.map((tag) => (
+          <Badge key={tag.id} variant='secondary' size='sm'>
+            {tag.name}
+          </Badge>
+        ))}
+      </CardContent>
+
+      <CardFooter className='flex flex-row justify-between items-center w-full'>
+        <div>{date}</div>
+        <div className='flex items-center gap-1.5'>
+          <UsersRound className='h-4 w-4' />
+          {participants}
+        </div>
+      </CardFooter>
+    </Card>
   );
 };

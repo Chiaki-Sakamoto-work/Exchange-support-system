@@ -18,7 +18,7 @@ const badgeVariants = cva(
        * デザイン系統の設定
        */
       variant: {
-        default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80', // 標準（塗りつぶし）
+        default: 'bg-primary-foreground text-primary [a]:hover:bg-primary/80', // 標準（塗りつぶし）
         secondary:
           'bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80', // 補助・補足
         destructive:
@@ -36,7 +36,7 @@ const badgeVariants = cva(
       size: {
         xs: 'min-h-4 px-1.5 py-0 text-[10px] [&>svg]:size-2.5!', // 極小（注釈や通知バッジ用）
         sm: 'min-h-6 px-2 py-0.5 text-xs [&>svg]:size-3!', // 小さめ
-        default: 'min-h-7 px-3 py-1 text-sm [&>svg]:size-4!', // 標準
+        default: 'min-h-7 px-2 py-1 text-sm [&>svg]:size-4!', // 標準
         lg: 'min-h-8 px-1.5 py-1 text-sm [&>svg]:size-4!', // 大きめ（余白広め）
       },
     },
