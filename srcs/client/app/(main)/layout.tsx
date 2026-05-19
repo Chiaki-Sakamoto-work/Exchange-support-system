@@ -14,9 +14,9 @@ export default function MainLayout({
         <h1 className='text-xl font-bold tracking-tight'>Nomikai Hub</h1>
       </header>
 
-      <main className='max-w-md mx-auto pb-24'>{children}</main>
+      <main className='max-w-[632px] mx-auto pb-24'>{children}</main>
 
-      <BottomNav />
+      <BottomNav className='max-w-[672px]' listClassName='w-full' />
     </div>
   );
 }

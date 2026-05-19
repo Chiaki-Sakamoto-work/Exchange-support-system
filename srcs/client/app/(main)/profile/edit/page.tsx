@@ -1,9 +1,11 @@
+import { getDepartments } from '@/features/events/actions/eventActions';
 import { ProfileEditForm } from '@/features/profile/components/ProfileEditForm';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
 
 export default async function ProfileEditPage() {
   const session = await auth();
+  const departmentList = await getDepartments();
 
   if (!session?.user) {
     return <div>ログインが必要です</div>;
@@ -36,5 +38,7 @@ export default async function ProfileEditPage() {
         is_support_used: false,
       };
 
-  return <ProfileEditForm initialData={initialData} />;
+  return (
+    <ProfileEditForm initialData={initialData} departments={departmentList} />
+  );
 }

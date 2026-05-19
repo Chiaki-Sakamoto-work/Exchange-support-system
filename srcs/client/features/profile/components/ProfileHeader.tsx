@@ -1,3 +1,7 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent } from '@/components/ui/Card';
+
 export interface ProfileHeaderProps {
   user: {
     username?: string | null;
@@ -12,48 +16,54 @@ export interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
-  const tags = [user.user_type, user.bio, user.departments?.name].filter(
-    Boolean,
-  );
-
   return (
-    <div className='flex flex-col items-center'>
-      <div className='w-24 h-24 bg-zinc-900 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 relative'>
-        {user.username?.charAt(0) || '無'}
-      </div>
+    <Card className='shadow-none!'>
+      <CardContent>
+        <div className='flex flex-col items-center'>
+          <Avatar size='lg' variant='rounded-full'>
+            <AvatarImage src='' />
+            <AvatarFallback className='text-4xl'>
+              {user.username?.charAt(0) || '無'}
+            </AvatarFallback>
+          </Avatar>
 
-      <h2 className='text-xl font-bold text-zinc-900'>
-        {user.username || '名前未設定'}
-      </h2>
-      <p className='text-zinc-400 text-sm mb-4'>{user.email}</p>
+          <h2 className='text-xl font-bold text-zinc-900'>
+            {user.username || '名前未設定'}
+          </h2>
 
-      <div className='flex gap-2 mb-4'>
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className='px-3 py-1 bg-zinc-950 text-white rounded-full text-xs font-bold'
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+          <p className='text-zinc-400 text-sm mb-4'>{user.email}</p>
+          <p className='text-center text-sm text-foreground'>
+            {user.bio || '自己紹介がありません'}
+          </p>
 
-      {user.allergies && user.allergies.length > 0 && (
-        <div className='flex flex-wrap justify-center gap-2 mb-4'>
-          {user.allergies.map((allergy: string) => (
-            <span
-              key={allergy}
-              className='px-3 py-1 bg-red-50 text-red-500 border border-red-100 rounded-full text-xs font-bold'
-            >
-              {allergy} アレルギー
-            </span>
-          ))}
+          <div className='flex gap-2 mb-4 mt-2'>
+            {user.user_type && (
+              <Badge
+                variant={user.user_type === '新卒' ? 'primary' : 'secondary'}
+              >
+                {user.user_type}
+              </Badge>
+            )}
+
+            {user.departments?.name && (
+              <Badge variant='secondary'>{user.departments?.name}</Badge>
+            )}
+          </div>
+
+          {user.allergies && user.allergies.length > 0 && (
+            <div className='flex flex-wrap justify-center gap-2 mb-4'>
+              {user.allergies.map((allergy: string) => (
+                <Badge
+                  key={allergy}
+                  className='bg-destructive/[0.08] text-destructive'
+                >
+                  {allergy} アレルギー
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-
-      <p className='text-center text-sm text-zinc-500 max-w-[280px]'>
-        {user.bio || '自己紹介がありません'}
-      </p>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
