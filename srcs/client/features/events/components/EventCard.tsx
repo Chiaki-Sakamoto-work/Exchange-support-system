@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
 
 export type EventCardProps = {
@@ -56,10 +57,15 @@ export const EventCard = ({
     >
       <CardHeader className='flex flex-row items-center gap-4'>
         {ownerProfile && (
-          <Avatar>
-            <AvatarImage src={ownerProfile.image} alt={ownerProfile.name} />
-            <AvatarFallback>{ownerProfile.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          // <Avatar>
+          //   <AvatarImage src={ownerProfile.image} alt={ownerProfile.name} />
+          //   <AvatarFallback>{ownerProfile.name.charAt(0)}</AvatarFallback>
+          // </Avatar>
+          <UserAvatar
+            name={ownerProfile.name}
+            imageSrc={ownerProfile.image}
+            size='default'
+          />
         )}
         <div className='flex-1'>
           <CardTitle>{title}</CardTitle>
