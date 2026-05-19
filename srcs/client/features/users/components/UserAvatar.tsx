@@ -13,6 +13,13 @@ type UserAvatarProps = {
   fallbackClassName?: string;
 };
 
+type AvatarSize = NonNullable<React.ComponentProps<typeof Avatar>['size']>;
+const fallbackTextSizeByAvatarSize: Record<AvatarSize, string> = {
+  sm: 'text-xs',
+  default: 'text-sm',
+  lg: 'text-3xl',
+};
+
 const getFallbackText = (name?: string | null) =>
   name?.trim().slice(0, 1).toUpperCase() || '?';
 
@@ -35,7 +42,13 @@ export function UserAvatar({
         alt={imageAlt ?? displayName}
         className={imageClassName}
       />
-      <AvatarFallback className={cn('font-bold', fallbackClassName)} />
+      <AvatarFallback
+        className={cn(
+          'font-bold',
+          fallbackTextSizeByAvatarSize[size],
+          fallbackClassName,
+        )}
+      />
       {getFallbackText(name)}
     </Avatar>
   );
