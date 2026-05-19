@@ -1,5 +1,4 @@
-import { ChevronRight, UsersRound } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { ChevronRight, PenBox, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -10,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
 
 export type EventCardProps = {
@@ -19,7 +19,13 @@ export type EventCardProps = {
   onClick?: () => void;
   tags: { id: number; name: string }[];
   participants: string;
+  icon?: 'show' | 'edit';
   ownerProfile?: { image?: string; name: string };
+};
+
+const CARD_ICON = {
+  show: { icon: ChevronRight, size: 'size-5' },
+  edit: { icon: PenBox, size: 'size-4' },
 };
 
 export const EventCard = ({
@@ -30,6 +36,7 @@ export const EventCard = ({
   tags,
   participants,
   ownerProfile,
+  icon = 'show',
 }: EventCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -37,7 +44,7 @@ export const EventCard = ({
       onClick?.();
     }
   };
-
+  const Icon = CARD_ICON[icon];
   return (
     <Card
       role='button'
@@ -50,25 +57,25 @@ export const EventCard = ({
         'active:scale-[0.98]',
         'focus-visible:outline-none',
         'h-36.5',
-        // 'flex flex-col gap-3',
       )}
       variant='default'
     >
       <CardHeader className='flex flex-row items-center gap-4'>
         {ownerProfile && (
-          <Avatar>
-            <AvatarImage src={ownerProfile.image} alt={ownerProfile.name} />
-            <AvatarFallback>{ownerProfile.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            name={ownerProfile.name}
+            imageSrc={ownerProfile.image}
+            size='default'
+            className='rounded'
+            variant='default'
+          />
         )}
         <div className='flex-1'>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{shop}</CardDescription>
         </div>
         <CardAction>
-          {/* <Button variant='ghost' size='icon'> */}
-          <ChevronRight className='h-5 w-5 text-muted-foreground' />
-          {/* </Button> */}
+          <Icon.icon className={cn(Icon.size, 'text-muted-foreground')} />
         </CardAction>
       </CardHeader>
 

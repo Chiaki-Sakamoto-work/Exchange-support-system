@@ -9,7 +9,6 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -18,12 +17,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
-
-import {
-  getDisplayName,
-  getFallback,
-  isNewRecruit,
-} from '@/features/users/lib/profile';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
+import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
 
 type Props = {
   isLeaveDialogOpen: boolean;
@@ -52,20 +47,15 @@ export const ExitParticipantAlertDialog = ({
         <AlertDialogBody>
           <Card variant='secondary shadow-none' className='min-h-0! py-4!'>
             <CardHeader className='flex flex-row items-center gap-3 px-4'>
-              <Avatar variant='rounded-full'>
-                <AvatarImage
-                  src={leaveDialogProfile?.avatar_url ?? undefined}
-                />
-                <AvatarFallback
-                  className={
-                    isNewRecruit(leaveDialogProfile)
-                      ? 'bg-accent text-accent-foreground'
-                      : undefined
-                  }
-                >
-                  {getFallback(leaveDialogProfile)}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                name={leaveDialogProfile?.username}
+                imageSrc={leaveDialogProfile?.avatar_url ?? undefined}
+                fallbackClassName={
+                  isNewRecruit(leaveDialogProfile)
+                    ? 'bg-accent text-accent-foreground'
+                    : undefined
+                }
+              />
               <div>
                 <CardTitle>{getDisplayName(leaveDialogProfile)}</CardTitle>
                 <CardDescription>さんを退室させます</CardDescription>

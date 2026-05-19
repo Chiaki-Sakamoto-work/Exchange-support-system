@@ -60,6 +60,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
               image: owner?.avatar_url ?? undefined,
             }}
             onClick={() => setEditingEvent(event)}
+            icon='edit'
           />
         );
       })}

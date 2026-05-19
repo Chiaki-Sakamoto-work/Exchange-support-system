@@ -11,6 +11,7 @@ import {
 } from '../actions/eventActions';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
+import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -58,7 +59,7 @@ export const EventHome = () => {
   }, [fetchAllData]);
 
   if (isLoading) {
-    return <div className='text-center py-10 text-zinc-400'>読み込み中...</div>;
+    return <EventListLoadingSkeleton showTabs />;
   }
 
   const sortByDate = (rooms: Room[]) => {
@@ -126,7 +127,7 @@ export const EventHome = () => {
                       title={room.title}
                       shop={room.location_name || '未定'}
                       date={formatDate(room.event_start_at)}
-                      participants={`👥 ${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
+                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                       tags={formattedTags}
                       ownerProfile={ownerProfile}
                       onClick={() => {
@@ -172,10 +173,10 @@ export const EventHome = () => {
               {displayRooms.length > 0 ? (
                 displayRooms.map((room) => {
                   const isMyHosted = hostedRooms.some((h) => h.id === room.id);
+                  const owner = room.user_rooms?.find((ur) => ur.is_owner);
                   const ownerProfile = {
-                    name:
-                      room.user_rooms?.find((ur) => ur.is_owner)?.profiles
-                        ?.username || '不明',
+                    name: owner?.profiles?.username || '不明',
+                    image: owner?.profiles?.avatar_url || '不明',
                   };
                   const formattedTags = room.room_tags.map((rt) => ({
                     id: rt.tags.id,
@@ -188,11 +189,9 @@ export const EventHome = () => {
                       title={room.title}
                       shop={room.location_name || '未定'}
                       date={formatDate(room.event_start_at)}
-                      participants={`👥 ${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
+                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                       tags={formattedTags}
-                      ownerProfile={
-                        isMyHosted ? { name: 'あなた (主催)' } : ownerProfile
-                      }
+                      ownerProfile={ownerProfile}
                       onClick={() => {
                         setSelectedRoomId(room.id);
                         setModalMode(isMyHosted ? 'hosted' : 'joined');

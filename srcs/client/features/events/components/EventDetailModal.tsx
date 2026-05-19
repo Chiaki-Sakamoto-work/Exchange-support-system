@@ -41,6 +41,7 @@ import {
   joinEventAction,
 } from '../actions/eventActions';
 import { EventForm } from './EventForm';
+import { EventDetailLoadingSkeleton } from './EventLoadingSkeleton';
 import { ExitEventAlertDialog } from './ExitEventAlertDialog';
 
 type Props = {
@@ -80,11 +81,7 @@ export const EventDetailModal = ({
   }, [roomId]);
 
   if (isLoading) {
-    return (
-      <div className='fixed inset-0 bg-black/60 z-50 flex justify-center items-center'>
-        <div className='text-white'>読み込み中...</div>
-      </div>
-    );
+    return <EventDetailLoadingSkeleton />;
   }
   if (error || !eventData) {
     return (
@@ -307,15 +304,16 @@ export const EventDetailModal = ({
                 )}
 
                 {mode === 'explore' && (
-                  <Button
-                    size='sm'
+                  <DialogIconAction
                     variant='default'
                     className='top-6 right-6'
                     onClick={handleJoinAction}
+                    size='sm'
                     disabled={isProcessing}
+                    asChild
                   >
-                    参加
-                  </Button>
+                    <Button>参加</Button>
+                  </DialogIconAction>
                 )}
               </DialogHeader>
 
