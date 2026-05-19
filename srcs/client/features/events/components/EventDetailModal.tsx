@@ -81,7 +81,7 @@ export const EventDetailModal = ({
   }, [roomId]);
 
   if (isLoading) {
-    return <EventDetailLoadingSkeleton />;
+    return <EventDetailLoadingSkeleton mode={mode} />;
   }
   if (error || !eventData) {
     return (
