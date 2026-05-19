@@ -1,32 +1,61 @@
-// サーバー側で安全にDB操作を行う宣言
 'use server';
 
 import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { fullEventInclude } from '@/app/types';
-import { prisma } from '../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
+import { createClient } from '@/lib/supabase/server';
 
-// シードで作ったテストユーザーのID
-const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
-// 自分のユーザーID　ログイン機能ができたら、そこから取得するように変更
-const MY_USER_ID = '11111111-1111-1111-1111-111111111111';
-
-// 1. 自分が主催(is_owner: true)のイベントを取得
 export async function getHostedEvents() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: true } },
+      user_rooms: { some: { user_id: user.id, is_owner: true } },
     },
-    include: fullEventInclude,
+    // 💡 共通の fullEventInclude を使わず、ここで個別に指定する
+    include: {
+      user_rooms: {
+        // ⭕ where: { is_owner: true } を排除！ これで参加者全員が profiles 付きで取得できます
+        include: {
+          profiles: true,
+        },
+      },
+      room_tags: {
+        include: {
+          tags: true,
+        },
+      },
+      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+      _count: {
+        select: {
+          user_rooms: true,
+        },
+      },
+    },
     orderBy: { event_start_at: 'asc' },
   });
 }
 
 // 2. 自分が参加(is_owner: false)のイベントを取得
 export async function getJoinedEvents() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    console.log('⚠️ ログインユーザーが見つかりません');
+    return [];
+  }
   return await prisma.rooms.findMany({
     where: {
-      user_rooms: { some: { user_id: MOCK_USER_ID, is_owner: false } },
+      user_rooms: { some: { user_id: user.id, is_owner: false } },
     },
     include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
@@ -76,7 +105,7 @@ export async function getEventDetail(roomId: number) {
 }
 
 // 予定の削除（主催者用）
-export async function deleteEventAction(roomId: number) {
+export async function deleteEventAction(roomId: number, path: string) {
   try {
     // 🌟 修正1: 部屋を消す前に、まず関連する名簿(user_rooms)を全て削除する！
     await prisma.user_rooms.deleteMany({
@@ -89,7 +118,7 @@ export async function deleteEventAction(roomId: number) {
     });
 
     // 🌟 修正2: 画面の古い記憶（キャッシュ）を捨てて最新にする
-    revalidatePath('/');
+    revalidatePath(path);
 
     return { success: true };
   } catch (error) {
@@ -101,10 +130,15 @@ export async function deleteEventAction(roomId: number) {
 // 参加のキャンセル
 export async function cancelParticipationAction(roomId: number) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     await prisma.user_rooms.deleteMany({
       where: {
         room_id: roomId,
-        user_id: MY_USER_ID,
+        user_id: user?.id,
       },
     });
 
@@ -121,10 +155,17 @@ export async function cancelParticipationAction(roomId: number) {
 // 新しく参加する（参加タブ用）
 export async function joinEventAction(roomId: number) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: 'ログインが必要です' };
+
     await prisma.user_rooms.create({
       data: {
         room_id: roomId,
-        user_id: MY_USER_ID,
+        user_id: user.id,
         is_owner: false,
       },
     });
@@ -148,18 +189,25 @@ export async function createEvent(formData: {
   shop: string;
 }) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'ログインが必要です' };
+    }
+
     const newRoom = await prisma.rooms.create({
       data: {
         title: formData.title,
-        // tags はDBに専用カラムがないため、一旦 description に保存します
         capacity_limit: formData.capacity,
         location_name: formData.shop,
-        event_start_at: new Date(formData.datetime), // 文字列からDate型へ変換
+        event_start_at: new Date(formData.datetime),
         status: 'OPEN' as RoomStatus,
-        // 同時に、自分を「主催者」として user_rooms に登録する（シードと同じ手法）
         user_rooms: {
           create: {
-            user_id: MOCK_USER_ID,
+            user_id: user.id,
             is_owner: true,
           },
         },
@@ -178,7 +226,6 @@ export async function createEvent(formData: {
       },
     });
 
-    // newRoomがlintに引っかからないように一時的に記述
     console.log('新しく作成された部屋のID:', newRoom.id);
     revalidatePath('/');
 
@@ -189,7 +236,6 @@ export async function createEvent(formData: {
   }
 }
 
-// 予定を更新する（編集用）
 export async function updateEventAction(
   roomId: number,
   formData: {
@@ -202,13 +248,19 @@ export async function updateEventAction(
   },
 ) {
   try {
-    // 🌟 追加: もし「新しいホスト」が指定されていて、かつそれが「自分」ではない場合、権限の移行を行う
-    if (formData.hostId && formData.hostId !== MOCK_USER_ID) {
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (formData.hostId && formData.hostId !== user?.id) {
+
       // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
-          user_id: MOCK_USER_ID,
+          user_id: user?.id,
+
         },
         data: {
           is_owner: false,
@@ -259,6 +311,11 @@ export async function updateEventAction(
 
 export async function getExploreEvents() {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
@@ -267,7 +324,7 @@ export async function getExploreEvents() {
         },
         user_rooms: {
           none: {
-            user_id: MOCK_USER_ID,
+            user_id: user?.id,
           },
         },
       },

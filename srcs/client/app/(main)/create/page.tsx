@@ -1,19 +1,8 @@
-'use client';
+import { getHostedEvents } from '@feature/events/actions/eventActions';
+import { MyEvents } from '@/features/events/components/MyEvents';
 
-import { useRouter } from 'next/navigation';
-import { EventForm } from '@/features/events/components/EventForm';
+export default async function CreatePage() {
+  const events = await getHostedEvents();
 
-export default function CreatePage() {
-  const router = useRouter();
-
-  const handleSuccess = () => {
-    router.push('/');
-    router.refresh();
-  };
-
-  return (
-    // <div className='p-6'>
-    <EventForm onSuccess={handleSuccess} />
-    // </div>
-  );
+  return <MyEvents events={events} />;
 }

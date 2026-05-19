@@ -1,20 +1,43 @@
 'use client';
 
+
+import type { profiles } from '@prisma/client';
 import {
+  ArrowLeftRight,
   Calendar1,
-  Crown,
   FileText,
   Store,
   Tag,
+  Trash2,
+
   UserRound,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Room } from '@/app/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogBody,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { HoverCard } from '@/components/ui/HoverCard';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import {
@@ -25,7 +48,12 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
-import { createEvent, updateEventAction } from '../actions/eventActions';
+import { UserBadge } from '@/features/users/components/UserBadge';
+import {
+  createEvent,
+  deleteEventAction,
+  updateEventAction,
+} from '../actions/eventActions';
 
 // テストデータ
 const MOCK_SHOPS = [
@@ -53,7 +81,12 @@ const MOCK_SHOPS = [
 
 type Props = {
   onSuccess: () => void;
-  initialData?: Room;
+  // 💡 initialData の型定義を完全にこちらへ差し替えてください
+  initialData?: Room & {
+    user_rooms: (Room['user_rooms'][number] & {
+      profiles: NonNullable<Room['user_rooms'][number]['profiles']>;
+    })[];
+  };
   roomId?: number;
 };
 
@@ -66,12 +99,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const currentHostId = initialData?.user_rooms?.find(
     (ur) => ur.is_owner,
   )?.user_id;
-
-  const participants =
-    initialData?.user_rooms?.map((ur) => ({
-      id: ur.user_id,
-      name: ur.profiles?.username || '不明',
-    })) || [];
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -157,6 +184,105 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       _setError(result.error);
     }
     setIsProcessing(false);
+  };
+
+  const handleDelete = async () => {
+    if (!roomId) return;
+
+    if (
+      !window.confirm(
+        'このイベントを削除してもよろしいですか？（この操作は取り消せません）',
+      )
+    ) {
+      return;
+    }
+
+    setIsProcessing(true);
+    // 先ほど確認したサーバー側の削除アクションを呼び出す
+    const result = await deleteEventAction(roomId, '/create');
+
+    if (result?.success) {
+      toast.success('イベントを削除しました');
+      onSuccess(); // フォームを閉じて一覧を更新
+    } else {
+      toast.error(result?.error || '削除に失敗しました');
+    }
+    setIsProcessing(false);
+  };
+
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<
+    Room['user_rooms'][number]['profiles'] | null
+  >(null);
+  const participants = initialData?.user_rooms || [];
+  const totalParticipantsCount =
+    (initialData as unknown as { count?: { user_rooms: number } })?.count
+      ?.user_rooms ?? participants.length;
+  const transferCandidates = participants.filter((ur) => !ur.is_owner); // 👈 自分を除外！
+
+  // 切り分ける配列を候補者リスト（transferCandidates）に変更
+  const visibleParticipants = transferCandidates.slice(0, 5);
+  const overflowParticipants = transferCandidates.slice(5);
+  const handleSelectParticipant = (participant: Room['user_rooms'][number]) => {
+    setSelectedProfile(participant.profiles);
+    setIsTransferDialogOpen(true); // バッジをクリックしたらアラートを開く
+  };
+  const handleConfirmTransfer = async () => {
+    if (!roomId || !selectedProfile) return;
+
+    setIsProcessing(true);
+
+    // 💡 確実に新しいホストのID（selectedProfile.id）だけをターゲットにして送信する
+    const submitData = {
+      title: formData.title,
+      datetime: formData.datetime,
+      capacity: Number(formData.capacity),
+      tags: formData.tags,
+      shop: formData.shop,
+      hostId: selectedProfile.id, // ⭕ 混ざり物のない、新しいホストのUUIDをここで確定させる
+    };
+
+    const result = await updateEventAction(roomId, submitData);
+
+    if (result?.success) {
+      toast.success('ホスト権限を移動しました！');
+      setIsTransferDialogOpen(false);
+      onSuccess(); // これでマイイベント一覧が更新され、主催タブから消えます
+    } else {
+      toast.error(result?.error || 'ホスト移動に失敗しました');
+    }
+
+    setIsProcessing(false);
+  };
+
+  const isNewRecruit = (profile: profiles | null) =>
+    profile?.user_type === '新入社員';
+  const getDisplayName = (profile: profiles | null) =>
+    profile?.username ?? '名無しさん';
+  const getFallback = (profile: profiles | null) =>
+    getDisplayName(profile).slice(0, 1).toUpperCase();
+  const getUserBadgeUser = (profile: profiles | null) => ({
+    name: getDisplayName(profile),
+    avatarUrl: profile?.avatar_url,
+    isNewRecruit: isNewRecruit(profile),
+  });
+
+  const renderParticipantBadge = (
+    participant: Room['user_rooms'][number],
+    variant: 'default' | 'secondary' = 'default',
+  ) => {
+    const profile = participant.profiles;
+
+    return (
+      <UserBadge
+        key={`${participant.room_id}-${participant.user_id}`}
+        leadingVisual='dot'
+        variant={formData.hostId === participant.user_id ? 'accept' : variant}
+        className='hover:bg-accent hover:text-accent-foreground'
+        user={getUserBadgeUser(profile)}
+        onClick={() => handleSelectParticipant(participant)}
+      />
+    );
   };
 
   return (
@@ -302,34 +428,113 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
         </CardContent>
       </Card>
 
-      {/* 🌟 3. ホスト権限の移行 UI（参加者が2人以上いる時だけ表示） */}
-      {roomId && participants.length > 1 && (
-        <Card variant='secondary shadow-none'>
-          <CardContent>
-            <div className='flex flex-col gap-2.5'>
-              <Label htmlFor='hostId'>
-                <Crown className='w-4 h-4 text-yellow-500' />
-                ホスト権限の移行
+      {roomId && totalParticipantsCount > 1 && (
+        <>
+          <Card
+            variant='secondary shadow-none'
+            className='h-auto w-full min-h-0!'
+          >
+            <CardContent>
+              <Label>
+                <ArrowLeftRight className='w-4 h-4' />
+                ホスト権限を移動
               </Label>
-              <select
-                id='hostId'
-                name='hostId'
-                value={formData.hostId}
-                onChange={handleChange}
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-              >
-                {participants.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} {p.id === currentHostId ? '(現在のホスト)' : ''}
-                  </option>
-                ))}
-              </select>
-              <p className='text-xs text-zinc-500 mt-1'>
-                ※他の参加者を選ぶと、あなたはこのイベントのホスト権限を失います。
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              <span className='py-1 text-[12px] text-muted-foreground block'>
+                選ぶと自分は普通の参加者になり、その人がホストになります。
+              </span>
+
+              <div className='py-2 flex flex-wrap gap-2'>
+                {visibleParticipants.map((participant) =>
+                  renderParticipantBadge(participant),
+                )}
+
+                {/* overflowParticipants の HoverCard 処理もここにそのまま移植 */}
+                {overflowParticipants.length > 0 ? (
+                  <HoverCard openDelay={120} closeDelay={120}>
+                    {/* ...提示された HoverCard の中身をそのまま配置... */}
+                  </HoverCard>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 💡 【新規追加】ホスト移動確認のAlertDialogもここに移植 */}
+          <AlertDialog
+            open={isTransferDialogOpen}
+            onOpenChange={setIsTransferDialogOpen}
+          >
+            <AlertDialogContent>
+              <AlertDialogTitle className='text-xl'>
+                ホストを移動しますか？
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                この人にホスト権限を渡します。あなたは普通の参加者になり、このルームは「参加予定」に移ります。
+              </AlertDialogDescription>
+              <AlertDialogBody>
+                {/* アバターカード部分 */}
+                <Card
+                  variant='secondary shadow-none'
+                  className='min-h-0! py-4!'
+                >
+                                
+                  <CardHeader className='flex flex-row items-center gap-3 px-4'>
+                                    
+                    <Avatar variant='rounded-full'>
+                                        
+                      <AvatarImage
+                        src={selectedProfile?.avatar_url ?? undefined}
+                      />
+                                        
+                      <AvatarFallback
+                        className={
+                          isNewRecruit(selectedProfile)
+                            ? 'bg-accent text-accent-foreground'
+                            : undefined
+                        }
+                      >
+                                            {getFallback(selectedProfile)}
+                                          
+                      </AvatarFallback>
+                                      
+                    </Avatar>
+                                    
+                    <div>
+                                        
+                      <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
+                                        
+                      <CardDescription>
+                        さんを新しいホストにします
+                      </CardDescription>
+                                      
+                    </div>
+                                    
+                    {isNewRecruit(selectedProfile) ? (
+                      <CardAction className='self-center'>
+                                            
+                        <Badge variant='accent' size='xs'>
+                                                新                     
+                        </Badge>
+                                          
+                      </CardAction>
+                    ) : null}
+                                  
+                  </CardHeader>
+                </Card>
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <AlertDialogCancel variant='outline'>
+                  キャンセル
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant='accent'
+                  onClick={handleConfirmTransfer}
+                >
+                  ホストを移動
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )}
 
       <Button
@@ -349,6 +554,19 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
           '作成する'
         )}
       </Button>
+
+      {roomId && (
+        <Button
+          type='submit'
+          className='w-full'
+          variant='destructive'
+          disabled={isProcessing}
+          onClick={handleDelete}
+        >
+          <Trash2 className='w-4 h-4' />
+          削除する
+        </Button>
+      )}
     </form>
   );
 };
