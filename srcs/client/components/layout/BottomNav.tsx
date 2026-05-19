@@ -32,7 +32,11 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
   const router = useRouter();
 
   const activeValue =
-    NAV_ITEMS.find((item) => item.href === pathname)?.href ?? '/';
+    NAV_ITEMS.find(({ href }) =>
+      href === '/'
+        ? pathname === href
+        : pathname === href || pathname.startsWith(`${href}/`),
+    )?.href ?? '/';
 
   const handleNavigte = (href: string) => {
     if (href !== pathname) {
