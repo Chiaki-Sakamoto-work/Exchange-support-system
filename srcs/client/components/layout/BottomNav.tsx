@@ -24,6 +24,8 @@ const NAV_ITEMS = [
   },
 ] as const;
 
+type NavItemHref = (typeof NAV_ITEMS)[number]['href'];
+
 const TAB_COUNT = NAV_ITEMS.length;
 const ACTIVE_OVERLAY_TRANSITION = {
   type: 'spring' as const,
@@ -59,8 +61,11 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
   const overlayX = `${activeIndex * 100}%`;
   const clipLeft = `${(activeIndex / TAB_COUNT) * 100}%`;
   const clipRight = `${((TAB_COUNT - activeIndex - 1) / TAB_COUNT) * 100}%`;
+  const navGridStyle = {
+    gridTemplateColumns: `repeat(${TAB_COUNT}, minmax(0, 1fr))`,
+  };
 
-  const handleNavigte = (href: string) => {
+  const handleNavigte = (href: NavItemHref) => {
     setVisualActiveValue(href);
 
     if (href !== pathname) {
@@ -78,9 +83,10 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
       >
         <TabsList
           className={cn(
-            'relative grid h-20 w-full grid-cols-3 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-2 shadow-xl backdrop-blur-sm',
+            'relative grid h-20 w-full overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-2 shadow-xl backdrop-blur-sm',
             listClassName,
           )}
+          style={navGridStyle}
         >
           <motion.div
             aria-hidden='true'
@@ -97,7 +103,8 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
               clipPath: `inset(0 ${clipRight} 0 ${clipLeft})`,
             }}
             transition={ACTIVE_OVERLAY_TRANSITION}
-            className='pointer-events-none absolute inset-2 z-20 grid grid-cols-3 text-accent'
+            className='pointer-events-none absolute inset-2 z-20 grid text-accent'
+            style={navGridStyle}
           >
             {NAV_ITEMS.map(({ href, icon: Icon, label }) => (
               <span
