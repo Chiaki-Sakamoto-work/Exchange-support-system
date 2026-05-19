@@ -23,7 +23,7 @@ export async function getHostedEvents() {
       user_rooms: {
         // ⭕ where: { is_owner: true } を排除！ これで参加者全員が profiles 付きで取得できます
         include: {
-          profiles: true, 
+          profiles: true,
         },
       },
       room_tags: {
@@ -31,16 +31,16 @@ export async function getHostedEvents() {
           tags: true,
         },
       },
+      // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
       _count: {
         select: {
-          user_rooms: true, 
+          user_rooms: true,
         },
       },
     },
     orderBy: { event_start_at: 'asc' },
   });
 }
-
 
 // 2. 自分が参加(is_owner: false)のイベントを取得
 export async function getJoinedEvents() {
@@ -252,12 +252,12 @@ export async function updateEventAction(
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (formData.hostId && formData.hostId !== user.id) {
+    if (formData.hostId && formData.hostId !== user?.id) {
       // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
-          user_id: user.id,
+          user_id: user?.id,
         },
         data: {
           is_owner: false,

@@ -76,8 +76,8 @@ const MyEvents = ({ events, onSuccess }: Props) => {
                 roomId={editingEvent.id}
                 initialData={editingEvent}
                 onSuccess={() => {
-                setEditingEvent(null);
-                onSuccess?.();
+                  setEditingEvent(null);
+                  onSuccess?.();
                 }}
               />
             )}
