@@ -1,5 +1,6 @@
 'use client';
 
+import type { profiles } from '@prisma/client';
 import {
   ArrowLeftRight,
   Calendar1,
@@ -21,9 +22,17 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
 import { HoverCard } from '@/components/ui/HoverCard';
 import { Input } from '@/components/ui/Input';
@@ -215,14 +224,13 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     setIsProcessing(false);
   };
 
-  type ProfileType = NonNullable<Room['user_rooms'][number]['profiles']>;
-
-  const isNewRecruit = (profile: ProfileType | null) =>
+  const isNewRecruit = (profile: profiles | null) =>
     profile?.user_type === '新入社員';
-  const getDisplayName = (profile: ProfileType | null) =>
+  const getDisplayName = (profile: profiles | null) =>
     profile?.username ?? '名無しさん';
-
-  const getUserBadgeUser = (profile: ProfileType | null) => ({
+  const getFallback = (profile: profiles | null) =>
+    getDisplayName(profile).slice(0, 1).toUpperCase();
+  const getUserBadgeUser = (profile: profiles | null) => ({
     name: getDisplayName(profile),
     avatarUrl: profile?.avatar_url,
     isNewRecruit: isNewRecruit(profile),
@@ -437,7 +445,49 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                   variant='secondary shadow-none'
                   className='min-h-0! py-4!'
                 >
-                  {/* ...提示された中身をそのまま配置... */}
+                                
+                  <CardHeader className='flex flex-row items-center gap-3 px-4'>
+                                    
+                    <Avatar variant='rounded-full'>
+                                        
+                      <AvatarImage
+                        src={selectedProfile?.avatar_url ?? undefined}
+                      />
+                                        
+                      <AvatarFallback
+                        className={
+                          isNewRecruit(selectedProfile)
+                            ? 'bg-accent text-accent-foreground'
+                            : undefined
+                        }
+                      >
+                                            {getFallback(selectedProfile)}
+                                          
+                      </AvatarFallback>
+                                      
+                    </Avatar>
+                                    
+                    <div>
+                                        
+                      <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
+                                        
+                      <CardDescription>
+                        さんを新しいホストにします
+                      </CardDescription>
+                                      
+                    </div>
+                                    
+                    {isNewRecruit(selectedProfile) ? (
+                      <CardAction className='self-center'>
+                                            
+                        <Badge variant='accent' size='xs'>
+                                                新                     
+                        </Badge>
+                                          
+                      </CardAction>
+                    ) : null}
+                                  
+                  </CardHeader>
                 </Card>
               </AlertDialogBody>
               <AlertDialogFooter>
