@@ -126,7 +126,7 @@ export const EventHome = () => {
                       title={room.title}
                       shop={room.location_name || '未定'}
                       date={formatDate(room.event_start_at)}
-                      participants={`👥 ${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
+                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                       tags={formattedTags}
                       ownerProfile={ownerProfile}
                       onClick={() => {
@@ -188,7 +188,7 @@ export const EventHome = () => {
                       title={room.title}
                       shop={room.location_name || '未定'}
                       date={formatDate(room.event_start_at)}
-                      participants={`👥 ${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}名`}
+                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                       tags={formattedTags}
                       ownerProfile={
                         isMyHosted ? { name: 'あなた (主催)' } : ownerProfile
