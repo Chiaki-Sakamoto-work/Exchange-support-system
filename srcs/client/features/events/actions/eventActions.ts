@@ -198,9 +198,36 @@ export async function updateEventAction(
     capacity: number;
     tags: string[];
     shop: string;
+    hostId: string;
   },
 ) {
   try {
+    // 🌟 追加: もし「新しいホスト」が指定されていて、かつそれが「自分」ではない場合、権限の移行を行う
+    if (formData.hostId && formData.hostId !== MOCK_USER_ID) {
+      // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
+      await prisma.user_rooms.updateMany({
+        where: {
+          room_id: roomId,
+          user_id: MOCK_USER_ID,
+        },
+        data: {
+          is_owner: false,
+        },
+      });
+
+      // 2. 次に、新しく選ばれた人の is_owner を true にする
+      await prisma.user_rooms.updateMany({
+        where: {
+          room_id: roomId,
+          user_id: formData.hostId,
+        },
+        data: {
+          is_owner: true,
+        },
+      });
+    }
+
+    // 🌟 部屋本体（rooms）の更新処理（ここはそのまま）
     await prisma.rooms.update({
       where: { id: roomId },
       data: {
@@ -210,7 +237,6 @@ export async function updateEventAction(
         event_start_at: new Date(formData.datetime),
         room_tags: {
           deleteMany: {},
-
           create: formData.tags.map((tagName) => ({
             tags: {
               connectOrCreate: {
