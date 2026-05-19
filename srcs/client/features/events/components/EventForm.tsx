@@ -7,6 +7,7 @@ import {
   FileText,
   Store,
   Tag,
+  Trash2,
   UserRound,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -46,7 +47,11 @@ import {
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
 import { UserBadge } from '@/features/users/components/UserBadge';
-import { createEvent, updateEventAction } from '../actions/eventActions';
+import {
+  createEvent,
+  deleteEventAction,
+  updateEventAction,
+} from '../actions/eventActions';
 
 // テストデータ
 const MOCK_SHOPS = [
@@ -175,6 +180,30 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       onSuccess();
     } else if (result?.error) {
       _setError(result.error);
+    }
+    setIsProcessing(false);
+  };
+
+  const handleDelete = async () => {
+    if (!roomId) return;
+
+    if (
+      !window.confirm(
+        'このイベントを削除してもよろしいですか？（この操作は取り消せません）',
+      )
+    ) {
+      return;
+    }
+
+    setIsProcessing(true);
+    // 先ほど確認したサーバー側の削除アクションを呼び出す
+    const result = await deleteEventAction(roomId, '/create');
+
+    if (result?.success) {
+      toast.success('イベントを削除しました');
+      onSuccess(); // フォームを閉じて一覧を更新
+    } else {
+      toast.error(result?.error || '削除に失敗しました');
     }
     setIsProcessing(false);
   };
@@ -523,6 +552,19 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
           '作成する'
         )}
       </Button>
+
+      {roomId && (
+        <Button
+          type='submit'
+          className='w-full'
+          variant='destructive'
+          disabled={isProcessing}
+          onClick={handleDelete}
+        >
+          <Trash2 className='w-4 h-4' />
+          削除する
+        </Button>
+      )}
     </form>
   );
 };

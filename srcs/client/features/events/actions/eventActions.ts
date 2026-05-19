@@ -105,7 +105,7 @@ export async function getEventDetail(roomId: number) {
 }
 
 // 予定の削除（主催者用）
-export async function deleteEventAction(roomId: number) {
+export async function deleteEventAction(roomId: number, path: string) {
   try {
     // 🌟 修正1: 部屋を消す前に、まず関連する名簿(user_rooms)を全て削除する！
     await prisma.user_rooms.deleteMany({
@@ -118,7 +118,7 @@ export async function deleteEventAction(roomId: number) {
     });
 
     // 🌟 修正2: 画面の古い記憶（キャッシュ）を捨てて最新にする
-    revalidatePath('/');
+    revalidatePath(path);
 
     return { success: true };
   } catch (error) {
