@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
-import { HostAuthDiv } from '@/features/events/components/HostAuthDiv';
 import { createEvent, updateEventAction } from '../actions/eventActions';
 
 // テストデータ
@@ -72,7 +71,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     initialData?.user_rooms?.map((ur) => ({
       id: ur.user_id,
       name: ur.profiles?.username || '不明',
-      profiles: ur.profiles,
     })) || [];
 
   const [formData, setFormData] = useState({
@@ -95,10 +93,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleConfirm = (newHostId: string | number) => {
-    setFormData((prev) => ({ ...prev, hostId: String(newHostId) }));
   };
 
   const handleShopChange = (newValue: string) => {
@@ -310,36 +304,32 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
       {/* 🌟 3. ホスト権限の移行 UI（参加者が2人以上いる時だけ表示） */}
       {roomId && participants.length > 1 && (
-        <HostAuthDiv
-          participants={participants.filter((p) => p.id !== currentHostId)}
-          handleConfirm={handleConfirm}
-        />
-        // <Card variant='secondary shadow-none'>
-        //   <CardContent>
-        //     <div className='flex flex-col gap-2.5'>
-        //       <Label htmlFor='hostId'>
-        //         <Crown className='w-4 h-4 text-yellow-500' />
-        //         ホスト権限の移行
-        //       </Label>
-        //       <select
-        //         id='hostId'
-        //         name='hostId'
-        //         value={formData.hostId}
-        //         onChange={handleChange}
-        //         className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-        //       >
-        //         {participants.map((p) => (
-        //           <option key={p.id} value={p.id}>
-        //             {p.name} {p.id === currentHostId ? '(現在のホスト)' : ''}
-        //           </option>
-        //         ))}
-        //       </select>
-        //       <p className='text-xs text-zinc-500 mt-1'>
-        //         ※他の参加者を選ぶと、あなたはこのイベントのホスト権限を失います。
-        //       </p>
-        //     </div>
-        //   </CardContent>
-        // </Card>
+        <Card variant='secondary shadow-none'>
+          <CardContent>
+            <div className='flex flex-col gap-2.5'>
+              <Label htmlFor='hostId'>
+                <Crown className='w-4 h-4 text-yellow-500' />
+                ホスト権限の移行
+              </Label>
+              <select
+                id='hostId'
+                name='hostId'
+                value={formData.hostId}
+                onChange={handleChange}
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+              >
+                {participants.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} {p.id === currentHostId ? '(現在のホスト)' : ''}
+                  </option>
+                ))}
+              </select>
+              <p className='text-xs text-zinc-500 mt-1'>
+                ※他の参加者を選ぶと、あなたはこのイベントのホスト権限を失います。
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <Button
