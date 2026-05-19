@@ -16,7 +16,7 @@ export default function MainLayout({
 
       <main className='max-w-[632px] mx-auto pb-24'>{children}</main>
 
-      <BottomNav />
+      <BottomNav className='max-w-[672px]' listClassName='w-full' />
     </div>
   );
 }

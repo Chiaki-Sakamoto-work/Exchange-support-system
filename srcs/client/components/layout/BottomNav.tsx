@@ -1,64 +1,75 @@
 'use client';
-import { LayoutDashboard, PlusCircle, UserCircle, Users } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { House, UserCircle, Utensils } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 
-export const BottomNav = () => {
+const NAV_ITEMS = [
+  {
+    href: '/create',
+    icon: Utensils,
+    label: 'MYイベント',
+  },
+  {
+    href: '/',
+    icon: House,
+    label: 'ホーム',
+  },
+  {
+    href: '/profile',
+    icon: UserCircle,
+    label: 'プロフィール',
+  },
+] as const;
+
+interface BottomNavProps {
+  className?: string;
+  listClassName?: string;
+}
+
+export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const activeValue =
+    NAV_ITEMS.find((item) => item.href === pathname)?.href ?? '/';
+
+  const handleNavigte = (href: string) => {
+    if (href !== pathname) {
+      router.push(href);
+    }
+  };
 
   return (
-    <nav className='fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/90 backdrop-blur-lg border border-zinc-200 rounded-[32px] p-2 shadow-2xl z-50 flex justify-around items-center h-20'>
-      {/* pathname と href が一致している時だけ active を true にする */}
-      <NavItem
-        href='/'
-        icon={<LayoutDashboard size={22} />}
-        label='ホーム'
-        active={pathname === '/'}
-      />
-      <NavItem
-        href='/create'
-        icon={<PlusCircle size={22} />}
-        label='開催する'
-        active={pathname === '/create'}
-      />
-      <NavItem
-        href='/join'
-        icon={<Users size={22} />}
-        label='参加する'
-        active={pathname === '/join'}
-      />
-      <NavItem
-        href='/profile'
-        icon={<UserCircle size={22} />}
-        label='マイページ'
-        active={pathname === '/profile'}
-      />
-    </nav>
+    <div className='fixed inset-x-0 bottom-6 z-50 flex justify-center px-4'>
+      <Tabs
+        value={activeValue}
+        variant='invert'
+        className={cn('w-full max-w-md', className)}
+      >
+        <TabsList
+          className={cn(
+            'h-20 w-full justify-around rounded-2xl border border-border bg-card/90 p-2 shadow-2xl backdrop-blur-lg',
+            listClassName,
+          )}
+        >
+          {NAV_ITEMS.map(({ href, icon: Icon, label }) => (
+            <TabsTrigger
+              key={href}
+              value={href}
+              onClick={() => handleNavigte(href)}
+              className='h-full rounded-2xl px-2 py-2 text-muted-foreground data-active:scale-105 data-active:text-foreground'
+            >
+              <span className='flex flex-col items-center justify-center gap-1'>
+                <Icon className='size-[15px]' />
+                <span className='text-[12px] font-bold tracking-normal'>
+                  {label}
+                </span>
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+    </div>
   );
 };
-
-const NavItem = ({
-  href,
-  icon,
-  label,
-  active,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  active: boolean;
-}) => (
-  <Link
-    href={href}
-    className={`flex flex-col items-center justify-center gap-1 w-full h-full rounded-2xl transition-all duration-300 ${
-      active
-        ? 'bg-zinc-100 text-zinc-950 scale-105'
-        : 'text-zinc-400 hover:text-zinc-600'
-    }`}
-  >
-    <div className={`${active ? 'animate-in zoom-in duration-300' : ''}`}>
-      {icon}
-    </div>
-    <span className='text-[10px] font-bold tracking-tighter'>{label}</span>
-  </Link>
-);
