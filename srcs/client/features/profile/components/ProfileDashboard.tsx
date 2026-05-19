@@ -21,12 +21,7 @@ export interface UserProfileProps {
 
 export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
   return (
-    <div className='min-h-screen bg-zinc-50 pb-24'>
-      {/* 上部タイトル */}
-      <div className='p-6'>
-        <h1 className='text-xl font-bold text-zinc-900'>のみ会</h1>
-      </div>
-
+    <div>
       <div className='px-4 flex flex-col gap-4'>
         {/* メインカード (ProfileHeaderをラップ) */}
 
