@@ -1,7 +1,7 @@
 import type * as React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
+import { UserAvatar } from './UserAvatar';
 
 type UserBadgeVariant = 'default' | 'accept' | 'destructive' | 'secondary';
 type UserBadgeLeadingVisual = 'avatar' | 'dot';
@@ -107,16 +107,14 @@ function UserBadgeContent({
   return (
     <>
       {leadingVisual === 'avatar' ? (
-        <Avatar size='sm' variant='rounded-full'>
-          <AvatarImage src={user.avatarUrl ?? undefined} />
-          <AvatarFallback
-            className={
-              user.isNewRecruit ? 'bg-accent text-accent-foreground' : undefined
-            }
-          >
-            {getFallback(user.name)}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          size='sm'
+          name={user.name}
+          imageSrc={user.avatarUrl ?? undefined}
+          fallbackClassName={
+            user.isNewRecruit ? 'bg-accent text-accent-foreground' : undefined
+          }
+        />
       ) : (
         <span
           aria-hidden='true'

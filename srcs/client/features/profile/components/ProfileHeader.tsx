@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 
 export interface ProfileHeaderProps {
   user: {
@@ -12,6 +12,7 @@ export interface ProfileHeaderProps {
     departments?: {
       name: string;
     } | null;
+    avatar_url?: string | null;
   };
 }
 
@@ -20,12 +21,11 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
     <Card className='shadow-none!'>
       <CardContent>
         <div className='flex flex-col items-center'>
-          <Avatar size='lg' variant='rounded-full'>
-            <AvatarImage src='' />
-            <AvatarFallback className='text-4xl'>
-              {user.username?.charAt(0) || '無'}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            size='lg'
+            imageSrc={user.avatar_url}
+            name={user.username}
+          />
 
           <h2 className='text-xl font-bold text-zinc-900'>
             {user.username || '名前未設定'}

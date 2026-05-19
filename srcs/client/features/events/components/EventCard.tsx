@@ -1,5 +1,4 @@
 import { ChevronRight, UsersRound } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -57,14 +56,12 @@ export const EventCard = ({
     >
       <CardHeader className='flex flex-row items-center gap-4'>
         {ownerProfile && (
-          // <Avatar>
-          //   <AvatarImage src={ownerProfile.image} alt={ownerProfile.name} />
-          //   <AvatarFallback>{ownerProfile.name.charAt(0)}</AvatarFallback>
-          // </Avatar>
           <UserAvatar
             name={ownerProfile.name}
             imageSrc={ownerProfile.image}
             size='default'
+            className='rounded'
+            variant='default'
           />
         )}
         <div className='flex-1'>

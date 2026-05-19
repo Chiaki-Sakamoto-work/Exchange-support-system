@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { type KeyboardEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription } from '@/components/ui/Card';
@@ -23,6 +22,7 @@ import {
   SelectTrigger,
 } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
 import { createDepartment, updateProfile } from '../actions/profile';
 import { type ProfileFormValues, profileSchema } from '../schemas/profile';
@@ -206,12 +206,11 @@ export function ProfileEditForm({
     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
       <Card variant='default' className='space-y-2 shadow-none!'>
         <CardContent className='mx-auto'>
-          <Avatar size='lg' variant='rounded-full'>
-            <AvatarImage src='' />
-            <AvatarFallback className='text-4xl'>
-              {userName.charAt(0) || '無'}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            name={userName || '無'}
+            size='lg'
+            imageSrc={initialData.avatar_url}
+          />
         </CardContent>
       </Card>
 

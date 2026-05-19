@@ -172,10 +172,10 @@ export const EventHome = () => {
               {displayRooms.length > 0 ? (
                 displayRooms.map((room) => {
                   const isMyHosted = hostedRooms.some((h) => h.id === room.id);
+                  const owner = room.user_rooms?.find((ur) => ur.is_owner);
                   const ownerProfile = {
-                    name:
-                      room.user_rooms?.find((ur) => ur.is_owner)?.profiles
-                        ?.username || '不明',
+                    name: owner?.profiles?.username || '不明',
+                    image: owner?.profiles?.avatar_url || '不明',
                   };
                   const formattedTags = room.room_tags.map((rt) => ({
                     id: rt.tags.id,
@@ -190,9 +190,7 @@ export const EventHome = () => {
                       date={formatDate(room.event_start_at)}
                       participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                       tags={formattedTags}
-                      ownerProfile={
-                        isMyHosted ? { name: 'あなた (主催)' } : ownerProfile
-                      }
+                      ownerProfile={ownerProfile}
                       onClick={() => {
                         setSelectedRoomId(room.id);
                         setModalMode(isMyHosted ? 'hosted' : 'joined');

@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
+import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import {
   createEvent,
@@ -474,48 +475,29 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                   variant='secondary shadow-none'
                   className='min-h-0! py-4!'
                 >
-                                
                   <CardHeader className='flex flex-row items-center gap-3 px-4'>
-                                    
-                    <Avatar variant='rounded-full'>
-                                        
-                      <AvatarImage
-                        src={selectedProfile?.avatar_url ?? undefined}
-                      />
-                                        
-                      <AvatarFallback
-                        className={
-                          isNewRecruit(selectedProfile)
-                            ? 'bg-accent text-accent-foreground'
-                            : undefined
-                        }
-                      >
-                                            {getFallback(selectedProfile)}
-                                          
-                      </AvatarFallback>
-                                      
-                    </Avatar>
-                                    
+                    <UserAvatar
+                      name={selectedProfile?.username}
+                      imageSrc={selectedProfile?.avatar_url}
+                      fallbackClassName={
+                        isNewRecruit(selectedProfile)
+                          ? 'bg-accent text-accent-foreground'
+                          : undefined
+                      }
+                    />
                     <div>
-                                        
                       <CardTitle>{getDisplayName(selectedProfile)}</CardTitle>
-                                        
                       <CardDescription>
                         さんを新しいホストにします
                       </CardDescription>
-                                      
                     </div>
-                                    
                     {isNewRecruit(selectedProfile) ? (
                       <CardAction className='self-center'>
-                                            
                         <Badge variant='accent' size='xs'>
-                                                新                     
+                          新
                         </Badge>
-                                          
                       </CardAction>
                     ) : null}
-                                  
                   </CardHeader>
                 </Card>
               </AlertDialogBody>

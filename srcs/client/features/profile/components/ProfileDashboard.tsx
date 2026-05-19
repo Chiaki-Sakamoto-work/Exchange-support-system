@@ -17,6 +17,7 @@ export interface UserProfileProps {
   departments?: {
     name: string;
   } | null;
+  avatar_url?: string | null;
 }
 
 export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
