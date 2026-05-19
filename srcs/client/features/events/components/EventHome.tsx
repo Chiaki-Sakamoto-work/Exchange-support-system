@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Room } from '@/app/types';
+import type { Room } from '@type';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { formatDate, isEventOngoing } from '@/lib/date';
 import {

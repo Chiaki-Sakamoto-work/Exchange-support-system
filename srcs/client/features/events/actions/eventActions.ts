@@ -2,7 +2,7 @@
 
 import type { RoomStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { fullEventInclude } from '@/app/types';
+import { fullEventInclude } from '@type';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 

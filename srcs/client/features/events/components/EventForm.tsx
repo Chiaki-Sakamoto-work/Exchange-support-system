@@ -13,8 +13,8 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Room } from '@/app/types';
 import type { GetRestaurantOptionsResult } from '@/app/types/restaurants';
+import type { Room } from '@type';
 import {
   AlertDialog,
   AlertDialogAction,

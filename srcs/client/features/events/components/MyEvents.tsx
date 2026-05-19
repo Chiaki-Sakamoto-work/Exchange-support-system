@@ -3,7 +3,7 @@
 import { EventCard } from '@feature/events/components/EventCard';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import type { Room } from '@/app/types';
+import type { Room } from '@type';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
