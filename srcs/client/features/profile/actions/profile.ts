@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 
+const normalizeDepartmentName = (name: string) => name.trim();
+
 // 💡 引数に email と avatarUrl を追加します
 export async function updateProfile(
   userId: string,
@@ -46,5 +48,47 @@ export async function updateProfile(
   } catch (error) {
     console.error('Prisma Upsert Error:', error);
     return { success: false, error: '更新に失敗しました' };
+  }
+}
+
+export async function createDepartment(name: string) {
+  const normalizedName = normalizeDepartmentName(name);
+
+  if (!normalizedName) {
+    return { success: false, error: '部署名を入力してください' };
+  }
+
+  try {
+    const departments = await prisma.departments.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    const existingDepartment = departments.find(
+      (department) =>
+        department.name.trim().toLocaleLowerCase() ===
+        normalizedName.toLocaleLowerCase(),
+    );
+
+    if (existingDepartment) {
+      return { success: true, department: existingDepartment };
+    }
+
+    const department = await prisma.departments.create({
+      data: {
+        name: normalizedName,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    revalidatePath('/profile/edit');
+    return { success: true, department };
+  } catch (error) {
+    console.error('Department Create Error:', error);
+    return { success: false, error: '部署の追加に失敗しました' };
   }
 }
