@@ -307,15 +307,16 @@ export const EventDetailModal = ({
                 )}
 
                 {mode === 'explore' && (
-                  <Button
-                    size='sm'
+                  <DialogIconAction
                     variant='default'
                     className='top-6 right-6'
                     onClick={handleJoinAction}
+                    size='sm'
                     disabled={isProcessing}
+                    asChild
                   >
-                    参加
-                  </Button>
+                    <Button>参加</Button>
+                  </DialogIconAction>
                 )}
               </DialogHeader>
 
