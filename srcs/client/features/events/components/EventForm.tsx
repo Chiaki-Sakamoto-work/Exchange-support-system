@@ -7,7 +7,9 @@ import {
   Store,
   Tag,
   UserRound,
+  ArrowLeftRight,
 } from 'lucide-react';
+import { Room } from '@/types/room'
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Room } from '@/app/types';
@@ -23,9 +25,20 @@ import {
   RadioCardHeader,
   RadioCardTitle,
 } from '@/components/ui/RadioCard';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
 import { createEvent, updateEventAction } from '../actions/eventActions';
+import { UserBadge } from '@/features/users/components/UserBadge';
 
 // テストデータ
 const MOCK_SHOPS = [
@@ -53,7 +66,15 @@ const MOCK_SHOPS = [
 
 type Props = {
   onSuccess: () => void;
-  initialData?: Room;
+  // 💡 user_rooms の中身を、Prismaのinclude構造（profilesを持つ形）に正しく定義します
+  initialData?: Room & { 
+    user_rooms: {
+      user_id: string;
+      room_id: number;
+      is_owner: boolean;
+      profiles: any; // もしくは profile型
+    }[];
+  };
   roomId?: number;
 };
 
@@ -66,12 +87,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const currentHostId = initialData?.user_rooms?.find(
     (ur) => ur.is_owner,
   )?.user_id;
-
-  const participants =
-    initialData?.user_rooms?.map((ur) => ({
-      id: ur.user_id,
-      name: ur.profiles?.username || '不明',
-    })) || [];
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -157,6 +172,103 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       _setError(result.error);
     }
     setIsProcessing(false);
+  };
+
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<any>(null);
+  const [transferredHostUserId, setTransferredHostUserId] = useState<string | null>(null);
+  const participants = initialData?.user_rooms || [];
+  const totalParticipantsCount = (initialData as any)?._count?.user_rooms ?? participants.length;
+  const transferCandidates = participants.filter((ur) => !ur.is_owner); // 👈 自分を除外！
+
+  // 切り分ける配列を候補者リスト（transferCandidates）に変更
+  const visibleParticipants = transferCandidates.slice(0, 5); 
+  const overflowParticipants = transferCandidates.slice(5);
+  const handleSelectParticipant = (participant: any) => {
+    setSelectedProfile(participant.profiles);
+    setIsTransferDialogOpen(true); // バッジをクリックしたらアラートを開く
+  };
+  const handleConfirmTransfer = async () => {
+    if (!roomId || !selectedProfile) return;
+    
+    setIsProcessing(true);
+    
+    // 💡 確実に新しいホストのID（selectedProfile.id）だけをターゲットにして送信する
+    const submitData = {
+      title: formData.title,
+      datetime: formData.datetime,
+      capacity: Number(formData.capacity),
+      tags: formData.tags,
+      shop: formData.shop,
+      hostId: selectedProfile.id, // ⭕ 混ざり物のない、新しいホストのUUIDをここで確定させる
+    };
+
+    const result = await updateEventAction(roomId, submitData);
+
+    if (result?.success) {
+      toast.success("ホスト権限を移動しました！");
+      setIsTransferDialogOpen(false);
+      onSuccess(); // これでマイイベント一覧が更新され、主催タブから消えます
+    } else {
+      toast.error(result?.error || "ホスト移動に失敗しました");
+    }
+    
+    setIsProcessing(false);
+  };
+
+  const isNewRecruit = (profile: profiles | null) =>
+    profile?.user_type === '新入社員';
+  const getDisplayName = (profile: profiles | null) =>
+    profile?.username ?? '名無しさん';
+
+  const getUserBadgeUser = (profile: profiles | null) => ({
+    name: getDisplayName(profile),
+    avatarUrl: profile?.avatar_url,
+    isNewRecruit: isNewRecruit(profile),
+  });
+  const renderDetailParticipantBadge = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+  ) => {
+    const profile = participant.profiles;
+    const isLeaving = leavingParticipantId === participant.user_id;
+
+    return (
+      <span
+        key={`detail-${participant.room_id}-${participant.user_id}`}
+        data-detail-participant-control='true'
+      >
+        <UserBadge
+          className='transition-all duration-200 hover:scale-105 active:scale-95'
+          label={isLeaving ? '退室' : undefined}
+          variant={isLeaving ? 'destructive' : 'secondary'}
+          user={{
+            ...getUserBadgeUser(profile),
+            isNewRecruit: isLeaving ? false : isNewRecruit(profile),
+          }}
+          onClick={() => handleSelectDetailParticipant(participant)}
+        />
+      </span>
+    );
+  };
+
+  const renderParticipantBadge = (
+    participant: MockRoomWithUsers['user_rooms'][number],
+    variant: 'default' | 'secondary' = 'default',
+  ) => {
+    const profile = participant.profiles;
+
+    return (
+      <UserBadge
+        key={`${participant.room_id}-${participant.user_id}`}
+        leadingVisual='dot'
+        variant={
+          transferredHostUserId === participant.user_id ? 'accept' : variant
+        }
+        className='hover:bg-accent hover:text-accent-foreground'
+        user={getUserBadgeUser(profile)}
+        onClick={() => handleSelectParticipant(participant)}
+      />
+    );
   };
 
   return (
@@ -302,34 +414,55 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
         </CardContent>
       </Card>
 
-      {/* 🌟 3. ホスト権限の移行 UI（参加者が2人以上いる時だけ表示） */}
-      {roomId && participants.length > 1 && (
-        <Card variant='secondary shadow-none'>
-          <CardContent>
-            <div className='flex flex-col gap-2.5'>
-              <Label htmlFor='hostId'>
-                <Crown className='w-4 h-4 text-yellow-500' />
-                ホスト権限の移行
+      {roomId && totalParticipantsCount > 1 && (
+        <>
+          <Card variant='secondary shadow-none' className='h-auto w-full min-h-0!'>
+            <CardContent>
+              <Label>
+                <ArrowLeftRight className='w-4 h-4' />
+                ホスト権限を移動
               </Label>
-              <select
-                id='hostId'
-                name='hostId'
-                value={formData.hostId}
-                onChange={handleChange}
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-              >
-                {participants.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} {p.id === currentHostId ? '(現在のホスト)' : ''}
-                  </option>
-                ))}
-              </select>
-              <p className='text-xs text-zinc-500 mt-1'>
-                ※他の参加者を選ぶと、あなたはこのイベントのホスト権限を失います。
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+              <span className='py-1 text-[12px] text-muted-foreground block'>
+                選ぶと自分は普通の参加者になり、その人がホストになります。
+              </span>
+
+              <div className='py-2 flex flex-wrap gap-2'>
+                {visibleParticipants.map((participant) =>
+                  renderParticipantBadge(participant)
+                )}
+                
+                {/* overflowParticipants の HoverCard 処理もここにそのまま移植 */}
+                {overflowParticipants.length > 0 ? (
+                  <HoverCard openDelay={120} closeDelay={120}>
+                    {/* ...提示された HoverCard の中身をそのまま配置... */}
+                  </HoverCard>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 💡 【新規追加】ホスト移動確認のAlertDialogもここに移植 */}
+          <AlertDialog open={isTransferDialogOpen} onOpenChange={setIsTransferDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogTitle className='text-xl'>ホストを移動しますか？</AlertDialogTitle>
+              <AlertDialogDescription>
+                この人にホスト権限を渡します。あなたは普通の参加者になり、このルームは「参加予定」に移ります。
+              </AlertDialogDescription>
+              <AlertDialogBody>
+                {/* アバターカード部分 */}
+                <Card variant='secondary shadow-none' className='min-h-0! py-4!'>
+                  {/* ...提示された中身をそのまま配置... */}
+                </Card>
+              </AlertDialogBody>
+              <AlertDialogFooter>
+                <AlertDialogCancel variant='outline'>キャンセル</AlertDialogCancel>
+                <AlertDialogAction variant='accent' onClick={handleConfirmTransfer}>
+                  ホストを移動
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )}
 
       <Button

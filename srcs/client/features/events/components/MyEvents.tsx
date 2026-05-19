@@ -38,7 +38,8 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         </Button>
       </div>
       {events.map((event) => {
-        const owner = event.user_rooms[0]?.profiles;
+        const currentHost = event.user_rooms.find((ur) => ur.is_owner);
+        const owner = currentHost?.profiles;
         const tags = event.room_tags.map((rt) => ({
           id: rt.tags.id,
           name: rt.tags.name,
@@ -74,7 +75,10 @@ const MyEvents = ({ events, onSuccess }: Props) => {
               <EventForm
                 roomId={editingEvent.id}
                 initialData={editingEvent}
-                onSuccess={() => setEditingEvent(null)}
+                onSuccess={() => {
+                setEditingEvent(null);
+                onSuccess?.();
+                }}
               />
             )}
           </DialogBody>

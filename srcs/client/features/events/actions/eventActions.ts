@@ -18,10 +18,29 @@ export async function getHostedEvents() {
     where: {
       user_rooms: { some: { user_id: user.id, is_owner: true } },
     },
-    include: fullEventInclude,
+    // 💡 共通の fullEventInclude を使わず、ここで個別に指定する
+    include: {
+      user_rooms: {
+        // ⭕ where: { is_owner: true } を排除！ これで参加者全員が profiles 付きで取得できます
+        include: {
+          profiles: true, 
+        },
+      },
+      room_tags: {
+        include: {
+          tags: true,
+        },
+      },
+      _count: {
+        select: {
+          user_rooms: true, 
+        },
+      },
+    },
     orderBy: { event_start_at: 'asc' },
   });
 }
+
 
 // 2. 自分が参加(is_owner: false)のイベントを取得
 export async function getJoinedEvents() {
@@ -217,7 +236,6 @@ export async function createEvent(formData: {
   }
 }
 
-// 予定を更新する（編集用）
 export async function updateEventAction(
   roomId: number,
   formData: {
@@ -230,13 +248,16 @@ export async function updateEventAction(
   },
 ) {
   try {
-    // 🌟 追加: もし「新しいホスト」が指定されていて、かつそれが「自分」ではない場合、権限の移行を行う
-    if (formData.hostId && formData.hostId !== MOCK_USER_ID) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (formData.hostId && formData.hostId !== user.id) {
       // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
-          user_id: MOCK_USER_ID,
+          user_id: user.id,
         },
         data: {
           is_owner: false,
