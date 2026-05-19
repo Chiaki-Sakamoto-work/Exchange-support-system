@@ -1,7 +1,15 @@
 'use client';
 
-import { Calendar1, FileText, Store, Tag, UserRound } from 'lucide-react';
+import {
+  Calendar1,
+  Crown,
+  FileText,
+  Store,
+  Tag,
+  UserRound,
+} from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import type { Room } from '@/app/types';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -55,6 +63,16 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
   const [tagInput, setTagInput] = useState('');
 
+  const currentHostId = initialData?.user_rooms?.find(
+    (ur) => ur.is_owner,
+  )?.user_id;
+
+  const participants =
+    initialData?.user_rooms?.map((ur) => ({
+      id: ur.user_id,
+      name: ur.profiles?.username || '不明',
+    })) || [];
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     datetime: initialData?.event_start_at
@@ -63,12 +81,15 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     capacity: initialData?.capacity_limit || 4,
     tags: initialData?.room_tags?.map((rt) => rt.tags.name) || ([] as string[]),
     shop: initialData?.location_name || '',
+    hostId: currentHostId || '',
   });
 
   const today = new Date().toISOString().split('T')[0];
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >, // 🌟 ここに HTMLSelectElement を追加！
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -130,7 +151,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     // 🌟 result?.success とすることで、undefined の可能性を考慮
     if (result?.success) {
-      alert(roomId ? '更新しました！' : '作成しました！');
+      toast.success(roomId ? '更新しました！' : '作成しました！');
       onSuccess();
     } else if (result?.error) {
       _setError(result.error);
@@ -280,6 +301,36 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* 🌟 3. ホスト権限の移行 UI（参加者が2人以上いる時だけ表示） */}
+      {roomId && participants.length > 1 && (
+        <Card variant='secondary shadow-none'>
+          <CardContent>
+            <div className='flex flex-col gap-2.5'>
+              <Label htmlFor='hostId'>
+                <Crown className='w-4 h-4 text-yellow-500' />
+                ホスト権限の移行
+              </Label>
+              <select
+                id='hostId'
+                name='hostId'
+                value={formData.hostId}
+                onChange={handleChange}
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+              >
+                {participants.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} {p.id === currentHostId ? '(現在のホスト)' : ''}
+                  </option>
+                ))}
+              </select>
+              <p className='text-xs text-zinc-500 mt-1'>
+                ※他の参加者を選ぶと、あなたはこのイベントのホスト権限を失います。
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Button
         type='submit'
