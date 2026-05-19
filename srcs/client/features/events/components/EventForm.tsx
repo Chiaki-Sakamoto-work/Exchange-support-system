@@ -1,6 +1,5 @@
 'use client';
 
-
 import type { profiles } from '@prisma/client';
 import {
   ArrowLeftRight,
@@ -9,7 +8,6 @@ import {
   Store,
   Tag,
   Trash2,
-
   UserRound,
 } from 'lucide-react';
 import { useState } from 'react';

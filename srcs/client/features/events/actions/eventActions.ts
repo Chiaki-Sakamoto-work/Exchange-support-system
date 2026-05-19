@@ -248,19 +248,16 @@ export async function updateEventAction(
   },
 ) {
   try {
-
     const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (formData.hostId && formData.hostId !== user?.id) {
-
       // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
           user_id: user?.id,
-
         },
         data: {
           is_owner: false,
