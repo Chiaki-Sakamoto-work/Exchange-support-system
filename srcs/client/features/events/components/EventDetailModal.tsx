@@ -233,8 +233,9 @@ export const EventDetailModal = ({
               roomId={roomId}
               initialData={eventData || undefined}
               onSuccess={() => {
-                onSuccess(); // 親のリストを更新
                 setIsEditing(false); // 詳細画面に戻る、または onClose() で閉じる
+                onClose(); // 編集完了後にモーダルを閉じる場合はこれを有効に
+                onSuccess(); // 親のリストを更新
               }}
             />
           </DialogBody>
