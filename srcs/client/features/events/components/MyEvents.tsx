@@ -1,7 +1,7 @@
 'use client';
 
 import { EventCard } from '@feature/events/components/EventCard';
-import { UtensilsCrossed } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import type { Room } from '@/app/types';
 import { Button } from '@/components/ui/Button';
@@ -29,12 +29,14 @@ const MyEvents = ({ events, onSuccess }: Props) => {
     <div className='flex flex-col gap-4'>
       <div className='flex justify-end'>
         <Button
-          size='icon-lg'
-          variant='outline'
+          type='submit'
+          className='w-full bg-gray-400'
+          variant='accent'
           onClick={() => setIsCreateOpen(true)}
           aria-label='イベントを作成'
         >
-          <UtensilsCrossed />
+          <Plus />
+          イベントを作成
         </Button>
       </div>
       {events.map((event) => {
