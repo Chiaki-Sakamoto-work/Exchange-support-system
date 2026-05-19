@@ -207,8 +207,10 @@ export function ProfileEditForm({
       <Card variant='default' className='space-y-2 shadow-none!'>
         <CardContent className='mx-auto'>
           <Avatar size='lg' variant='rounded-full'>
-            <AvatarImage src='https://github.com/shadcn.png' />
-            <AvatarFallback>{userName.charAt(0) || '無'}</AvatarFallback>
+            <AvatarImage src='' />
+            <AvatarFallback className='text-4xl'>
+              {userName.charAt(0) || '無'}
+            </AvatarFallback>
           </Avatar>
         </CardContent>
       </Card>

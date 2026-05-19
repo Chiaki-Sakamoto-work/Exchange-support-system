@@ -21,8 +21,10 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
       <CardContent>
         <div className='flex flex-col items-center'>
           <Avatar size='lg' variant='rounded-full'>
-            <AvatarImage src='https://github.com/shadcn.png' />
-            <AvatarFallback>{user.username?.charAt(0) || '無'}</AvatarFallback>
+            <AvatarImage src='' />
+            <AvatarFallback className='text-4xl'>
+              {user.username?.charAt(0) || '無'}
+            </AvatarFallback>
           </Avatar>
 
           <h2 className='text-xl font-bold text-zinc-900'>
