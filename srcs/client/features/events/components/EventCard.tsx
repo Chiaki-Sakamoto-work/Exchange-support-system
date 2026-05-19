@@ -1,4 +1,4 @@
-import { ChevronRight, UsersRound } from 'lucide-react';
+import { ChevronRight, PenBox, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -19,7 +19,13 @@ export type EventCardProps = {
   onClick?: () => void;
   tags: { id: number; name: string }[];
   participants: string;
+  icon?: 'show' | 'edit';
   ownerProfile?: { image?: string; name: string };
+};
+
+const CARD_ICON = {
+  show: { icon: ChevronRight, size: 'size-5' },
+  edit: { icon: PenBox, size: 'size-4' },
 };
 
 export const EventCard = ({
@@ -30,6 +36,7 @@ export const EventCard = ({
   tags,
   participants,
   ownerProfile,
+  icon = 'show',
 }: EventCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -37,7 +44,7 @@ export const EventCard = ({
       onClick?.();
     }
   };
-
+  const Icon = CARD_ICON[icon];
   return (
     <Card
       role='button'
@@ -50,7 +57,6 @@ export const EventCard = ({
         'active:scale-[0.98]',
         'focus-visible:outline-none',
         'h-36.5',
-        // 'flex flex-col gap-3',
       )}
       variant='default'
     >
@@ -69,9 +75,7 @@ export const EventCard = ({
           <CardDescription>{shop}</CardDescription>
         </div>
         <CardAction>
-          {/* <Button variant='ghost' size='icon'> */}
-          <ChevronRight className='h-5 w-5 text-muted-foreground' />
-          {/* </Button> */}
+          <Icon.icon className={cn(Icon.size, 'text-muted-foreground')} />
         </CardAction>
       </CardHeader>
 
