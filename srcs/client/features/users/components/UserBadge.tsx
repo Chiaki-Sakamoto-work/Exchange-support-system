@@ -39,8 +39,6 @@ const badgeVariantByUserBadgeVariant: Record<
   secondary: 'secondary',
 };
 
-const getFallback = (name: string) => name.slice(0, 1).toUpperCase();
-
 function UserBadge({
   user,
   variant = 'default',

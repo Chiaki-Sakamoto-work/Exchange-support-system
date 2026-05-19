@@ -23,7 +23,6 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
@@ -258,8 +257,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     profile?.user_type === '新入社員';
   const getDisplayName = (profile: profiles | null) =>
     profile?.username ?? '名無しさん';
-  const getFallback = (profile: profiles | null) =>
-    getDisplayName(profile).slice(0, 1).toUpperCase();
   const getUserBadgeUser = (profile: profiles | null) => ({
     name: getDisplayName(profile),
     avatarUrl: profile?.avatar_url,
