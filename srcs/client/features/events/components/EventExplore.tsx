@@ -5,6 +5,7 @@ import type { Room } from '@/app/types';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
+import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventExplore = () => {
   // explore専用のデータと状態
@@ -42,7 +43,7 @@ export const EventExplore = () => {
   };
 
   if (isLoading) {
-    return <div className='text-center py-10 text-zinc-400'>読み込み中...</div>;
+    return <EventListLoadingSkeleton showHeader />;
   }
 
   return (

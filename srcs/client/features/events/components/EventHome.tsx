@@ -11,6 +11,7 @@ import {
 } from '../actions/eventActions';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
+import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -58,7 +59,7 @@ export const EventHome = () => {
   }, [fetchAllData]);
 
   if (isLoading) {
-    return <div className='text-center py-10 text-zinc-400'>読み込み中...</div>;
+    return <EventListLoadingSkeleton showTabs />;
   }
 
   const sortByDate = (rooms: Room[]) => {

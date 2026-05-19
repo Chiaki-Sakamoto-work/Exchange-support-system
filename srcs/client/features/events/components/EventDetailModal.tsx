@@ -41,6 +41,7 @@ import {
   joinEventAction,
 } from '../actions/eventActions';
 import { EventForm } from './EventForm';
+import { EventDetailLoadingSkeleton } from './EventLoadingSkeleton';
 import { ExitEventAlertDialog } from './ExitEventAlertDialog';
 
 type Props = {
@@ -80,11 +81,7 @@ export const EventDetailModal = ({
   }, [roomId]);
 
   if (isLoading) {
-    return (
-      <div className='fixed inset-0 bg-black/60 z-50 flex justify-center items-center'>
-        <div className='text-white'>読み込み中...</div>
-      </div>
-    );
+    return <EventDetailLoadingSkeleton />;
   }
   if (error || !eventData) {
     return (
