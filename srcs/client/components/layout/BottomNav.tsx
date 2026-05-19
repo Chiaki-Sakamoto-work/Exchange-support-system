@@ -45,11 +45,12 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
       <Tabs
         value={activeValue}
         variant='invert'
+        indicatorClassName='bg-background/55 shadow-sm ring-1 ring-border/40'
         className={cn('w-full max-w-md', className)}
       >
         <TabsList
           className={cn(
-            'h-20 w-full justify-around rounded-2xl border border-border bg-card/90 p-2 shadow-2xl backdrop-blur-lg',
+            'h-20 w-full justify-around rounded-2xl border border-border/60 bg-card/80 p-2 shadow-xl backdrop-blur-sm',
             listClassName,
           )}
         >
