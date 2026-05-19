@@ -267,7 +267,6 @@ export async function getExploreEvents() {
         },
         user_rooms: {
           none: {
-            // MOCK_USER_ID가 정의되어 있다고 가정합니다
             user_id: MOCK_USER_ID,
           },
         },
@@ -284,7 +283,6 @@ export async function getExploreEvents() {
           select: { user_rooms: true },
         },
       },
-      // 👆 여기까지 수정
       orderBy: {
         event_start_at: 'asc',
       },
