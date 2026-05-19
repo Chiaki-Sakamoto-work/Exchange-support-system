@@ -94,3 +94,7 @@ export const EventDetailLoadingSkeleton = () => (
     </Card>
   </div>
 );
+
+export const EventLoadingSkeleton = () => {
+  return EventDetailLoadingSkeleton;
+};
