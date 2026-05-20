@@ -11,7 +11,7 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { Room } from '@/app/types';
 import {
@@ -53,49 +53,10 @@ import {
   deleteEventAction,
   updateEventAction,
 } from '../actions/eventActions';
+import { GetRestaurantOptionsResult } from '@/app/types/restaurants';
+import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
 
-// テストデータ
-const MOCK_SHOPS = [
-  {
-    'ChIJQ-s-N92MGGARs0B3V2x0aTo': {
-      name: '渋谷 魚金',
-      googleMapsUrl: 'https://maps.app.goo.gl/example1',
-      avgRating: 4.1,
-      category: '居酒屋・海鮮',
-      reviewCount: 428,
-      tags: ['個室あり', '日本酒が豊富', '要予約'],
-    },
-    'ChIJW8Z1v-uMGGAR59k0xW4jGq8': {
-      name: 'ブルーボトルコーヒー 渋谷カフェ',
-      googleMapsUrl: 'https://maps.app.goo.gl/example2',
-      avgRating: 4.4,
-      category: 'カフェ',
-      reviewCount: 1156,
-      tags: ['Wi-Fiあり', 'おしゃれな空間', 'テイクアウト可'],
-    },
-    'ChIJP5Z-5_2MGGARRB-eD5K_-Yg': {
-      name: '焼肉トラジ 渋谷店',
-      googleMapsUrl: 'https://maps.app.goo.gl/example3',
-      avgRating: 4.3,
-      category: '焼肉',
-      reviewCount: 312,
-      tags: ['ランチ', '個室あり', '記念日に最適'],
-    },
-    'ChIJt23x4euMGGARTg0bX-R3dKc': {
-      name: 'リゴレット ショートヒルズ',
-      googleMapsUrl: 'https://maps.app.goo.gl/example4',
-      avgRating: 4.2,
-      category: 'イタリアン',
-      reviewCount: 890,
-      tags: ['ワインが豊富', 'テラス席あり', '深夜営業'],
-    },
-  },
-];
 
-const shopList = Object.entries(MOCK_SHOPS[0]).map(([placeId, data]) => ({
-  placeId,
-  ...data,
-}));
 
 type Props = {
   onSuccess: () => void;
@@ -130,6 +91,26 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     shop: initialData?.location_name || '',
     hostId: currentHostId || '',
   });
+
+  // テストデータ
+  const [restaurantData, setRestaurantData] =
+      useState<GetRestaurantOptionsResult | null>(null);
+
+    useEffect(() => {
+      const fetchRestaurants = async () => {
+        const result = await getRestaurantOptions();
+        setRestaurantData(result);
+      };
+
+      fetchRestaurants();
+    }, []);
+
+  const shopList = restaurantData?.success
+    ? Object.entries(restaurantData.restaurants || {}).map(([placeId, data]) => ({
+        placeId,
+        ...data,
+      }))
+    : [];
 
   const today = new Date().toISOString().split('T')[0];
 
