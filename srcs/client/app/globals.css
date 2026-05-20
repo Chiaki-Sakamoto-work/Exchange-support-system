@@ -40,6 +40,13 @@
   --radius-sm: calc(var(--radius) - 4px);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --animate-skeleton-gradient: skeleton-gradient 1.8s ease-in-out infinite;
+  @keyframes skeleton-gradient {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 :root {
