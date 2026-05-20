@@ -13,7 +13,7 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    environment: Production
+    environment: ${{ github.ref_name == 'main' && 'Production' || 'Preview' }}
 
     defaults:
       run:
@@ -31,7 +31,8 @@ jobs:
       - name: 📦 パッケージのインストール
         run: npm ci
 
-      - name: 🚀 本番DBへマイグレーションを適用 (Prisma Migrate deploy)
+      - name: 🚀 DBへマイグレーションを適用 (環境に合わせて自動切り替え)
         env:
-          DATABASE_URL: ${{ secrets.PROD_DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
         run: npx prisma migrate deploy
+
