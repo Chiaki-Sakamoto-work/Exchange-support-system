@@ -62,6 +62,8 @@ export async function updateSession(request: NextRequest) {
     error: authError, // 💡 【追加】エラー内容を受け取る
   } = await supabase.auth.getUser();
 
+  console.log('--- 🛑 ミドルウェア通過中のパス:', request.nextUrl.pathname);
+
   const url = request.nextUrl;
 
   // 💡 【追加】Vercelのログ画面に本当の理由を吐き出させる
@@ -72,8 +74,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 4. 除外設定
-  const isAuthPage =
-    url.pathname.startsWith('/login') || url.pathname === '/callback';
+  const isAuthPage = url.pathname.startsWith('/login') || url.pathname.startsWith('/callback');
+  
   if (isAuthPage) {
     return supabaseResponse;
   }
