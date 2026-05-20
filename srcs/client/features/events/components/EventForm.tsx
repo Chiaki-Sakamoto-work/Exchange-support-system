@@ -456,15 +456,12 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                     <RadioCard
                       key={shop.placeId}
                       value={shop.name}
-                      className='w-full min-w-0'
+                      className='w-full min-w-0 max-w-full transition-none hover:transform-none hover:translate-x-0 hover:translate-y-0 hover:scale-100'
                     >
                       {/* 🌟 Header と Title に w-full min-w-0 を徹底 */}
-                      <RadioCardHeader className='w-full min-w-0'>
+                      <RadioCardHeader className='w-full min-w-0 p-3'>
                         <RadioCardTitle className='flex items-center justify-between gap-2 w-full min-w-0'>
-                          <span
-                            className='truncate shrink mr-2'
-                            title={shop.name}
-                          >
+                          <span className='truncate shrink w-full'>
                             {shop.name}
                           </span>
                           {shop.googleMapsUrl && (
@@ -491,7 +488,9 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                               <span className='text-yellow-600 font-medium shrink-0'>
                                 ★ {shop.avgRating.toFixed(1)}
                               </span>
-                              <span className='text-zinc-500 shrink-0'>({shop.reviewCount}件)</span>
+                              <span className='text-zinc-500 shrink-0'>
+                                ({shop.reviewCount}件)
+                              </span>
                             </div>
 
                             {shop.tags && shop.tags.length > 0 && (
