@@ -5,7 +5,9 @@ export async function updateSession(request: NextRequest) {
   // クッキー名はブラウザが使う公開URLから生成されるため NEXT_PUBLIC_SUPABASE_URL を使う
   const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   // 実際のAPIリクエストはDocker内部から到達できるURLへリライトする
-  const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
+  const internalUrl = process.env.VERCEL
+    ? publicUrl
+    : process.env.SUPABASE_INTERNAL_URL || publicUrl;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // 💡 【修正】環境変数に頼らず、今アクセスされているURLから「https://xxx.vercel.app」を自動取得！
