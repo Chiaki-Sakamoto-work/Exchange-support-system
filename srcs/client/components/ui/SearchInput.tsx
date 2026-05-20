@@ -1,6 +1,6 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
@@ -90,7 +90,7 @@ export function SearchInput({
           <span
             className={cn(
               'ml-2 text-muted-foreground transition-all duration-300 md:text-sm whitespace-nowrap',
-              isActive ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100', // 이전으로 롤백 (delay 제거)
+              isActive ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100',
             )}
           >
             {placeholder}
@@ -126,7 +126,7 @@ export function SearchInput({
       <div
         className={cn(
           'transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap flex items-center',
-          isActive ? 'w-16 opacity-100 ml-2' : 'w-0 opacity-0 ml-0',
+          isActive ? 'w-16 opacity-100 ml-0' : 'w-0 opacity-0 ml-0',
         )}
       >
         <Button
@@ -138,7 +138,7 @@ export function SearchInput({
             handleCancel();
           }}
         >
-          クリア
+          <X className='size-5' />
         </Button>
       </div>
     </div>

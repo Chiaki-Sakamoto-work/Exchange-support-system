@@ -7,7 +7,6 @@ import {
   FileText,
   Store,
   Tag,
-  Trash2,
   UserRound,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -639,7 +638,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
           disabled={isProcessing}
           onClick={handleDelete}
         >
-          <Trash2 className='w-4 h-4' />
           削除する
         </Button>
       )}
