@@ -220,7 +220,7 @@ export const EventDetailModal = ({
           }
         }}
       >
-        <DialogContent className='max-h-[80vh]'>
+        <DialogContent preventOutsideClose className='max-h-[80vh]'>
           <DialogHeader>
             <DialogTitle>{eventData.title}を編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>

@@ -77,7 +77,11 @@ export const EventDetailLoadingSkeleton = ({
   mode: EventDetailLoadingSkeletonMode;
 }) => (
   <Dialog open={true}>
-    <DialogContent showCloseButton={false} className='max-h-[80vh]'>
+    <DialogContent
+      preventOutsideClose
+      showCloseButton={false}
+      className='max-h-[80vh]'
+    >
       <span className='sr-only'>読み込み中</span>
 
       <div className='animate-pulse'>
