@@ -499,7 +499,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                                 {shop.tags.map((tag) => (
                                   <span
                                     key={tag}
-                                    className='px-1.5 py-0.5 bg-zinc-200/60 text-zinc-700 rounded text-[10px] whitespace-nowrap shrink-0'
+                                    className='px-1.5 py-0.5 bg-background text-foreground rounded text-[10px] whitespace-nowrap shrink-0'
                                   >
                                     {tag}
                                   </span>
