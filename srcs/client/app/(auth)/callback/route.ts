@@ -3,13 +3,10 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/';
-  const origin = new URL(request.url).origin;
-
-  // 💡 【超重要】先にリダイレクト先のレスポンスオブジェクトを作ってしまう！
-  const response = NextResponse.redirect(`${origin}${next}`);
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
+  // リダイレクト先がない場合はトップページ（/）へ
+  const next = requestUrl.searchParams.get('next') ?? '/';
 
   if (code) {
     const cookieStore = await cookies();
@@ -23,24 +20,31 @@ export async function GET(request: Request) {
             return cookieStore.getAll();
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
+            try {
+              // 💡 responseではなく、cookieStore.set を使うのが Next.js 15 の絶対の掟！
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options);
+              });
+            } catch (error) {
+              console.error('Cookie Set Error:', error);
+            }
           },
         },
       },
     );
 
-    // 本物のSupabase Cloudに対してセッション交換を実行
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // 💡 クッキーが100%乗っかった状態の response をそのままブラウザに返す！
-      return response;
+      // 🎉 セッション交換成功！ 新しいクッキーを持ったままトップページへ
+      return NextResponse.redirect(new URL(next, requestUrl.origin));
+    } else {
+      console.error('❌ Supabase Auth Error:', error.message);
     }
-    console.error('❌ exchangeCodeForSession Error:', error.message);
   }
 
-  // 失敗した場合はエラーパラメーター付きでログイン画面へ戻す
-  return NextResponse.redirect(`${origin}/login?error=auth-callback-failed`);
+  // codeが無い、または交換に失敗した場合はエラー付きでログインへ戻す
+  return NextResponse.redirect(
+    new URL('/login?error=auth-callback-failed', requestUrl.origin),
+  );
 }
