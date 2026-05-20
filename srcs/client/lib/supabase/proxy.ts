@@ -74,8 +74,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 4. 除外設定
-  const isAuthPage = url.pathname.startsWith('/login') || url.pathname.startsWith('/callback');
-  
+  const isAuthPage =
+    url.pathname.startsWith('/login') || url.pathname.startsWith('/callback');
+
   if (isAuthPage) {
     return supabaseResponse;
   }
