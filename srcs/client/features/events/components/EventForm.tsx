@@ -5,6 +5,7 @@ import {
   ArrowLeftRight,
   Calendar1,
   FileText,
+  Search,
   Store,
   Tag,
   Trash2,
@@ -56,26 +57,45 @@ import {
 // テストデータ
 const MOCK_SHOPS = [
   {
-    name: '居酒屋たぬき',
-    description: '渋谷・和食・¥¥',
+    'ChIJQ-s-N92MGGARs0B3V2x0aTo': {
+      name: '渋谷 魚金',
+      googleMapsUrl: 'https://maps.app.goo.gl/example1',
+      avgRating: 4.1,
+      category: '居酒屋・海鮮',
+      reviewCount: 428,
+      tags: ['個室あり', '日本酒が豊富', '要予約'],
+    },
+    'ChIJW8Z1v-uMGGAR59k0xW4jGq8': {
+      name: 'ブルーボトルコーヒー 渋谷カフェ',
+      googleMapsUrl: 'https://maps.app.goo.gl/example2',
+      avgRating: 4.4,
+      category: 'カフェ',
+      reviewCount: 1156,
+      tags: ['Wi-Fiあり', 'おしゃれな空間', 'テイクアウト可'],
+    },
+    'ChIJP5Z-5_2MGGARRB-eD5K_-Yg': {
+      name: '焼肉トラジ 渋谷店',
+      googleMapsUrl: 'https://maps.app.goo.gl/example3',
+      avgRating: 4.3,
+      category: '焼肉',
+      reviewCount: 312,
+      tags: ['ランチ', '個室あり', '記念日に最適'],
+    },
+    'ChIJt23x4euMGGARTg0bX-R3dKc': {
+      name: 'リゴレット ショートヒルズ',
+      googleMapsUrl: 'https://maps.app.goo.gl/example4',
+      avgRating: 4.2,
+      category: 'イタリアン',
+      reviewCount: 890,
+      tags: ['ワインが豊富', 'テラス席あり', '深夜営業'],
+    },
   },
-  {
-    name: '焼き鳥みやび',
-    description: '新宿・焼き鳥・¥¥',
-  },
-  {
-    name: '焼き鳥みやび (2号店)',
-    description: '新宿・焼き鳥・¥¥',
-  },
-  // {
-  //   name: '焼き鳥みやび (3号店)',
-  //   description: '新宿・和食・¥¥',
-  // },
-  // {
-  //   name: '焼き鳥みやび (4号店)',
-  //   description: '新宿・焼き鳥・¥¥',
-  // },
 ];
+
+const shopList = Object.entries(MOCK_SHOPS[0]).map(([placeId, data]) => ({
+  placeId,
+  ...data,
+}));
 
 type Props = {
   onSuccess: () => void;
@@ -93,6 +113,8 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const [error, _setError] = useState<string | null>(null);
 
   const [tagInput, setTagInput] = useState('');
+
+  const [searchQuery, setSearchQuery] = useState('');
 
   const currentHostId = initialData?.user_rooms?.find(
     (ur) => ur.is_owner,
@@ -183,6 +205,16 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     }
     setIsProcessing(false);
   };
+
+  const filteredShops = shopList.filter((shop) => {
+    if (!searchQuery) return true; // 何も入力されていなければ全て表示
+    const lowerQuery = searchQuery.toLowerCase();
+    return (
+      shop.name.toLowerCase().includes(lowerQuery) ||
+      shop.category.toLowerCase().includes(lowerQuery) ||
+      shop.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
+    );
+  });
 
   const handleDelete = async () => {
     if (!roomId) return;
@@ -402,24 +434,98 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       <Card variant='secondary shadow-none'>
         <CardContent>
           <div className='flex flex-col gap-2.5'>
-            {/* 🌟 htmlFor='shop' を追加 */}
             <Label htmlFor='shop'>
               <Store className='w-4 h-4' />
               お店を選ぶ (任意)
             </Label>
-            {/* RadioGroupで全体を囲み、RadioCardで個別の選択肢を作ります */}
-            <RadioGroup value={formData.shop} onValueChange={handleShopChange}>
-              {MOCK_SHOPS.map((shop) => (
-                <RadioCard key={shop.name} value={shop.name} className='w-full'>
-                  <RadioCardHeader>
-                    <RadioCardTitle>{shop.name}</RadioCardTitle>
-                    <RadioCardDescription>
-                      {shop.description}
-                    </RadioCardDescription>
-                  </RadioCardHeader>
-                </RadioCard>
-              ))}
-            </RadioGroup>
+
+            {/* 🌟 1. 検索バーの追加 */}
+            <div className='relative'>
+              <Search className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
+              <Input
+                type='text'
+                placeholder='店名、カテゴリ、タグで検索...'
+                className='pl-9 bg-white'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* 🌟 2. スクロールエリア（max-h-64 と overflow-y-auto を追加） */}
+            <div className='max-h-[280px] overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin'>
+              {/* 🌟 3. shopList ではなく filteredShops でループを回すように変更 */}
+              {filteredShops.length > 0 ? (
+                <RadioGroup
+                  value={formData.shop}
+                  onValueChange={handleShopChange}
+                >
+                  {filteredShops.map((shop) => (
+                    <RadioCard
+                      key={shop.placeId}
+                      value={shop.name}
+                      className='w-full'
+                    >
+                      <RadioCardHeader>
+                        <RadioCardTitle className='flex items-center justify-between gap-2 min-w-0'>
+                          <span
+                            className='truncate shrink mr-2'
+                            title={shop.name} // 💡 ホバーした時にフルネームが出るようにする親切設計
+                          >
+                            {shop.name}
+                          </span>
+                          {shop.googleMapsUrl && (
+                            <a
+                              href={shop.googleMapsUrl}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-xs text-blue-500 hover:text-blue-700 hover:underline z-10'
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              マップで見る
+                            </a>
+                          )}
+                        </RadioCardTitle>
+
+                        <RadioCardDescription>
+                          <div className='flex flex-col gap-1.5 mt-1'>
+                            <div className='flex items-center gap-2 text-xs text-zinc-600'>
+                              <span className='font-medium'>
+                                {shop.category}
+                              </span>
+                              <span>•</span>
+                              <span className='text-yellow-600 font-medium'>
+                                ★ {shop.avgRating.toFixed(1)}
+                              </span>
+                              <span>({shop.reviewCount}件)</span>
+                            </div>
+
+                            {shop.tags && shop.tags.length > 0 && (
+                              <div className='flex flex-wrap gap-1'>
+                                {shop.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className='px-1.5 py-0.5 bg-background text-zinc-600 rounded text-[10px]'
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </RadioCardDescription>
+                      </RadioCardHeader>
+                    </RadioCard>
+                  ))}
+                </RadioGroup>
+              ) : (
+                /* 🌟 4. 検索にヒットしなかった時の親切なメッセージ */
+                <div className='py-8 text-center'>
+                  <p className='text-sm text-zinc-500'>
+                    該当するお店が見つかりません
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
