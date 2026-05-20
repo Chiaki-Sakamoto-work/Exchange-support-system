@@ -424,43 +424,46 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       {/* 2. お店・場所 */}
       <Card variant='secondary shadow-none'>
         <CardContent>
-          <div className='flex flex-col gap-2.5'>
+          <div className='flex flex-col gap-3 w-full'>
             <Label htmlFor='shop'>
               <Store className='w-4 h-4' />
               お店を選ぶ (任意)
             </Label>
 
-            {/* 🌟 1. 検索バーの追加 */}
-            <div className='relative'>
+            {/* 1. 検索バー */}
+            <div className='relative w-full'>
               <Search className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
               <Input
                 type='text'
                 placeholder='店名、カテゴリ、タグで検索...'
-                className='pl-9 bg-white'
+                className='pl-9 bg-white w-full'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            {/* 🌟 2. スクロールエリア（max-h-64 と overflow-y-auto を追加） */}
-            <div className='max-h-[280px] overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin'>
-              {/* 🌟 3. shopList ではなく filteredShops でループを回すように変更 */}
+            {/* 2. スクロールエリア */}
+            <div className='max-h-[280px] overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin w-full'>
               {filteredShops.length > 0 ? (
+                /* 🌟 RadioGroup 自体も横幅いっぱいに広げる */
                 <RadioGroup
                   value={formData.shop}
                   onValueChange={handleShopChange}
+                  className='w-full grid gap-2'
                 >
                   {filteredShops.map((shop) => (
+                    /* 🌟 RadioCard も w-full min-w-0 で絶対固定 */
                     <RadioCard
                       key={shop.placeId}
                       value={shop.name}
-                      className='w-full'
+                      className='w-full min-w-0'
                     >
-                      <RadioCardHeader>
-                        <RadioCardTitle className='flex items-center justify-between gap-2 min-w-0'>
+                      {/* 🌟 Header と Title に w-full min-w-0 を徹底 */}
+                      <RadioCardHeader className='w-full min-w-0'>
+                        <RadioCardTitle className='flex items-center justify-between gap-2 w-full min-w-0'>
                           <span
                             className='truncate shrink mr-2'
-                            title={shop.name} // 💡 ホバーした時にフルネームが出るようにする親切設計
+                            title={shop.name}
                           >
                             {shop.name}
                           </span>
@@ -469,7 +472,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                               href={shop.googleMapsUrl}
                               target='_blank'
                               rel='noopener noreferrer'
-                              className='text-xs text-blue-500 hover:text-blue-700 hover:underline z-10'
+                              className='text-xs text-blue-500 hover:text-blue-700 hover:underline z-10 shrink-0'
                               onClick={(e) => e.stopPropagation()}
                             >
                               マップで見る
@@ -477,25 +480,27 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                           )}
                         </RadioCardTitle>
 
-                        <RadioCardDescription>
-                          <div className='flex flex-col gap-1.5 mt-1'>
-                            <div className='flex items-center gap-2 text-xs text-zinc-600'>
-                              <span className='font-medium'>
+                        {/* 🌟 Description にも w-full min-w-0 を徹底 */}
+                        <RadioCardDescription className='w-full min-w-0'>
+                          <div className='flex flex-col gap-1.5 mt-1 w-full min-w-0'>
+                            <div className='flex items-center gap-2 text-xs text-zinc-600 w-full'>
+                              <span className='font-medium shrink-0'>
                                 {shop.category}
                               </span>
-                              <span>•</span>
-                              <span className='text-yellow-600 font-medium'>
+                              <span className='shrink-0'>•</span>
+                              <span className='text-yellow-600 font-medium shrink-0'>
                                 ★ {shop.avgRating.toFixed(1)}
                               </span>
-                              <span>({shop.reviewCount}件)</span>
+                              <span className='text-zinc-500 shrink-0'>({shop.reviewCount}件)</span>
                             </div>
 
                             {shop.tags && shop.tags.length > 0 && (
-                              <div className='flex flex-wrap gap-1'>
+                              /* 🌟 タグの親要素も横幅100%を維持させて折り返させる */
+                              <div className='flex flex-wrap gap-1 w-full min-w-0'>
                                 {shop.tags.map((tag) => (
                                   <span
                                     key={tag}
-                                    className='px-1.5 py-0.5 bg-background text-zinc-600 rounded text-[10px]'
+                                    className='px-1.5 py-0.5 bg-zinc-200/60 text-zinc-700 rounded text-[10px] whitespace-nowrap shrink-0'
                                   >
                                     {tag}
                                   </span>
@@ -509,8 +514,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                   ))}
                 </RadioGroup>
               ) : (
-                /* 🌟 4. 検索にヒットしなかった時の親切なメッセージ */
-                <div className='py-8 text-center'>
+                <div className='py-8 text-center w-full'>
                   <p className='text-sm text-zinc-500'>
                     該当するお店が見つかりません
                   </p>
