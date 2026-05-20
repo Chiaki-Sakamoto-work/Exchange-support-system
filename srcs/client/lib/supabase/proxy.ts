@@ -25,13 +25,19 @@ export async function updateSession(request: NextRequest) {
 
   // 2. Supabase クライアント作成
   const supabase = createServerClient(publicUrl, supabaseAnonKey, {
-    global: {
-      fetch: (url, options) =>
-        fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
-    },
+    // 💡 【修正①】Vercel上（process.env.VERCELがある時）は、Docker用のfetch書き換えを「丸ごと無効化」する
+    ...(process.env.VERCEL
+      ? {}
+      : {
+          global: {
+            fetch: (url, options) =>
+              fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
+          },
+        }),
     cookies: {
       getAll() {
-        return request.cookies.getAll();
+        // 💡 【修正②】公式推奨の安全な形（nameとvalueだけ）に綺麗にマッピングして返す
+        return request.cookies.getAll().map(({ name, value }) => ({ name, value }));
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => {
