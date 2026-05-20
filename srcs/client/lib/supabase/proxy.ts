@@ -5,11 +5,16 @@ export async function updateSession(request: NextRequest) {
   // クッキー名はブラウザが使う公開URLから生成されるため NEXT_PUBLIC_SUPABASE_URL を使う
   const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   // 実際のAPIリクエストはDocker内部から到達できるURLへリライトする
-  const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
+  const internalUrl = process.env.VERCEL
+    ? publicUrl
+    : process.env.SUPABASE_INTERNAL_URL || publicUrl;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // ブラウザがアクセス可能なURLを定義
-  const PublicUrl = process.env.NEXT_PROG_URL || process.env.FRONTEND;
+  // 💡 【修正】環境変数に頼らず、今アクセスされているURLから「https://xxx.vercel.app」を自動取得！
+  const origin =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : request.nextUrl.origin;
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -23,13 +28,24 @@ export async function updateSession(request: NextRequest) {
 
   // 2. Supabase クライアント作成
   const supabase = createServerClient(publicUrl, supabaseAnonKey, {
-    global: {
-      fetch: (url, options) =>
-        fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
-    },
+    // 💡 【修正①】Vercel上（process.env.VERCELがある時）は、Docker用のfetch書き換えを「丸ごと無効化」する
+    ...(process.env.VERCEL
+      ? {}
+      : {
+          global: {
+            fetch: (url, options) =>
+              fetch(
+                url.toString().replace(publicUrl, internalUrl ?? ''),
+                options,
+              ),
+          },
+        }),
     cookies: {
       getAll() {
-        return request.cookies.getAll();
+        // 💡 【修正②】公式推奨の安全な形（nameとvalueだけ）に綺麗にマッピングして返す
+        return request.cookies
+          .getAll()
+          .map(({ name, value }) => ({ name, value }));
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => {
@@ -46,26 +62,36 @@ export async function updateSession(request: NextRequest) {
   // 3. ユーザー取得
   const {
     data: { user },
+    error: authError, // 💡 【追加】エラー内容を受け取る
   } = await supabase.auth.getUser();
 
-  const url = request.nextUrl.clone();
+  console.log('--- 🛑 ミドルウェア通過中のパス:', request.nextUrl.pathname);
 
-  // 4. 除外設定
-  const isAuthPage =
-    url.pathname.startsWith('/login') || url.pathname === '/callback';
-  if (isAuthPage) {
-    return supabaseResponse;
-  }
+  const url = request.nextUrl;
 
-  // 5. 未ログイン時のガード（リダイレクト先を PUBLIC_URL に固定）
-  if (!user) {
-    // 🔴 request.url ではなく、明示的に localhost:3000 を指定してリダイレクト
-    return NextResponse.redirect(new URL('/login', PublicUrl));
+  // 💡 【追加】Vercelのログ画面に本当の理由を吐き出させる
+  console.log('=== 🔐 ミドルウェア認証デバッグ ===');
+  console.log('ユーザーが存在するか:', !!user);
+  if (authError) {
+    console.error('🚨 拒否された本当の理由:', authError.message);
   }
 
   // 6. ログイン済みで /login にアクセスした場合
   if (user && url.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', PublicUrl));
+    return NextResponse.redirect(new URL('/', origin));
+  }
+
+  // 4. 除外設定
+  const isAuthPage =
+    url.pathname.startsWith('/login') || url.pathname.startsWith('/callback');
+
+  if (isAuthPage) {
+    return supabaseResponse;
+  }
+
+  // 5. 未ログイン時のガード（リダイレクト先を今いるドメインに固定）
+  if (!user) {
+    return NextResponse.redirect(new URL('/login', origin));
   }
 
   return supabaseResponse;

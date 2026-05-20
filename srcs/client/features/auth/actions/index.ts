@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers'; // 💡 【追加】これをインポートします
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
@@ -8,13 +9,31 @@ export async function signOut() {
   await supabase.auth.signOut();
   redirect('/login');
 }
+
 export async function signInWithGoogle() {
   const supabase = await createClient();
+
+  // 💡 今アクセスされているドメイン（host）をサーバー側で動的に取得
+  const headerList = await headers();
+  let host = headerList.get('host') || 'localhost:3000'; // 例: "exchange-support-system-2hna0alsj.vercel.app"
+
+  // ローカル環境（localhost）なら http、Vercel上なら https に自動切り替え
+  const protocol =
+    host?.includes('localhost') || host?.includes('127.0.0.1')
+      ? 'http'
+      : 'https';
+
+  if (process.env.NODE_ENV === 'development') {
+    host = 'localhost:3000';
+  }
+
+  // 💡 本番・テスト・ローカルに100%自動追従するコールバックURLをその場で組み立てる
+  const redirectTo = `${protocol}://${host}/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: process.env.AUTH_GOOGLE_CALLBACK_URL,
+      redirectTo: redirectTo, // 💡 環境変数ではなく、組み立てた動的URLを渡す！
     },
   });
 
