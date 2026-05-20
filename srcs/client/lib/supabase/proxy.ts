@@ -11,7 +11,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // 💡 【修正】環境変数に頼らず、今アクセスされているURLから「https://xxx.vercel.app」を自動取得！
-  const origin = request.nextUrl.origin;
+  const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : request.nextUrl.origin;
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -73,6 +73,11 @@ export async function updateSession(request: NextRequest) {
     console.error('🚨 拒否された本当の理由:', authError.message);
   }
 
+  // 6. ログイン済みで /login にアクセスした場合
+  if (user && url.pathname === '/login') {
+    return NextResponse.redirect(new URL('/', origin));
+  }
+
   // 4. 除外設定
   const isAuthPage =
     url.pathname.startsWith('/login') || url.pathname.startsWith('/callback');
@@ -81,15 +86,10 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+
   // 5. 未ログイン時のガード（リダイレクト先を今いるドメインに固定）
   if (!user) {
-    // ⭕ originを使うので、Preview環境でも絶対にクラッシュしません！
     return NextResponse.redirect(new URL('/login', origin));
-  }
-
-  // 6. ログイン済みで /login にアクセスした場合
-  if (user && url.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', origin));
   }
 
   return supabaseResponse;
