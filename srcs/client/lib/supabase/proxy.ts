@@ -59,8 +59,10 @@ export async function updateSession(request: NextRequest) {
   // 3. ユーザー取得
   const {
     data: { user },
-    error: authError // 💡 【追加】エラー内容を受け取る
+    error: authError, // 💡 【追加】エラー内容を受け取る
   } = await supabase.auth.getUser();
+
+  const url = request.nextUrl;
 
   // 💡 【追加】Vercelのログ画面に本当の理由を吐き出させる
   console.log('=== 🔐 ミドルウェア認証デバッグ ===');
