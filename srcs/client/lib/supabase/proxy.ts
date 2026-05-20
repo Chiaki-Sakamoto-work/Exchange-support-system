@@ -11,7 +11,10 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // 💡 【修正】環境変数に頼らず、今アクセスされているURLから「https://xxx.vercel.app」を自動取得！
-  const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : request.nextUrl.origin;
+  const origin =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : request.nextUrl.origin;
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -85,7 +88,6 @@ export async function updateSession(request: NextRequest) {
   if (isAuthPage) {
     return supabaseResponse;
   }
-
 
   // 5. 未ログイン時のガード（リダイレクト先を今いるドメインに固定）
   if (!user) {
