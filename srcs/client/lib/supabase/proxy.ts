@@ -9,7 +9,7 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // ブラウザがアクセス可能なURLを定義
-  const PublicUrl = process.env.NEXT_PROG_URL || process.env.FRONTEND;
+  const PublicUrl = process.env.NEXT_PROG_URL || process.env.NEXTAUTH_URL || process.env.FRONTEND;
 
   let supabaseResponse = NextResponse.next({
     request,

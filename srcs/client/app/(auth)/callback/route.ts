@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/';
 
   // ブラウザの戻り先は常に localhost に固定
-  const origin = process.env.NEXT_PROG_URL || process.env.FRONTEND;
+  const origin = process.env.NEXT_PROG_URL || process.env.NEXTAUTH_URL || process.env.FRONTEND;
 
   if (code) {
     const supabase = await createClient();
