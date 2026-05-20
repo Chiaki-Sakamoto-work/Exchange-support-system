@@ -11,9 +11,10 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type { Room } from '@/app/types';
+import type { GetRestaurantOptionsResult } from '@/app/types/restaurants';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +47,7 @@ import {
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
 import { Stepper } from '@/components/ui/Stepper';
+import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import {
@@ -53,10 +55,6 @@ import {
   deleteEventAction,
   updateEventAction,
 } from '../actions/eventActions';
-import { GetRestaurantOptionsResult } from '@/app/types/restaurants';
-import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
-
-
 
 type Props = {
   onSuccess: () => void;
@@ -94,22 +92,24 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
   // テストデータ
   const [restaurantData, setRestaurantData] =
-      useState<GetRestaurantOptionsResult | null>(null);
+    useState<GetRestaurantOptionsResult | null>(null);
 
-    useEffect(() => {
-      const fetchRestaurants = async () => {
-        const result = await getRestaurantOptions();
-        setRestaurantData(result);
-      };
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const result = await getRestaurantOptions();
+      setRestaurantData(result);
+    };
 
-      fetchRestaurants();
-    }, []);
+    fetchRestaurants();
+  }, []);
 
   const shopList = restaurantData?.success
-    ? Object.entries(restaurantData.restaurants || {}).map(([placeId, data]) => ({
-        placeId,
-        ...data,
-      }))
+    ? Object.entries(restaurantData.restaurants || {}).map(
+        ([placeId, data]) => ({
+          placeId,
+          ...data,
+        }),
+      )
     : [];
 
   const today = new Date().toISOString().split('T')[0];
@@ -165,7 +165,9 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     let result: { success: boolean; error?: string } | undefined;
 
-    const selectedShopData = shopList.find((shop) => shop.name === formData.shop);
+    const selectedShopData = shopList.find(
+      (shop) => shop.name === formData.shop,
+    );
 
     const submitData = {
       ...formData,
@@ -246,7 +248,9 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     setIsProcessing(true);
 
-    const selectedShopData = shopList.find((shop) => shop.name === formData.shop);
+    const selectedShopData = shopList.find(
+      (shop) => shop.name === formData.shop,
+    );
 
     // 💡 確実に新しいホストのID（selectedProfile.id）だけをターゲットにして送信する
     const submitData = {
