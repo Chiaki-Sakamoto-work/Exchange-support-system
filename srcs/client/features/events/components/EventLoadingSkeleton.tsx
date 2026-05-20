@@ -93,7 +93,7 @@ export const EventDetailLoadingSkeleton = ({
           <DialogTitle>
             <SkeletonBlock className='h-5 w-2/3 rounded-md' />
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription asChild>
             <SkeletonBlock className='h-4 w-32 rounded-md' />
           </DialogDescription>
 
