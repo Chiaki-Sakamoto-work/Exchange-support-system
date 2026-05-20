@@ -7,7 +7,9 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const next = searchParams.get('next') ?? '/';
+  
+  // 💡 【修正】requestUrl.searchParams から取得するように直しました！
+  const next = requestUrl.searchParams.get('next') ?? '/';
 
   if (!code) {
     return NextResponse.redirect(new URL('/login?error=missing-code', requestUrl.origin));
@@ -25,7 +27,6 @@ export async function GET(request: Request) {
         },
         setAll(cookiesToSet) {
           try {
-            // 💡 Next.js 15の正攻法：cookieStoreに直接セットしてブラウザに同期させる
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
