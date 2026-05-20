@@ -5,11 +5,9 @@ on:
     branches:
       - main
       - develop
-      - chore/27-prisma-introduction
-      - chore/83-chore-cloud-supabase-dev-and-prod-env-deploy-check
-#    paths:
-#      - 'srcs/client/prisma/schema.prisma'
-#      - 'srcs/client/prisma/migrations/**'
+    paths:
+      - 'srcs/client/prisma/schema.prisma'
+      - 'srcs/client/prisma/migrations/**'
 
 jobs:
   migrate:
