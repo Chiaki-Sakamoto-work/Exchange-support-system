@@ -165,10 +165,13 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     let result: { success: boolean; error?: string } | undefined;
 
+    const selectedShopData = shopList.find((shop) => shop.name === formData.shop);
+
     const submitData = {
       ...formData,
       capacity: Number(formData.capacity),
       tags: formData.tags,
+      locationAddress: selectedShopData?.googleMapsUrl || '',
     };
 
     if (roomId) {
@@ -243,6 +246,8 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
     setIsProcessing(true);
 
+    const selectedShopData = shopList.find((shop) => shop.name === formData.shop);
+
     // 💡 確実に新しいホストのID（selectedProfile.id）だけをターゲットにして送信する
     const submitData = {
       title: formData.title,
@@ -251,6 +256,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       tags: formData.tags,
       shop: formData.shop,
       hostId: selectedProfile.id, // ⭕ 混ざり物のない、新しいホストのUUIDをここで確定させる
+      locationAddress: selectedShopData?.googleMapsUrl || '',
     };
 
     const result = await updateEventAction(roomId, submitData);
