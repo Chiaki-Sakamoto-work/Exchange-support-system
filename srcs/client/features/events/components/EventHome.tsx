@@ -58,10 +58,6 @@ export const EventHome = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-  if (isLoading) {
-    return <EventListLoadingSkeleton showTabs />;
-  }
-
   const sortByDate = (rooms: Room[]) => {
     return [...rooms].sort((a, b) => {
       const timeA = a.event_start_at ? new Date(a.event_start_at).getTime() : 0;
@@ -107,42 +103,48 @@ export const EventHome = () => {
             value='explore'
             className='col-start-1 row-start-1 bg-background'
           >
-            <div className='space-y-4 pt-2'>
-              {exploreEvents.length > 0 ? (
-                exploreEvents.map((room) => {
-                  // 主催者を安全に取得
-                  const ownerProfile = {
-                    name:
-                      room.user_rooms?.find((ur) => ur.is_owner)?.profiles
-                        ?.username || '不明',
-                  };
-                  const formattedTags = room.room_tags.map((rt) => ({
-                    id: rt.tags.id,
-                    name: rt.tags.name,
-                  }));
+            {isLoading ? (
+              <div className='pt-2'>
+                <EventListLoadingSkeleton />
+              </div>
+            ) : (
+              <div className='space-y-4 pt-2'>
+                {exploreEvents.length > 0 ? (
+                  exploreEvents.map((room) => {
+                    // 主催者を安全に取得
+                    const ownerProfile = {
+                      name:
+                        room.user_rooms?.find((ur) => ur.is_owner)?.profiles
+                          ?.username || '不明',
+                    };
+                    const formattedTags = room.room_tags.map((rt) => ({
+                      id: rt.tags.id,
+                      name: rt.tags.name,
+                    }));
 
-                  return (
-                    <EventCard
-                      key={room.id}
-                      title={room.title}
-                      shop={room.location_name || '未定'}
-                      date={formatDate(room.event_start_at)}
-                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                      tags={formattedTags}
-                      ownerProfile={ownerProfile}
-                      onClick={() => {
-                        setSelectedRoomId(room.id);
-                        setModalMode('explore'); // 🌟 exploreモードでモーダルを開く
-                      }}
-                    />
-                  );
-                })
-              ) : (
-                <p className='text-center text-sm text-zinc-500 py-10'>
-                  現在、参加できる新しい予定はありません
-                </p>
-              )}
-            </div>
+                    return (
+                      <EventCard
+                        key={room.id}
+                        title={room.title}
+                        shop={room.location_name || '未定'}
+                        date={formatDate(room.event_start_at)}
+                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
+                        tags={formattedTags}
+                        ownerProfile={ownerProfile}
+                        onClick={() => {
+                          setSelectedRoomId(room.id);
+                          setModalMode('explore'); // 🌟 exploreモードでモーダルを開く
+                        }}
+                      />
+                    );
+                  })
+                ) : (
+                  <p className='text-center text-sm text-zinc-500 py-10'>
+                    現在、参加できる新しい予定はありません
+                  </p>
+                )}
+              </div>
+            )}
           </TabsContent>
 
           {/* 「参加予定」タブの中身 (前回の3分割フィルター) */}
@@ -150,61 +152,75 @@ export const EventHome = () => {
             value='joined'
             className='col-start-1 row-start-1 bg-background'
           >
-            <div className='sticky top-0 z-10 bg-background pt-2 pb-4 flex justify-center'>
-              <Tabs
-                value={filter}
-                onValueChange={(val) => setFilter(val as FilterMode)}
-              >
-                <TabsList className='grid grid-cols-3 w-64 h-9 bg-zinc-100 p-1 rounded-full'>
-                  <TabsTrigger value='all' className='text-xs rounded-full'>
-                    全て
-                  </TabsTrigger>
-                  <TabsTrigger value='hosted' className='text-xs rounded-full'>
-                    主催
-                  </TabsTrigger>
-                  <TabsTrigger value='joined' className='text-xs rounded-full'>
-                    参加
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+            {!isLoading && (
+              <div className='sticky top-0 z-10 bg-background pt-2 pb-4 flex justify-center'>
+                <Tabs
+                  value={filter}
+                  onValueChange={(val) => setFilter(val as FilterMode)}
+                >
+                  <TabsList className='grid grid-cols-3 w-64 h-9 bg-zinc-100 p-1 rounded-full'>
+                    <TabsTrigger value='all' className='text-xs rounded-full'>
+                      全て
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='hosted'
+                      className='text-xs rounded-full'
+                    >
+                      主催
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='joined'
+                      className='text-xs rounded-full'
+                    >
+                      参加
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+            )}
 
-            <div className='space-y-4'>
-              {displayRooms.length > 0 ? (
-                displayRooms.map((room) => {
-                  const isMyHosted = hostedRooms.some((h) => h.id === room.id);
-                  const owner = room.user_rooms?.find((ur) => ur.is_owner);
-                  const ownerProfile = {
-                    name: owner?.profiles?.username || '不明',
-                    image: owner?.profiles?.avatar_url || '不明',
-                  };
-                  const formattedTags = room.room_tags.map((rt) => ({
-                    id: rt.tags.id,
-                    name: rt.tags.name,
-                  }));
+            {isLoading ? (
+              <EventListLoadingSkeleton />
+            ) : (
+              <div className='space-y-4'>
+                {displayRooms.length > 0 ? (
+                  displayRooms.map((room) => {
+                    const isMyHosted = hostedRooms.some(
+                      (h) => h.id === room.id,
+                    );
+                    const owner = room.user_rooms?.find((ur) => ur.is_owner);
+                    const ownerProfile = {
+                      name: owner?.profiles?.username || '不明',
+                      image: owner?.profiles?.avatar_url || '不明',
+                    };
+                    const formattedTags = room.room_tags.map((rt) => ({
+                      id: rt.tags.id,
+                      name: rt.tags.name,
+                    }));
 
-                  return (
-                    <EventCard
-                      key={room.id}
-                      title={room.title}
-                      shop={room.location_name || '未定'}
-                      date={formatDate(room.event_start_at)}
-                      participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                      tags={formattedTags}
-                      ownerProfile={ownerProfile}
-                      onClick={() => {
-                        setSelectedRoomId(room.id);
-                        setModalMode(isMyHosted ? 'hosted' : 'joined');
-                      }}
-                    />
-                  );
-                })
-              ) : (
-                <p className='text-center text-sm text-zinc-500 py-10'>
-                  {emptyMessage}
-                </p>
-              )}
-            </div>
+                    return (
+                      <EventCard
+                        key={room.id}
+                        title={room.title}
+                        shop={room.location_name || '未定'}
+                        date={formatDate(room.event_start_at)}
+                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
+                        tags={formattedTags}
+                        ownerProfile={ownerProfile}
+                        onClick={() => {
+                          setSelectedRoomId(room.id);
+                          setModalMode(isMyHosted ? 'hosted' : 'joined');
+                        }}
+                      />
+                    );
+                  })
+                ) : (
+                  <p className='text-center text-sm text-zinc-500 py-10'>
+                    {emptyMessage}
+                  </p>
+                )}
+              </div>
+            )}
           </TabsContent>
         </div>
 

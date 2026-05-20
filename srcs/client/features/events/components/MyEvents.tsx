@@ -68,7 +68,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         open={editingEvent !== null}
         onOpenChange={() => setEditingEvent(null)}
       >
-        <DialogContent>
+        <DialogContent preventOutsideClose>
           <DialogHeader>
             <DialogTitle>イベントを編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
@@ -89,7 +89,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
       </Dialog>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent>
+        <DialogContent preventOutsideClose>
           <DialogHeader>
             <DialogTitle>イベントを作成</DialogTitle>
             <DialogDescription>
