@@ -8,8 +8,8 @@ export async function updateSession(request: NextRequest) {
   const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // ブラウザがアクセス可能なURLを定義
-  const PublicUrl = process.env.NEXT_PROG_URL || process.env.NEXTAUTH_URL || process.env.FRONTEND;
+  // 💡 【修正】環境変数に頼らず、今アクセスされているURLから「https://xxx.vercel.app」を自動取得！
+  const origin = request.nextUrl.origin;
 
   let supabaseResponse = NextResponse.next({
     request,
@@ -57,15 +57,15 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // 5. 未ログイン時のガード（リダイレクト先を PUBLIC_URL に固定）
+  // 5. 未ログイン時のガード（リダイレクト先を今いるドメインに固定）
   if (!user) {
-    // 🔴 request.url ではなく、明示的に localhost:3000 を指定してリダイレクト
-    return NextResponse.redirect(new URL('/login', PublicUrl));
+    // ⭕ originを使うので、Preview環境でも絶対にクラッシュしません！
+    return NextResponse.redirect(new URL('/login', origin));
   }
 
   // 6. ログイン済みで /login にアクセスした場合
   if (user && url.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', PublicUrl));
+    return NextResponse.redirect(new URL('/', origin));
   }
 
   return supabaseResponse;

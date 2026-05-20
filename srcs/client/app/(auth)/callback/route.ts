@@ -6,15 +6,16 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
-  // ブラウザの戻り先は常に localhost に固定
-  const origin = process.env.NEXT_PROG_URL || process.env.NEXTAUTH_URL || process.env.FRONTEND;
+  // 💡 【ここを修正】今アクセスされているURLから「https://xxx.vercel.app」を自動抽出！
+  const requestUrl = new URL(request.url);
+  const origin = requestUrl.origin;
 
   if (code) {
     const supabase = await createClient();
-    // 内部通信 (host.docker.internal) を使ってセッション交換
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // ⭕ originが「https://xxx.vercel.app」になるので絶対にクラッシュしない
       return NextResponse.redirect(`${origin}${next}`);
     }
     console.error('❌ exchangeCodeForSession Error:', error.message);
