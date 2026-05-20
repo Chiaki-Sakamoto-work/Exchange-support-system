@@ -5,7 +5,6 @@ import {
   ArrowLeftRight,
   Calendar1,
   FileText,
-  Search,
   Store,
   Tag,
   Trash2,
@@ -46,6 +45,7 @@ import {
   RadioCardTitle,
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { Stepper } from '@/components/ui/Stepper';
 import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
@@ -430,13 +430,12 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
               お店を選ぶ (任意)
             </Label>
 
-            {/* 1. 検索バー */}
-            <div className='relative w-full'>
-              <Search className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-              <Input
+            {/* 🌟 1. 検索バーの追加 */}
+            <div className='flex items-center gap-3'>
+              <SearchInput
                 type='text'
                 placeholder='店名、カテゴリ、タグで検索...'
-                className='pl-9 bg-white w-full'
+                className='w-full rounded-full'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
