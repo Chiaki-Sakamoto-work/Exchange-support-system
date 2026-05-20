@@ -328,7 +328,18 @@ export const EventDetailModal = ({
                       <Store className='size-4' />
                       <span>お店</span>
                       <span className='ml-auto text-foreground'>
-                        {eventData.location_name}
+                        {eventData.location_address ? (
+                          <a
+                            href={eventData.location_address}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-500 hover:text-blue-700 hover:underline transition-colors'
+                          >
+                            {eventData.location_name}
+                          </a>
+                        ) : (
+                          eventData.location_name || '未定'
+                        )}
                       </span>
                     </div>
                     <div className='flex items-center gap-3 border-b border-border py-3'>

@@ -187,6 +187,7 @@ export async function createEvent(formData: {
   capacity: number;
   tags: string[];
   shop: string;
+  locationAddress: string;
 }) {
   try {
     const supabase = await createClient();
@@ -203,6 +204,7 @@ export async function createEvent(formData: {
         title: formData.title,
         capacity_limit: formData.capacity,
         location_name: formData.shop,
+        location_address: formData.locationAddress,
         event_start_at: new Date(formData.datetime),
         status: 'OPEN' as RoomStatus,
         user_rooms: {
@@ -244,7 +246,8 @@ export async function updateEventAction(
     capacity: number;
     tags: string[];
     shop: string;
-    hostId: string;
+    hostId?: string;
+    locationAddress?: string;
   },
 ) {
   try {
@@ -283,6 +286,7 @@ export async function updateEventAction(
         title: formData.title,
         capacity_limit: Number(formData.capacity),
         location_name: formData.shop,
+        location_address: formData.locationAddress,
         event_start_at: new Date(formData.datetime),
         room_tags: {
           deleteMany: {},
