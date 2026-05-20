@@ -31,13 +31,18 @@ export async function updateSession(request: NextRequest) {
       : {
           global: {
             fetch: (url, options) =>
-              fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
+              fetch(
+                url.toString().replace(publicUrl, internalUrl ?? ''),
+                options,
+              ),
           },
         }),
     cookies: {
       getAll() {
         // 💡 【修正②】公式推奨の安全な形（nameとvalueだけ）に綺麗にマッピングして返す
-        return request.cookies.getAll().map(({ name, value }) => ({ name, value }));
+        return request.cookies
+          .getAll()
+          .map(({ name, value }) => ({ name, value }));
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => {
@@ -54,9 +59,15 @@ export async function updateSession(request: NextRequest) {
   // 3. ユーザー取得
   const {
     data: { user },
+    error: authError // 💡 【追加】エラー内容を受け取る
   } = await supabase.auth.getUser();
 
-  const url = request.nextUrl.clone();
+  // 💡 【追加】Vercelのログ画面に本当の理由を吐き出させる
+  console.log('=== 🔐 ミドルウェア認証デバッグ ===');
+  console.log('ユーザーが存在するか:', !!user);
+  if (authError) {
+    console.error('🚨 拒否された本当の理由:', authError.message);
+  }
 
   // 4. 除外設定
   const isAuthPage =
