@@ -1,0 +1,38 @@
+import { type CookieOptionsWithName, createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+export async function createClient() {
+  const cookieStore = await cookies();
+  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!publicUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createServerClient(publicUrl, supabaseAnonKey, {
+    global: {
+      fetch: (url, options) =>
+        fetch(url.toString().replace(publicUrl, internalUrl ?? ''), options),
+    },
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(
+        cookiesToSet: {
+          name: string;
+          value: string;
+          options: CookieOptionsWithName;
+        }[],
+      ) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {}
+      },
+    },
+  });
+}

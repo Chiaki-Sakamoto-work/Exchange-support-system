@@ -38,3 +38,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+/generated/prisma
+
+*storybook.log
+storybook-static
