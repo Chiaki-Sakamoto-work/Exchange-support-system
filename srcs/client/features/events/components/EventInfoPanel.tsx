@@ -61,7 +61,7 @@ export const EventInfoPanel = ({ roomId, mode, onClose, onSuccess }: Props) => {
   }, [roomId]);
 
   if (isLoading) {
-    return <EventDetailLoadingSkeleton />;
+    return <EventDetailLoadingSkeleton mode={mode} />;
   }
 
   if (error || !eventData) {
