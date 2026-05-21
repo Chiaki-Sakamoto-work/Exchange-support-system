@@ -44,11 +44,106 @@ import { EventForm } from './EventForm';
 import { EventDetailLoadingSkeleton } from './EventLoadingSkeleton';
 import { ExitEventAlertDialog } from './ExitEventAlertDialog';
 
+// 🌟 Step 1: バッジコンポーネント用の型定義をexport Propsの上に追記
+interface ParticipantBadgeProps {
+  participant: Participant;
+  isOpen: boolean; // 親から「開いているか」を受け取る
+  onHover: () => void; // 乗ったことを親に伝える
+  onLeave: () => void; // 外れたことを親に伝える
+}
+
 type Props = {
   roomId: number;
   mode: 'hosted' | 'joined' | 'explore';
   onClose: () => void;
   onSuccess: () => void;
+};
+
+// 🌟 Step 2: コンポーネントを丸ごと上書き
+const ParticipantBadge = ({
+  participant,
+  isOpen,
+  onHover,
+  onLeave,
+}: ParticipantBadgeProps) => {
+  const profile = participant.profiles;
+
+  const userProfile = profile as profiles & {
+    departments?: { name: string } | null;
+  };
+
+  const isNewRecruit = (profile: profiles | null) =>
+    profile?.user_type === '新入社員';
+
+  const getUserBadgeUser = (profile: profiles | null) => ({
+    name: getDisplayName(profile),
+    avatarUrl: profile?.avatar_url ?? undefined,
+    isNewRecruit: isNewRecruit(profile),
+  });
+
+  return (
+    <HoverCard open={isOpen}>
+      <HoverCardTrigger asChild>
+        <button
+          type='button'
+          data-detail-participant-control='true'
+          className='cursor-pointer text-left' // ※Tailwindを使っていればbuttonのデザインはリセットされるので、spanと同じ見た目になります
+          onMouseEnter={onHover}
+          onMouseLeave={onLeave}
+        >
+          <UserBadge
+            variant={'secondary'}
+            user={{
+              ...getUserBadgeUser(profile),
+              isNewRecruit: isNewRecruit(profile),
+            }}
+          />
+        </button>
+      </HoverCardTrigger>
+
+      <HoverCardContent
+        side='left'
+        // 🌟 追加1：インラインスタイルで「マウスブロック」を強制解除
+        style={{ pointerEvents: 'none' }}
+        // 🌟 追加2：Tailwind側も「!」をつけて強制適用（!pointer-events-none）
+        className='!pointer-events-none w-auto min-w-56 max-w-72 p-4 flex flex-col gap-3 z-50 shadow-md bg-background'
+      >
+        <div className='flex items-center gap-3'>
+          <div className='flex flex-col'>
+            <span className='font-bold text-sm'>{getDisplayName(profile)}</span>
+            <span className='text-xs text-muted-foreground mt-0.5'>
+              {/* 🌟 修正1-B：anyを消して、上で作った userProfile を使う */}
+              {userProfile?.departments?.name
+                ? `${userProfile.departments.name} / `
+                : ''}
+              {profile?.user_type || '社員'}
+            </span>
+          </div>
+        </div>
+
+        {profile?.bio && (
+          <div className='text-xs text-foreground border-t border-border pt-3 whitespace-pre-wrap'>
+            {profile.bio}
+          </div>
+        )}
+
+        {profile?.allergies && profile.allergies.length > 0 && (
+          <div className='flex flex-wrap gap-1 mt-1'>
+            {profile.allergies.map((allergy) => (
+              <Badge
+                key={`${participant.user_id}-${allergy}`}
+                variant='destructive'
+                size='sm'
+                className='text-[10px] px-1 py-0'
+              >
+                {allergy}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </HoverCardContent>
+    </HoverCard>
+  );
 };
 
 export const EventDetailModal = ({
@@ -66,6 +161,7 @@ export const EventDetailModal = ({
 
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+  const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadDetail() {
@@ -108,15 +204,6 @@ export const EventDetailModal = ({
       participant,
     }))
     .filter(({ allergies }) => allergies.length > 0);
-
-  const isNewRecruit = (profile: profiles | null) =>
-    profile?.user_type === '新入社員';
-
-  const getUserBadgeUser = (profile: profiles | null) => ({
-    name: getDisplayName(profile),
-    avatarUrl: profile?.avatar_url ?? undefined,
-    isNewRecruit: isNewRecruit(profile),
-  });
 
   const handleDetailDialogClick = (event: MouseEvent<HTMLDivElement>) => {
     const target = event.target;
@@ -169,20 +256,19 @@ export const EventDetailModal = ({
   };
 
   const renderDetailParticipantBadge = (participant: Participant) => {
-    const profile = participant.profiles;
+    // 参加者ごとのユニークなIDを作成
+    const pId = `${participant.room_id}-${participant.user_id}`;
+
     return (
-      <span
-        key={`detail-${participant.room_id}-${participant.user_id}`}
-        data-detail-participant-control='true'
-      >
-        <UserBadge
-          variant={'secondary'}
-          user={{
-            ...getUserBadgeUser(profile),
-            isNewRecruit: isNewRecruit(profile),
-          }}
-        />
-      </span>
+      <ParticipantBadge
+        key={`detail-${pId}`}
+        participant={participant}
+        // 🌟 今自分がホバーされているか判定して渡す
+        isOpen={hoveredUserId === pId}
+        // 🌟 乗ったら自分のIDを親にセット
+        onHover={() => setHoveredUserId(pId)}
+        onLeave={() => setHoveredUserId((prev) => (prev === pId ? null : prev))}
+      />
     );
   };
 
