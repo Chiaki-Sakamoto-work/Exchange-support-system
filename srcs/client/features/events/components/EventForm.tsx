@@ -197,7 +197,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     const lowerQuery = searchQuery.toLowerCase();
     return (
       shop.name.toLowerCase().includes(lowerQuery) ||
-      shop.category.toLowerCase().includes(lowerQuery) ||
+      shop.category?.toLowerCase().includes(lowerQuery) ||
       shop.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
     );
   });
