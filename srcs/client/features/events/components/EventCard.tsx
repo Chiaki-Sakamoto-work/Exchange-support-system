@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
+import { relative } from 'node:path';
 
 export type EventCardProps = {
   title: string;
@@ -21,6 +22,7 @@ export type EventCardProps = {
   participants: string;
   icon?: 'show' | 'edit';
   ownerProfile?: { image?: string; name: string };
+  isOngoing?: boolean;
 };
 
 const CARD_ICON = {
@@ -37,6 +39,7 @@ export const EventCard = ({
   participants,
   ownerProfile,
   icon = 'show',
+  isOngoing = false,
 }: EventCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -56,7 +59,8 @@ export const EventCard = ({
         'hover:scale-[1.02] focus-visible:scale-[1.02]',
         'active:scale-[0.98]',
         'focus-visible:outline-none',
-        'h-36.5',
+        'h-36.5 relative overflow-hidden',
+        isOngoing ? 'border-2 border-green-500/70' : ''
       )}
       variant='default'
     >
@@ -66,12 +70,26 @@ export const EventCard = ({
             name={ownerProfile.name}
             imageSrc={ownerProfile.image}
             size='default'
-            className='rounded'
+            className='rounded shrink-0'
             variant='default'
           />
         )}
-        <div className='flex-1'>
-          <CardTitle>{title}</CardTitle>
+        <div className='flex-1 min-w-0'>
+          <CardTitle className='flex items-center gap-2 min-w-0'>
+            <span className='truncate' title={title}>
+              {title}
+            </span>
+
+            {isOngoing && (
+              <Badge 
+                variant='accent' 
+                size='sm' 
+                className='bg-green-500 px-1.5 py-0 text-[10px] shrink-0'
+              >
+                開催中
+              </Badge>
+            )}
+          </CardTitle>
           <CardDescription>{shop}</CardDescription>
         </div>
         <CardAction>

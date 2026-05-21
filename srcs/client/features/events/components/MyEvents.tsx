@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { formatDate } from '@/lib/date';
+import { formatDate, isEventOngoing } from '@/lib/date';
 import { EventForm } from './EventForm';
 
 type Props = {
@@ -59,6 +59,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
               name: owner?.username ?? '未定',
               image: owner?.avatar_url ?? undefined,
             }}
+            isOngoing={isEventOngoing(event.event_start_at)}
             onClick={() => setEditingEvent(event)}
             icon='edit'
           />
