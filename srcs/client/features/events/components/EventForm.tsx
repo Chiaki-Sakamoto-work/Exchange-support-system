@@ -5,10 +5,10 @@ import {
   ArrowLeftRight,
   Calendar1,
   FileText,
-  Search,
+  MapPin,
+  Star,
   Store,
   Tag,
-  Trash2,
   UserRound,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -46,8 +46,10 @@ import {
   RadioCardTitle,
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { Stepper } from '@/components/ui/Stepper';
 import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
+import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/RestaurantRadioCardSkeleton';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import {
@@ -286,6 +288,10 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     isNewRecruit: isNewRecruit(profile),
   });
 
+  const isRestaurantLoading = restaurantData === null;
+  const restaurantError =
+    restaurantData?.success === false ? restaurantData.error : null;
+
   const renderParticipantBadge = (
     participant: Room['user_rooms'][number],
     variant: 'default' | 'secondary' = 'default',
@@ -430,21 +436,26 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
               お店を選ぶ (任意)
             </Label>
 
-            {/* 1. 検索バー */}
-            <div className='relative w-full'>
-              <Search className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-              <Input
+            {/* 🌟 1. 検索バーの追加 */}
+            <div className='flex items-center gap-3'>
+              <SearchInput
                 type='text'
                 placeholder='店名、カテゴリ、タグで検索...'
-                className='pl-9 bg-white w-full'
+                className='w-full rounded-full'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
             {/* 2. スクロールエリア */}
-            <div className='max-h-[280px] overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin w-full'>
-              {filteredShops.length > 0 ? (
+            <div className='max-h-[280px] pt-2 overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin w-full'>
+              {isRestaurantLoading ? (
+                <RestaurantRadioCardSkeleton />
+              ) : restaurantError ? (
+                <div className='py-8 text-center w-full'>
+                  <p className='text-sm text-zinc-500'>{restaurantError}</p>
+                </div>
+              ) : filteredShops.length > 0 ? (
                 /* 🌟 RadioGroup 自体も横幅いっぱいに広げる */
                 <RadioGroup
                   value={formData.shop}
@@ -452,63 +463,61 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                   className='w-full grid gap-2'
                 >
                   {filteredShops.map((shop) => (
-                    /* 🌟 RadioCard も w-full min-w-0 で絶対固定 */
                     <RadioCard
                       key={shop.placeId}
                       value={shop.name}
-                      className='w-full min-w-0 max-w-full transition-none hover:transform-none hover:translate-x-0 hover:translate-y-0 hover:scale-100'
+                      className='w-[98%] min-w-0 max-w-full hover:scale-100'
                     >
-                      {/* 🌟 Header と Title に w-full min-w-0 を徹底 */}
-                      <RadioCardHeader className='w-full min-w-0 p-3'>
-                        <RadioCardTitle className='flex items-center justify-between gap-2 w-full min-w-0'>
-                          <span className='truncate shrink w-full'>
-                            {shop.name}
-                          </span>
+                      <RadioCardHeader className='w-full min-w-0 p-0'>
+                        <RadioCardTitle className='text-foreground flex items-center justify-between gap-2 max-w-[250px] min-w-0'>
                           {shop.googleMapsUrl && (
                             <a
                               href={shop.googleMapsUrl}
                               target='_blank'
                               rel='noopener noreferrer'
-                              className='text-xs text-blue-500 hover:text-blue-700 hover:underline z-10 shrink-0'
+                              className='group/pin relative flex items-center border-b border-transparent hover:border-accent hover:text-accent/70 z-10 shrink-0'
                               onClick={(e) => e.stopPropagation()}
                             >
-                              マップで見る
+                              {/* <GoogleMapPin className='size-5 ' /> */}
+                              <MapPin className='size-4 text-accent hover:text-accent/80' />
+
+                              {/* <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-0 hidden group-hover/pin:block w-max bg-white/70 rounded px-2 py-0 text-[10px] text-accent'>
+                                マップで見る
+                              </span> */}
                             </a>
                           )}
+                          <span className='truncate shrink w-full'>
+                            {shop.name}
+                          </span>
                         </RadioCardTitle>
-
-                        {/* 🌟 Description にも w-full min-w-0 を徹底 */}
-                        <RadioCardDescription className='w-full min-w-0'>
-                          <div className='flex flex-col gap-1.5 mt-1 w-full min-w-0'>
-                            <div className='flex items-center gap-2 text-xs text-zinc-600 w-full'>
-                              <span className='font-medium shrink-0'>
-                                {shop.category}
-                              </span>
-                              <span className='shrink-0'>•</span>
-                              <span className='text-yellow-600 font-medium shrink-0'>
-                                ★ {shop.avgRating.toFixed(1)}
-                              </span>
-                              <span className='text-zinc-500 shrink-0'>
-                                ({shop.reviewCount}件)
-                              </span>
-                            </div>
-
-                            {shop.tags && shop.tags.length > 0 && (
-                              /* 🌟 タグの親要素も横幅100%を維持させて折り返させる */
-                              <div className='flex flex-wrap gap-1 w-full min-w-0'>
-                                {shop.tags.map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className='px-1.5 py-0.5 bg-background text-foreground rounded text-[10px] whitespace-nowrap shrink-0'
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </RadioCardDescription>
                       </RadioCardHeader>
+                      <RadioCardDescription className='w-full min-w-0'>
+                        <div className='flex flex-col gap-1.5 mt-1 w-full min-w-0'>
+                          <div className='flex items-center gap-2 text-xs text-zinc-600 w-full'>
+                            <span className='font-medium shrink-0'>
+                              {shop.category}
+                            </span>
+                            <span className='shrink-0'>•</span>
+                            <span className='flex flex-row items-center gap-1 text-yellow-500 font-medium shrink-0'>
+                              <Star className='size-3' fill='currentColor' />
+                              {shop.avgRating.toFixed(1)}
+                            </span>
+                            <span className='text-muted-foreground shrink-0'>
+                              ({shop.reviewCount}件)
+                            </span>
+                          </div>
+
+                          {shop.tags && shop.tags.length > 0 && (
+                            <div className='flex flex-wrap gap-1 w-full min-w-0 '>
+                              {shop.tags.slice(0, 3).map((tag) => (
+                                <Badge key={tag} size='xs' variant='secondary'>
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </RadioCardDescription>
                     </RadioCard>
                   ))}
                 </RadioGroup>
@@ -640,7 +649,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
           disabled={isProcessing}
           onClick={handleDelete}
         >
-          <Trash2 className='w-4 h-4' />
           削除する
         </Button>
       )}
