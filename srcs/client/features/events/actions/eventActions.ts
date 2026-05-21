@@ -72,7 +72,11 @@ export async function getEventDetail(roomId: number) {
       include: {
         user_rooms: {
           include: {
-            profiles: true, // 参加者のプロフィール情報（名前など）も一緒に取得
+            profiles: {
+              include: {
+                departments: true,
+              },
+            },
           },
         },
         room_tags: {
