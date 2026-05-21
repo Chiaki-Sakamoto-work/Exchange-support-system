@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Room } from '@/app/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { formatDate } from '@/lib/date';
+import { formatDate, isEventOngoing } from '@/lib/date';
 import {
   getExploreEvents,
   getHostedEvents,
@@ -131,6 +131,7 @@ export const EventHome = () => {
                         participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                         tags={formattedTags}
                         ownerProfile={ownerProfile}
+                        isOngoing={isEventOngoing(room.event_start_at)}
                         onClick={() => {
                           setSelectedRoomId(room.id);
                           setModalMode('explore'); // 🌟 exploreモードでモーダルを開く
@@ -207,6 +208,7 @@ export const EventHome = () => {
                         participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
                         tags={formattedTags}
                         ownerProfile={ownerProfile}
+                        isOngoing={isEventOngoing(room.event_start_at)}
                         onClick={() => {
                           setSelectedRoomId(room.id);
                           setModalMode(isMyHosted ? 'hosted' : 'joined');
