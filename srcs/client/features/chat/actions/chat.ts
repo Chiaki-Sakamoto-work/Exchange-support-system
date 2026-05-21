@@ -1,17 +1,18 @@
 'use server';
 
+import { ChatMessage, fullMessageInclude } from '@type';
 import { prisma } from '@/lib/prisma';
-import { fullMessageInclude } from '@type';
+import { createClient } from '@/lib/supabase/server';
 
 const getMessages = async (roomId: number) => {
   try {
-    const message = await prisma.message.findMany({
+    const message = await prisma.messages.findMany({
       where: {
-        room_id: roomId
+        room_id: roomId,
       },
       include: fullMessageInclude,
       orderBy: {
-        created_at: 'asc'
+        created_at: 'asc',
       },
     });
     return message;
@@ -21,15 +22,19 @@ const getMessages = async (roomId: number) => {
   }
 };
 
-const sendMessage = async (roomId: number, userId: string, content: string) => {
+const sendMessage = async (roomId: number, content: string) => {
   try {
-    const newMessage = await prisma.message.create({
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const newMessage = await prisma.messages.create({
       data: {
         room_id: roomId,
-        user_id: userId,
+        user_id: user.id,
         content: content,
       },
-      include: fullMessageInclude
+      include: fullMessageInclude,
     });
     return newMessage;
   } catch (error) {
@@ -40,17 +45,17 @@ const sendMessage = async (roomId: number, userId: string, content: string) => {
 
 const updateMessage = async (messageId: number, newContent: string) => {
   try {
-    updateMessage = await prisma.message.update({
+    updatedMessage = await prisma.messages.update({
       where: {
-        id: messageId
+        id: messageId,
       },
       data: {
         content: newContent,
       },
-      include: fullMessageInclude
+      include: fullMessageInclude,
     });
-    return updateMessage;
-  } chatch (error) {
+    return updatedMessage;
+  } catch (error) {
     console.error('メッセージの編集に失敗しました', error);
     throw new ERROR('メッセージの編集に失敗しました');
   }
@@ -58,15 +63,16 @@ const updateMessage = async (messageId: number, newContent: string) => {
 
 const deleteMessage = async (messageId: number) => {
   try {
-    delteMessage = await prisma.message.delete({
+    delteMessage = await prisma.messages.delete({
       where: {
-        id: messageId
+        id: messageId,
       },
     });
     return deleteMessage;
-  } chatch (error) {
+  } catch (error) {
     console.error('メッセージが削除できませんでした. ', error);
     throw new ERROR('メッセージが削除できませんでした. ');
   }
 };
 
+export { deleteMessage, getMessages, sendMessage, updateMessage };

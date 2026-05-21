@@ -1,6 +1,7 @@
 'use client';
 
 import type { profiles } from '@prisma/client';
+import type { Room } from '@type';
 import {
   ArrowLeftRight,
   Calendar1,

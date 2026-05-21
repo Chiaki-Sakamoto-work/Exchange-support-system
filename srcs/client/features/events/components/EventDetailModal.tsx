@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
 // 1. インポートの順番をアルファベット順に (p -> r -> u)
 import type { profiles } from '@prisma/client';
+import type { Participant, Room } from '@type';
 import {
   Calendar,
   CircleAlert,
@@ -13,7 +14,6 @@ import {
 // import { getDisplayName } from 'next/dist/shared/lib/utils';
 import { type MouseEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Participant, Room } from '@type';
 // import type { User } from '@type'; // 실제 Prisma 데이터 타입을 사용할 것이므로 주석처리
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';

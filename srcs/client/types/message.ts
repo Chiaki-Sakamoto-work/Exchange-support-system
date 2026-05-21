@@ -1,12 +1,11 @@
 import type { Prisma } from '@prisma/client';
 
 const fullMessageInclude = {
-  profiles: true, 
+  profiles: true,
 } satisfies Prisma.messagesInclude;
 
 type ChatMessage = Prisma.messagesGetPayload<{
   include: typeof fullMessageInclude;
 }>;
 
-export { fullMessageInclude, type ChatMessage };
-
+export { type ChatMessage, fullMessageInclude };

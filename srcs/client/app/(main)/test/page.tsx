@@ -1,4 +1,4 @@
-import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay'
+import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
 
 export default function TestPage() {
   return (

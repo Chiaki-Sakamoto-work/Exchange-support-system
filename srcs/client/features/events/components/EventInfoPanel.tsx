@@ -1,6 +1,7 @@
 'use client';
 
 import type { profiles } from '@prisma/client';
+import type { Participant, Room } from '@type';
 import {
   Calendar,
   CircleAlert,
@@ -11,7 +12,6 @@ import {
 } from 'lucide-react';
 import { type MouseEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Participant, Room } from '@type';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -39,12 +39,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-export const EventInfoPanel = ({
-  roomId,
-  mode,
-  onClose,
-  onSuccess,
-}: Props) => {
+export const EventInfoPanel = ({ roomId, mode, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState<Room>();
@@ -173,12 +168,14 @@ export const EventInfoPanel = ({
 
   if (isEditing) {
     return (
-      <div className="h-full flex flex-col gap-4 overflow-y-auto pr-1">
-        <div className="flex flex-col gap-1 pb-2 border-b border-zinc-200">
-          <h2 className="text-xl font-bold text-zinc-900">{eventData.title}を編集</h2>
-          <p className="text-sm text-zinc-500">内容を更新できます</p>
+      <div className='h-full flex flex-col gap-4 overflow-y-auto pr-1'>
+        <div className='flex flex-col gap-1 pb-2 border-b border-zinc-200'>
+          <h2 className='text-xl font-bold text-zinc-900'>
+            {eventData.title}を編集
+          </h2>
+          <p className='text-sm text-zinc-500'>内容を更新できます</p>
         </div>
-        <div className="flex-1">
+        <div className='flex-1'>
           <EventForm
             roomId={roomId}
             initialData={eventData || undefined}
@@ -188,7 +185,11 @@ export const EventInfoPanel = ({
             }}
           />
         </div>
-        <Button variant="outline" onClick={() => setIsEditing(false)} className="w-full mt-2">
+        <Button
+          variant='outline'
+          onClick={() => setIsEditing(false)}
+          className='w-full mt-2'
+        >
           キャンセル
         </Button>
       </div>
@@ -198,40 +199,41 @@ export const EventInfoPanel = ({
   return (
     <>
       {/* パネル全体を縦スクロール可能にするコンテナ */}
-      <div className="h-full flex flex-col gap-6 overflow-y-auto pr-1 relative">
-        
+      <div className='h-full flex flex-col gap-6 overflow-y-auto pr-1 relative'>
         {/* 📋 ヘッダー部分（元DialogHeaderの代わり） */}
-        <div className="flex flex-col gap-1 pr-12">
-          <h2 className="text-2xl font-bold text-zinc-900 tracking-tight">{eventData.title}</h2>
-          <p className="text-sm text-zinc-500">イベントの詳細情報</p>
+        <div className='flex flex-col gap-1 pr-12'>
+          <h2 className='text-2xl font-bold text-zinc-900 tracking-tight'>
+            {eventData.title}
+          </h2>
+          <p className='text-sm text-zinc-500'>イベントの詳細情報</p>
 
           {/* 🛠️ 右上のアクションボタン群（絶対配置で右上に固定） */}
-          <div className="absolute top-0 right-0">
+          <div className='absolute top-0 right-0'>
             {mode === 'hosted' && (
               <Button
-                variant="secondary"
-                size="icon"
-                className="rounded-full shadow-sm"
+                variant='secondary'
+                size='icon'
+                className='rounded-full shadow-sm'
                 onClick={() => setIsEditing(true)}
               >
-                <PenBoxIcon className="h-5 w-5" />
+                <PenBoxIcon className='h-5 w-5' />
               </Button>
             )}
 
             {mode === 'joined' && (
               <Button
-                variant="destructive"
-                size="icon"
-                className="rounded-full shadow-sm"
+                variant='destructive'
+                size='icon'
+                className='rounded-full shadow-sm'
                 onClick={() => setIsLeaveDialogOpen(true)}
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className='h-5 w-5' />
               </Button>
             )}
 
             {mode === 'explore' && (
               <Button
-                variant="default"
+                variant='default'
                 onClick={handleJoinAction}
                 disabled={isProcessing}
               >
@@ -250,21 +252,23 @@ export const EventInfoPanel = ({
           <CardContent className='flex-none! gap-0'>
             <div className='flex items-center gap-3 border-b border-zinc-200/60 py-3'>
               <Store className='size-4 text-zinc-500' />
-              <span className="text-zinc-600 font-medium">お店</span>
+              <span className='text-zinc-600 font-medium'>お店</span>
               <span className='ml-auto text-zinc-900 font-semibold'>
                 {eventData.location_name}
               </span>
             </div>
             <div className='flex items-center gap-3 border-b border-zinc-200/60 py-3'>
               <Calendar className='size-4 text-zinc-500' />
-              <span className="text-zinc-600 font-medium">日時</span>
+              <span className='text-zinc-600 font-medium'>日時</span>
               <span className='ml-auto text-zinc-900 font-semibold'>
-                {eventData.event_start_at ? formatDate(eventData.event_start_at) : '未定'}
+                {eventData.event_start_at
+                  ? formatDate(eventData.event_start_at)
+                  : '未定'}
               </span>
             </div>
             <div className='flex items-center gap-3 py-3'>
               <UsersRound className='size-4 text-zinc-500' />
-              <span className="text-zinc-600 font-medium">参加人数</span>
+              <span className='text-zinc-600 font-medium'>参加人数</span>
               <span className='ml-auto text-zinc-900 font-semibold'>
                 {eventData.user_rooms.length}/{eventData.capacity_limit}人
               </span>
@@ -274,12 +278,14 @@ export const EventInfoPanel = ({
 
         {/* 参加者一覧 */}
         <div className='flex flex-col gap-3'>
-          <p className='text-sm font-semibold text-zinc-500 tracking-wider'>参加者</p>
+          <p className='text-sm font-semibold text-zinc-500 tracking-wider'>
+            参加者
+          </p>
           <div className='flex flex-wrap gap-2'>
             {visibleDetailParticipants.map((participant) =>
               renderDetailParticipantBadge(participant),
             )}
-            
+
             {overflowDetailParticipants.length > 0 ? (
               <HoverCard openDelay={120} closeDelay={120}>
                 <HoverCardTrigger asChild>
@@ -301,7 +307,10 @@ export const EventInfoPanel = ({
                   align='start'
                   className='w-auto min-w-40 bg-transparent p-0 shadow-none ring-0'
                 >
-                  <Card variant='default shadow-none' className='h-auto min-h-0! w-auto py-0!'>
+                  <Card
+                    variant='default shadow-none'
+                    className='h-auto min-h-0! w-auto py-0!'
+                  >
                     <CardContent className='p-3'>
                       <div className='flex flex-wrap gap-2'>
                         {overflowDetailParticipants.map((participant) =>
@@ -318,10 +327,15 @@ export const EventInfoPanel = ({
 
         {/* アレルギー情報 */}
         {allergyEntries.length > 0 ? (
-          <Card variant='destructive' className='gap-2 border-none bg-red-50/50 text-red-900'>
+          <Card
+            variant='destructive'
+            className='gap-2 border-none bg-red-50/50 text-red-900'
+          >
             <CardHeader className='gap-2 pb-1'>
               <CircleAlert className='size-4 text-red-500' />
-              <CardTitle className="text-sm font-bold text-red-800">アレルギー情報</CardTitle>
+              <CardTitle className='text-sm font-bold text-red-800'>
+                アレルギー情報
+              </CardTitle>
             </CardHeader>
             <CardContent className='gap-2'>
               {allergyEntries.map(({ allergies, participant }) => (
@@ -329,7 +343,7 @@ export const EventInfoPanel = ({
                   key={`allergy-${participant.user_id}`}
                   size='sm'
                   variant='default shadow-none'
-                  className="bg-white/80 border-red-100"
+                  className='bg-white/80 border-red-100'
                 >
                   <CardContent className='flex-row items-center text-foreground p-2.5'>
                     <span className='mr-auto text-sm font-medium text-zinc-700'>
