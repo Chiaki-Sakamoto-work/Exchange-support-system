@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
-import { relative } from 'node:path';
 
 export type EventCardProps = {
   title: string;
@@ -60,7 +59,7 @@ export const EventCard = ({
         'active:scale-[0.98]',
         'focus-visible:outline-none',
         'h-36.5 relative overflow-hidden',
-        isOngoing ? 'border-2 border-green-500/70' : ''
+        isOngoing ? 'border-2 border-green-500/70' : '',
       )}
       variant='default'
     >
@@ -81,9 +80,9 @@ export const EventCard = ({
             </span>
 
             {isOngoing && (
-              <Badge 
-                variant='accent' 
-                size='sm' 
+              <Badge
+                variant='accent'
+                size='sm'
                 className='bg-green-500 px-1.5 py-0 text-[10px] shrink-0'
               >
                 開催中

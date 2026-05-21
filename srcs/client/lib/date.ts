@@ -14,7 +14,9 @@ export const formatDate = (date: Date | null) => {
 };
 
 // 🌟 追記: 開催中かどうかを判定する共通関数
-export const isEventOngoing = (date: Date | string | null | undefined): boolean => {
+export const isEventOngoing = (
+  date: Date | string | null | undefined,
+): boolean => {
   if (!date) return false;
   return new Date(date) <= new Date();
 };
