@@ -10,6 +10,7 @@ import {
   getJoinedEvents,
 } from '../actions/eventActions';
 import { EventCard } from './EventCard';
+import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
@@ -228,12 +229,21 @@ export const EventHome = () => {
 
         {/* モーダル部分 */}
         {selectedRoomId !== null && (
-          <EventDetailModal
-            roomId={selectedRoomId}
-            mode={modalMode}
-            onClose={() => setSelectedRoomId(null)}
-            onSuccess={fetchAllData}
-          />
+          modalMode === 'explore' ? (
+            <EventDetailModal
+              roomId={selectedRoomId}
+              mode={modalMode}
+              onClose={() => setSelectedRoomId(null)}
+              onSuccess={fetchAllData}
+            />
+          ) : (
+            <RoomInteractiveOverlay
+              roomId={selectedRoomId}
+              mode={modalMode}
+              onClose={() => setSelectedRoomId(null)}
+              onSuccess={fetchAllData}
+            />
+            )
         )}
       </Tabs>
     </div>

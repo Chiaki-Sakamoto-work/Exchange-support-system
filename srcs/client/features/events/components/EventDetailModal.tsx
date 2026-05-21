@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 // 1. インポートの順番をアルファベット順に (p -> r -> u)
 import type { profiles } from '@prisma/client';
@@ -158,7 +158,6 @@ export const EventDetailModal = ({
   const [eventData, setEventData] = useState<Room>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -175,7 +174,6 @@ export const EventDetailModal = ({
     }
     loadDetail();
   }, [roomId]);
-
   if (isLoading) {
     return <EventDetailLoadingSkeleton mode={mode} />;
   }
