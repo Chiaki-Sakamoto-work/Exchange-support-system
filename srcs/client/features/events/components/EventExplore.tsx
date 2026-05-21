@@ -1,6 +1,6 @@
 'use client';
 
-import type { Room } from '@types';
+import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard';

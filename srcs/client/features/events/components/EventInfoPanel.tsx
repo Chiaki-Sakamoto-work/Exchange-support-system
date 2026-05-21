@@ -10,7 +10,7 @@ import {
   Store,
   UsersRound,
 } from 'lucide-react';
-import { type MouseEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';

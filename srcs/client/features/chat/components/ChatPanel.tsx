@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { UserBadge } from '@/features/users/components/UserBadge';
 import { createClient } from '@/lib/supabase/client';
 
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
 };
 
 export const ChatPanel = ({ roomId }: Props) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
@@ -36,7 +35,7 @@ export const ChatPanel = ({ roomId }: Props) => {
           setCurrentUserId(user.id);
         }
         setMessages(data);
-      } catch (error) {
+      } catch (_error) {
         toast.error('メッセージの取得に失敗しました');
       } finally {
         setIsLoading(false);
@@ -46,6 +45,7 @@ export const ChatPanel = ({ roomId }: Props) => {
   }, [roomId]);
 
   // メッセージが更新されたら自動で一番下までスクロール
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on message update
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -62,7 +62,7 @@ export const ChatPanel = ({ roomId }: Props) => {
 
       setMessages((prev) => [...prev, newMessage]);
       setInputText('');
-    } catch (error) {
+    } catch (_error) {
       toast.error('送信に失敗しました');
     } finally {
       setIsSending(false);

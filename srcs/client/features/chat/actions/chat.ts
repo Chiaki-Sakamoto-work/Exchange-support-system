@@ -1,6 +1,6 @@
 'use server';
 
-import { ChatMessage, fullMessageInclude } from '@type';
+import { fullMessageInclude } from '@type';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 
@@ -23,11 +23,20 @@ const getMessages = async (roomId: number) => {
 };
 
 const sendMessage = async (roomId: number, content: string) => {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
+  const getUser = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error('ログインしてください');
+    }
+    return user;
+  };
+
+  try {
+    const user = await getUser();
     const newMessage = await prisma.messages.create({
       data: {
         room_id: roomId,
@@ -36,6 +45,10 @@ const sendMessage = async (roomId: number, content: string) => {
       },
       include: fullMessageInclude,
     });
+
+    if (!user) {
+      throw new Error('ログインしてください');
+    }
     return newMessage;
   } catch (error) {
     console.error('メッセージ送信エラー', error);
@@ -45,7 +58,7 @@ const sendMessage = async (roomId: number, content: string) => {
 
 const updateMessage = async (messageId: number, newContent: string) => {
   try {
-    updatedMessage = await prisma.messages.update({
+    const updatedMessage = await prisma.messages.update({
       where: {
         id: messageId,
       },
@@ -57,21 +70,21 @@ const updateMessage = async (messageId: number, newContent: string) => {
     return updatedMessage;
   } catch (error) {
     console.error('メッセージの編集に失敗しました', error);
-    throw new ERROR('メッセージの編集に失敗しました');
+    throw new Error('メッセージの編集に失敗しました');
   }
 };
 
 const deleteMessage = async (messageId: number) => {
   try {
-    delteMessage = await prisma.messages.delete({
+    const deletedMessage = await prisma.messages.delete({
       where: {
         id: messageId,
       },
     });
-    return deleteMessage;
+    return deletedMessage;
   } catch (error) {
     console.error('メッセージが削除できませんでした. ', error);
-    throw new ERROR('メッセージが削除できませんでした. ');
+    throw new Error('メッセージが削除できませんでした. ');
   }
 };
 
