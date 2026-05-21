@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Tag 스키마
 export const TagSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -36,29 +35,6 @@ export type RestaurantInfo = {
 };
 
 export type RestaurantList = Record<string, RestaurantInfo>;
-
-// type RestaurantTag = {
-//   id: string;
-//   name: string;
-//   emoji: string;
-//   count: number;
-// };
-
-// type RestaurantPlace = {
-//   name: string;
-//   googlePlaceId: string;
-//   googleMapsUrl: string;
-//   avgRating: number;
-//   category: string;
-//   reviewCount: number;
-//   tags: RestaurantTag[];
-// };
-
-// export type RestaurantApiResponse = {
-//   places: RestaurantPlace[];
-//   totalCount: number;
-//   generatedAt: string;
-// };
 
 export type GetRestaurantOptionsResult =
   | {
