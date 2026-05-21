@@ -12,19 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { SkeletonBlock } from '@/components/ui/SkeletonBlock';
 import { cn } from '@/lib/utils';
-
-const SkeletonBlock = ({ className }: { className?: string }) => (
-  <div
-    className={cn(
-      'relative overflow-hidden rounded-full bg-muted',
-      'before:absolute before:inset-0 before:-translate-x-full',
-      'before:bg-linear-to-r before:from-transparent before:via-white/55 before:to-transparent',
-      'before:motion-safe:animate-skeleton-gradient',
-      className,
-    )}
-  />
-);
 
 type EventDetailLoadingSkeletonMode = 'hosted' | 'joined' | 'explore';
 

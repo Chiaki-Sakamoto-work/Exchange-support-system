@@ -49,6 +49,7 @@ import { RadioGroup } from '@/components/ui/RadioGroup';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { Stepper } from '@/components/ui/Stepper';
 import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
+import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/RestaurantRadioCardSkeleton';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import {
@@ -287,6 +288,10 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     isNewRecruit: isNewRecruit(profile),
   });
 
+  const isRestaurantLoading = restaurantData === null;
+  const restaurantError =
+    restaurantData?.success === false ? restaurantData.error : null;
+
   const renderParticipantBadge = (
     participant: Room['user_rooms'][number],
     variant: 'default' | 'secondary' = 'default',
@@ -444,7 +449,13 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
             {/* 2. スクロールエリア */}
             <div className='max-h-[280px] pt-2 overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin w-full'>
-              {filteredShops.length > 0 ? (
+              {isRestaurantLoading ? (
+                <RestaurantRadioCardSkeleton />
+              ) : restaurantError ? (
+                <div className='py-8 text-center w-full'>
+                  <p className='text-sm text-zinc-500'>{restaurantError}</p>
+                </div>
+              ) : filteredShops.length > 0 ? (
                 /* 🌟 RadioGroup 自体も横幅いっぱいに広げる */
                 <RadioGroup
                   value={formData.shop}
