@@ -154,7 +154,7 @@ export const EventHome = () => {
             className='col-start-1 row-start-1 bg-background'
           >
             {!isLoading && (
-              <div className='sticky top-0 z-10 bg-background pt-2 pb-4 flex justify-center'>
+              <div className='sticky top-0 z-10 bg-background pt-2 pb-6 flex justify-center'>
                 <Tabs
                   value={filter}
                   onValueChange={(val) => setFilter(val as FilterMode)}
@@ -183,7 +183,7 @@ export const EventHome = () => {
             {isLoading ? (
               <EventListLoadingSkeleton />
             ) : (
-              <div className='space-y-4'>
+              <div className='space-y-4 pt-2'>
                 {displayRooms.length > 0 ? (
                   displayRooms.map((room) => {
                     const isMyHosted = hostedRooms.some(
