@@ -70,12 +70,13 @@ export const EventCard = ({
               </span>
 
               {event.isOngoing && (
-                <Badge
-                  variant='accent'
-                  size='sm'
-                  className='bg-green-500 px-1.5 py-0 text-[10px] shrink-0'
-                >
+                <Badge variant='green' size='sm' className='text-[10px]'>
                   開催中
+                </Badge>
+              )}
+              {event.hasNewRecruit && (
+                <Badge variant='accent' size='sm' className='text-[10px]'>
+                  新卒含め
                 </Badge>
               )}
             </CardTitle>

@@ -30,6 +30,7 @@ const badgeVariants = cva(
           'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50', // 背景なし（ホバーで背景出現）
         link: 'text-primary underline-offset-4 hover:underline', // テキストリンク風
         accent: 'bg-accent text-accent-foreground [a]:hover:bg-accent/80', // アクセント強調
+        green: 'bg-green-500 text-accent-foreground [a]:hover:bg-green-500/80',
       },
       /**
        * サイズの設定
