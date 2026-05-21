@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { type KeyboardEvent, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import type { UserType } from '@/app/types/user';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription } from '@/components/ui/Card';
@@ -305,7 +306,7 @@ export function ProfileEditForm({
             defaultValue={userType}
             className='flex-row!'
             onValueChange={(value) =>
-              setValue('user_type', value as '一般社員' | '新卒', {
+              setValue('user_type', value as UserType, {
                 shouldDirty: true,
               })
             }
