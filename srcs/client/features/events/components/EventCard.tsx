@@ -11,17 +11,12 @@ import {
 } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
+import type { EventCardViewModel } from '../libs/eventCard';
 
 export type EventCardProps = {
-  title: string;
-  shop: string;
-  date: string;
+  event: EventCardViewModel;
   onClick?: () => void;
-  tags: { id: number; name: string }[];
-  participants: string;
   icon?: 'show' | 'edit';
-  ownerProfile?: { image?: string; name: string };
-  isOngoing?: boolean;
 };
 
 const CARD_ICON = {
@@ -30,15 +25,9 @@ const CARD_ICON = {
 };
 
 export const EventCard = ({
-  title,
-  shop,
-  date,
+  event,
   onClick,
-  tags,
-  participants,
-  ownerProfile,
   icon = 'show',
-  isOngoing = false,
 }: EventCardProps) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -59,15 +48,15 @@ export const EventCard = ({
         'active:scale-[0.98]',
         'focus-visible:outline-none',
         'h-36.5 relative overflow-hidden',
-        isOngoing ? 'border-2 border-green-500/70' : '',
+        event.isOngoing ? 'border-2 border-green-500/70' : '',
       )}
       variant='default'
     >
       <CardHeader className='flex flex-row items-center gap-4'>
-        {ownerProfile && (
+        {event.ownerProfile && (
           <UserAvatar
-            name={ownerProfile.name}
-            imageSrc={ownerProfile.image}
+            name={event.ownerProfile.name}
+            imageSrc={event.ownerProfile.image}
             size='default'
             className='rounded shrink-0'
             variant='default'
@@ -75,11 +64,11 @@ export const EventCard = ({
         )}
         <div className='flex-1 min-w-0'>
           <CardTitle className='flex items-center gap-2 min-w-0'>
-            <span className='truncate' title={title}>
-              {title}
+            <span className='truncate' title={event.title}>
+              {event.title}
             </span>
 
-            {isOngoing && (
+            {event.isOngoing && (
               <Badge
                 variant='accent'
                 size='sm'
@@ -89,7 +78,7 @@ export const EventCard = ({
               </Badge>
             )}
           </CardTitle>
-          <CardDescription>{shop}</CardDescription>
+          <CardDescription>{event.shop}</CardDescription>
         </div>
         <CardAction>
           <Icon.icon className={cn(Icon.size, 'text-muted-foreground')} />
@@ -97,7 +86,7 @@ export const EventCard = ({
       </CardHeader>
 
       <CardContent className='flex flex-row flex-wrap gap-2 min-h-6'>
-        {tags?.map((tag) => (
+        {event.tags?.map((tag) => (
           <Badge key={tag.id} variant='secondary' size='sm'>
             {tag.name}
           </Badge>
@@ -105,10 +94,10 @@ export const EventCard = ({
       </CardContent>
 
       <CardFooter className='flex flex-row justify-between items-center w-full'>
-        <div>{date}</div>
+        <div>{event.date}</div>
         <div className='flex items-center gap-1.5'>
           <UsersRound className='h-4 w-4' />
-          {participants}
+          {event.participants}
         </div>
       </CardFooter>
     </Card>

@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Room } from '@/app/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { formatDate, isEventOngoing } from '@/lib/date';
 import {
   getExploreEvents,
   getHostedEvents,
   getJoinedEvents,
 } from '../actions/eventActions';
+import { toEventCardViewModel } from '../libs/eventCard';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
@@ -111,30 +111,13 @@ export const EventHome = () => {
               <div className='space-y-4 pt-2'>
                 {exploreEvents.length > 0 ? (
                   exploreEvents.map((room) => {
-                    // 主催者を安全に取得
-                    const ownerProfile = {
-                      name:
-                        room.user_rooms?.find((ur) => ur.is_owner)?.profiles
-                          ?.username || '不明',
-                    };
-                    const formattedTags = room.room_tags.map((rt) => ({
-                      id: rt.tags.id,
-                      name: rt.tags.name,
-                    }));
-
                     return (
                       <EventCard
                         key={room.id}
-                        title={room.title}
-                        shop={room.location_name || '未定'}
-                        date={formatDate(room.event_start_at)}
-                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                        tags={formattedTags}
-                        ownerProfile={ownerProfile}
-                        isOngoing={isEventOngoing(room.event_start_at)}
+                        event={toEventCardViewModel(room)}
                         onClick={() => {
                           setSelectedRoomId(room.id);
-                          setModalMode('explore'); // 🌟 exploreモードでモーダルを開く
+                          setModalMode('explore');
                         }}
                       />
                     );
@@ -189,26 +172,10 @@ export const EventHome = () => {
                     const isMyHosted = hostedRooms.some(
                       (h) => h.id === room.id,
                     );
-                    const owner = room.user_rooms?.find((ur) => ur.is_owner);
-                    const ownerProfile = {
-                      name: owner?.profiles?.username || '不明',
-                      image: owner?.profiles?.avatar_url || '不明',
-                    };
-                    const formattedTags = room.room_tags.map((rt) => ({
-                      id: rt.tags.id,
-                      name: rt.tags.name,
-                    }));
-
                     return (
                       <EventCard
                         key={room.id}
-                        title={room.title}
-                        shop={room.location_name || '未定'}
-                        date={formatDate(room.event_start_at)}
-                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                        tags={formattedTags}
-                        ownerProfile={ownerProfile}
-                        isOngoing={isEventOngoing(room.event_start_at)}
+                        event={toEventCardViewModel(room)}
                         onClick={() => {
                           setSelectedRoomId(room.id);
                           setModalMode(isMyHosted ? 'hosted' : 'joined');
