@@ -1,4 +1,5 @@
 import type { Room } from '@/app/types';
+import { isNewRecruit } from '@/features/users/lib/profile';
 import { formatDate, isEventOngoing } from '@/lib/date';
 
 export type EventCardViewModel = {
@@ -10,6 +11,7 @@ export type EventCardViewModel = {
   icon?: 'show' | 'edit';
   ownerProfile?: { image?: string; name: string };
   isOngoing: boolean;
+  hasNewRecruit: boolean;
 };
 
 export const toEventCardViewModel = (room: Room): EventCardViewModel => {
@@ -23,6 +25,11 @@ export const toEventCardViewModel = (room: Room): EventCardViewModel => {
     name: owner?.username || '不明',
     image: owner?.avatar_url || undefined,
   };
+
+  const hasNewRecruit = room.user_rooms.some((userRoom) => {
+    return isNewRecruit(userRoom?.profiles);
+  });
+
   return {
     title: room.title,
     shop: room.location_name || '未定',
@@ -31,5 +38,6 @@ export const toEventCardViewModel = (room: Room): EventCardViewModel => {
     tags: formattedTags,
     ownerProfile: ownerProfile,
     isOngoing: isEventOngoing(room.event_start_at),
+    hasNewRecruit: hasNewRecruit,
   };
 };
