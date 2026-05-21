@@ -93,7 +93,7 @@ export const EventHome = () => {
       >
         {/* 🌟 タブのメニュー名を「参加する」に変更 */}
         <TabsList className='w-full h-[48px] shrink-0'>
-          <TabsTrigger value='explore'>開催中イベント</TabsTrigger>
+          <TabsTrigger value='explore'>募集中</TabsTrigger>
           <TabsTrigger value='joined'>参加予定</TabsTrigger>
         </TabsList>
 
@@ -173,7 +173,7 @@ export const EventHome = () => {
                       value='joined'
                       className='text-xs rounded-full'
                     >
-                      参加
+                      他催
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
