@@ -1,9 +1,9 @@
 // import cron from 'node-cron';
 
-import { prisma } from './prisma';
+// import { prisma } from './prisma';
 
-export function initAutoDeleteJob() {
-  // 5分ごとにデータベースをチェックする設定
+// export function initAutoDeleteJob() {
+//   // 5分ごとにデータベースをチェックする設定
 //   cron.schedule('*/5 * * * *', async () => {
 //     console.log('[Cron] 終了した予定の自動削除チェックを開始します...');
 
@@ -30,4 +30,4 @@ export function initAutoDeleteJob() {
 //       );
 //     }
 //   });
-}
+// }
