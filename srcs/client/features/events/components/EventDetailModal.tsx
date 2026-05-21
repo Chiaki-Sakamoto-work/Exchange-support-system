@@ -33,7 +33,7 @@ import {
   HoverCardTrigger,
 } from '@/components/ui/HoverCard';
 import { UserBadge } from '@/features/users/components/UserBadge';
-import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
+import { getDisplayName } from '@/features/users/lib/profile';
 import { formatDate } from '@/lib/date';
 import {
   cancelParticipationAction,
