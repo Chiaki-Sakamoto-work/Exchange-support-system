@@ -33,7 +33,11 @@ export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: redirectTo, // 💡 環境変数ではなく、組み立てた動的URLを渡す！
+      redirectTo: redirectTo,
+      queryParams: {
+        prompt: 'select_account',
+        hd: process.env.DOMAIN ?? '',
+      },
     },
   });
 

@@ -45,10 +45,6 @@ const sendMessage = async (roomId: number, content: string) => {
       },
       include: fullMessageInclude,
     });
-
-    if (!user) {
-      throw new Error('ログインしてください');
-    }
     return newMessage;
   } catch (error) {
     console.error('メッセージ送信エラー', error);
