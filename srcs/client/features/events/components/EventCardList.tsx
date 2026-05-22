@@ -22,7 +22,6 @@ export const EventCardList = ({
   className,
   contentClassName,
 }: EventCardListProps) => {
-  const shouldShowFade = false; //isLoading || !isEmpty;
   const [isScrolled, setIsScrolled] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLElement>) => {
@@ -40,12 +39,6 @@ export const EventCardList = ({
         className,
       )}
     >
-      {shouldShowFade && (
-        <div
-          aria-hidden
-          className='pointer-events-none sticky top-0 z-20 -mx-4 h-8 -mb-8 bg-linear-to-b from-background via-background/85 to-transparent'
-        />
-      )}
       {isLoading ? (
         <div className='pb-8'>{loadingFallback}</div>
       ) : isEmpty ? (
@@ -54,12 +47,6 @@ export const EventCardList = ({
         </p>
       ) : (
         <div className={cn('space-y-4 pb-8', contentClassName)}>{children}</div>
-      )}
-      {shouldShowFade && (
-        <div
-          aria-hidden
-          className='pointer-events-none sticky bottom-0 z-20 -mx-4 h-8 -mt-8 bg-linear-to-t from-background via-background/85 to-transparent'
-        />
       )}
     </section>
   );
