@@ -25,6 +25,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
+      "@type": ["./types"],
       "@feature/*": ["./features/*"],
       "@components/*": ["./components/*"],
       "@shared/ui/*": ["./components/ui/*"]

@@ -2,6 +2,7 @@
 
 // 1. インポートの順番をアルファベット順に (p -> r -> u)
 import type { profiles } from '@prisma/client';
+import type { Participant, Room } from '@type';
 import {
   Calendar,
   CircleAlert,
@@ -13,8 +14,7 @@ import {
 // import { getDisplayName } from 'next/dist/shared/lib/utils';
 import { type MouseEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Participant, Room } from '@/app/types';
-// import type { User } from '@/app/types'; // 실제 Prisma 데이터 타입을 사용할 것이므로 주석처리
+// import type { User } from '@type'; // 실제 Prisma 데이터 타입을 사용할 것이므로 주석처리
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -158,7 +158,6 @@ export const EventDetailModal = ({
   const [eventData, setEventData] = useState<Room>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -175,7 +174,6 @@ export const EventDetailModal = ({
     }
     loadDetail();
   }, [roomId]);
-
   if (isLoading) {
     return <EventDetailLoadingSkeleton mode={mode} />;
   }

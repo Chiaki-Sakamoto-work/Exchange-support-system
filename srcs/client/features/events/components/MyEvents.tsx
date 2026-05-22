@@ -1,9 +1,9 @@
 'use client';
 
 import { EventCard } from '@feature/events/components/EventCard';
+import type { Room } from '@type';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import type { Room } from '@/app/types';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
