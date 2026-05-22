@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'; // Vercelのキャッシュバグを防止
+export const dynamic = 'force-dynamic';
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -16,8 +16,6 @@ export async function GET(request: Request) {
   }
 
   const cookieStore = await cookies();
-
-  // 💡 【追加】Docker内部通信用の環境変数を取得
   const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const internalUrl = process.env.SUPABASE_INTERNAL_URL || publicUrl;
 
@@ -25,7 +23,6 @@ export async function GET(request: Request) {
     publicUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     {
-      // 💡 【追加】ミドルウェアと同様、Docker内部のコンテナ間通信のためにfetchをリライト
       global: {
         fetch: (url, options) =>
           fetch(url.toString().replace(publicUrl, internalUrl), options),
@@ -39,23 +36,30 @@ export async function GET(request: Request) {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (_error) {
-            // Server Component用のエラーは無視
-          }
+          } catch (_error) {}
         },
       },
     },
   );
 
-  // 本物のSupabase（ローカルの場合はDockerのKong）に対してセッション交換を実行
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (!error) {
-    return NextResponse.redirect(new URL(next, requestUrl.origin));
+  if (!error && data?.user) {
+    const email = data.user.email;
+    const allowedDomain = process.env.DOMAIN ?? '';
+
+    if (!email?.endsWith(`@${allowedDomain}`)) {
+      await supabase.auth.signOut();
+      console.warn(`🚫 Domain restriction triggered: ${email} rejected.`);
+      return NextResponse.redirect(
+        new URL(`/login?error=domain_not_allowed`, requestUrl.origin),
+      );
+    }
+  } else if (error) {
+    console.error('❌ Supabase Auth Error:', error.message);
+    return NextResponse.redirect(
+      new URL(`/login?error=auth_failed`, requestUrl.origin),
+    );
   }
-
-  console.error('❌ Supabase Auth Error:', error.message);
-  return NextResponse.redirect(
-    new URL('/login?error=auth-callback-failed', requestUrl.origin),
-  );
+  return NextResponse.redirect(new URL(next, requestUrl.origin));
 }
