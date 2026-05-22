@@ -462,7 +462,7 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
                     <RadioCard
                       key={shop.placeId}
                       value={shop.name}
-                      className='w-[98%] min-w-0 max-w-full hover:scale-100'
+                      className='w-full min-w-0 max-w-full hover:scale-100'
                     >
                       <RadioCardHeader className='w-full min-w-0 p-0'>
                         <RadioCardTitle className='text-foreground flex items-center justify-between gap-2 max-w-[250px] min-w-0'>
