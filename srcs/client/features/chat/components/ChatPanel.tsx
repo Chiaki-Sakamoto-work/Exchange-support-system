@@ -44,6 +44,36 @@ export const ChatPanel = ({ roomId }: Props) => {
     fetchMessages();
   }, [roomId]);
 
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`room-${roomId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `room_id=eq.${roomId}`,
+        },
+        (payload) => {
+          const newMessage = payload.new as ChatMessage;
+
+          setMessages((prev) => {
+            const isExist = prev.some((msg) => msg.id === newMessage.id);
+
+            if (isExist) return prev;
+            return [...prev, newMessage];
+          });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [roomId]);
+
   // メッセージが更新されたら自動で一番下までスクロール
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on message update
   useEffect(() => {
