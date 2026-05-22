@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import { toEventCardViewModel } from '../libs/eventCard';
+import { EventCardList } from './EventCardList';
 import { EventForm } from './EventForm';
 
 type Props = {
@@ -26,8 +27,8 @@ const MyEvents = ({ events, onSuccess }: Props) => {
   const [editingEvent, setEditingEvent] = useState<Room | null>(null);
 
   return (
-    <div className='flex flex-col gap-4'>
-      <div className='flex justify-end'>
+    <div className='flex h-full min-h-0 flex-col gap-4'>
+      <div className='flex shrink-0 justify-end'>
         <Button
           type='submit'
           className='w-full bg-gray-400'
@@ -39,16 +40,22 @@ const MyEvents = ({ events, onSuccess }: Props) => {
           イベントを作成
         </Button>
       </div>
-      {events.map((event) => {
-        return (
-          <EventCard
-            key={event.id}
-            event={toEventCardViewModel(event)}
-            onClick={() => setEditingEvent(event)}
-            icon='edit'
-          />
-        );
-      })}
+      <EventCardList
+        ariaLabel='MYイベント一覧'
+        emptyMessage='作成したイベントはありません'
+        isEmpty={events.length === 0}
+      >
+        {events.map((event) => {
+          return (
+            <EventCard
+              key={event.id}
+              event={toEventCardViewModel(event)}
+              onClick={() => setEditingEvent(event)}
+              icon='edit'
+            />
+          );
+        })}
+      </EventCardList>
       <Dialog
         open={editingEvent !== null}
         onOpenChange={() => setEditingEvent(null)}
@@ -58,7 +65,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
             <DialogTitle>イベントを編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
           </DialogHeader>
-          <DialogBody>
+          <DialogBody className='-mx-6 px-6'>
             {editingEvent && (
               <EventForm
                 roomId={editingEvent.id}
