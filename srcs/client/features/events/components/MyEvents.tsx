@@ -12,7 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { EventCard, toEventCardViewModel } from './EventCard';
+import { EventCard } from '@/features/events/components/EventCard/EventCard';
+import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
 import { EventCardList } from './EventCardList';
 import { EventCreateDialogContent } from './EventCreateDialogContent';
 import { EventEditActionMenu } from './EventEditActionMenu';

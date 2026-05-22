@@ -2,7 +2,7 @@ import type * as React from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
 import { UserAvatar } from '../UserAvatar';
-import type { UserBadgeViewModel } from './userBadge.viewmodel';
+import type { UserBadgeViewModel } from './UserBadge.viewmodel';
 
 type UserBadgeVariant = 'default' | 'accept' | 'destructive' | 'secondary';
 type UserBadgeLeadingVisual = 'avatar' | 'dot';

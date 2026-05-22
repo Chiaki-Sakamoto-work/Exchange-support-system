@@ -5,10 +5,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/HoverCard';
-import {
-  toUserBadgeViewModel,
-  UserBadge,
-} from '@/features/users/components/UserBadge';
+import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
+import { toUserBadgeViewModel } from '@/features/users/components/UserBadge/UserBadge.viewmodel';
 import { getDisplayName } from '@/features/users/lib/profile';
 import type { Participant } from '@/types';
 
