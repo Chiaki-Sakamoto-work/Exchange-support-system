@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/delete-rooms",
+      "schedule": "0 15 * * *"
+    }
+  ]
+}
