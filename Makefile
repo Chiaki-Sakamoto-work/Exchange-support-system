@@ -1,11 +1,21 @@
-SHELL = bash
+SHELL = zsh
+
+RED    := \033[31m
+ORANGE := \033[38;5;208m
+YELLOW := \033[33m
+GREEN  := \033[32m
+CYAN   := \033[36m
+BLUE   := \033[34m
+PURPLE := \033[35m
+RESET  := \033[0m
 
 ##----Directory Location----##
 SRCDIR = ./srcs/
 ##--------------------------##
 
 ##------ Next.js (App) 操作 ------##
-all: build up restart
+.PHONY: all build up down restart setup logs
+all: build up restart art
 
 build:
 	cd ${SRCDIR} && docker compose build
@@ -26,7 +36,10 @@ setup: db-migrate restart
 logs:
 	cd ${SRCDIR} && docker compose logs -f app
 
+
 ##------ Supabase 操作 (※Docker Desktop推奨) ------##
+.PHONY: db-setup db-up db-down
+
 # Supabase の初期化（初回のみ）
 db-setup:
 	cd ${SRCDIR} && supabase init
@@ -41,6 +54,8 @@ db-down:
 
 
 ##------ Prisma 操作 ------##
+.PHONY: db-migrate db-reset
+
 db-migrate:
 	cd ${SRCDIR} && docker compose exec app npx prisma migrate dev
 	# schema.prisma の変更をローカルDBに反映する（マイグレーション）
@@ -48,13 +63,18 @@ db-migrate:
 db-reset:
 	cd ${SRCDIR} && docker compose exec app npx prisma migrate reset
 
+
 ##------ お掃除 ------##
+.PHONY: clean
+
 # Next.jsもSupabaseも全部落として、コンテナを綺麗にする
 clean: down db-down
 	cd ${SRCDIR} && docker compose down -v
 
 
 ##------ lint & format ------##
+.PHONY: lint format
+
 lint:
 	cd ${SRCDIR} && docker compose exec app npm run check && \
 		docker compose exec app npm run typecheck
@@ -62,3 +82,15 @@ lint:
 format:
 	cd ${SRCDIR} && docker compose exec app npm run check:fix
 
+
+##------ アスキーアート ------##
+.PHONY: art
+
+art:
+	@echo "$(RED)                                        $(RESET)"
+	@echo "$(ORANGE) __                 __                  $(RESET)"
+	@echo "$(YELLOW)/\\_\\    ___    ___ /\\_\\    ___    ___   $(RESET)"
+	@echo "$(GREEN)/\\/ \\  /'___\\ / __\`/\\/ \\  /'___\\ / __\` $(RESET)"
+	@echo "$(CYAN) \\ \\ \\/\\ \\__//\\ \\L\\ \\ \\ \\/\\ \\__//\\ \\L\\ \\ $(RESET)"
+	@echo "$(BLUE)  \\ \\_\\ \\____\\ \\____/\\ \\_\\ \\____\\ \\____/$(RESET)"
+	@echo "$(PURPLE)   \\/_/\\/____/\\/___/  \\/_/\\/____/\\/___/ $(RESET)"
