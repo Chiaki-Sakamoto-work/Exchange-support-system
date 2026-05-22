@@ -24,6 +24,7 @@ import {
 import { Textarea } from '@/components/ui/Textarea';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
+import type { UserType } from '@/types/user';
 import { createDepartment, updateProfile } from '../actions/profile';
 import { type ProfileFormValues, profileSchema } from '../schemas/profile';
 
@@ -305,7 +306,7 @@ export function ProfileEditForm({
             defaultValue={userType}
             className='flex-row!'
             onValueChange={(value) =>
-              setValue('user_type', value as '一般社員' | '新卒', {
+              setValue('user_type', value as UserType, {
                 shouldDirty: true,
               })
             }

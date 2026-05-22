@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { formatDate, isEventOngoing } from '@/lib/date';
+import { toEventCardViewModel } from '../libs/eventCard';
 import { EventForm } from './EventForm';
 
 type Props = {
@@ -40,26 +40,10 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         </Button>
       </div>
       {events.map((event) => {
-        const currentHost = event.user_rooms.find((ur) => ur.is_owner);
-        const owner = currentHost?.profiles;
-        const tags = event.room_tags.map((rt) => ({
-          id: rt.tags.id,
-          name: rt.tags.name,
-        }));
-
         return (
           <EventCard
             key={event.id}
-            title={event.title}
-            shop={event.location_name ?? '未定'}
-            date={formatDate(event.event_start_at)}
-            tags={tags}
-            participants={`${event._count.user_rooms}/${event.capacity_limit}`}
-            ownerProfile={{
-              name: owner?.username ?? '未定',
-              image: owner?.avatar_url ?? undefined,
-            }}
-            isOngoing={isEventOngoing(event.event_start_at)}
+            event={toEventCardViewModel(event)}
             onClick={() => setEditingEvent(event)}
             icon='edit'
           />

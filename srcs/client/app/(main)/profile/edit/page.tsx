@@ -2,6 +2,7 @@ import { getDepartments } from '@/features/events/actions/eventActions';
 import { ProfileEditForm } from '@/features/profile/components/ProfileEditForm';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
+import type { UserType } from '@/types/user';
 
 export default async function ProfileEditPage() {
   const session = await auth();
@@ -20,7 +21,7 @@ export default async function ProfileEditPage() {
         username: profile.username ?? '',
         bio: profile.bio ?? '',
         is_support_used: profile.is_support_used ?? false,
-        user_type: profile.user_type as '一般社員' | '新卒' | null,
+        user_type: profile.user_type as UserType,
         email: profile.email,
         avatar_url: profile.avatar_url,
       }
