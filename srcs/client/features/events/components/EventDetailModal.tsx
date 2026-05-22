@@ -304,7 +304,7 @@ export const EventDetailModal = ({
           }
         }}
       >
-        <DialogContent preventOutsideClose className='max-h-[80vh]'>
+        <DialogContent preventOutsideClose className='max-h-[80vh] -mx-6 px-6'>
           <DialogHeader>
             <DialogTitle>{eventData.title}を編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
@@ -338,7 +338,7 @@ export const EventDetailModal = ({
       >
         <DialogContent
           showCloseButton={false}
-          className='max-h-[80vh]'
+          className='max-h-[80vh] -mx-6 px-6'
           onClick={handleDetailDialogClick}
         >
           {/* 🌟 編集モードが ON の時の表示 */}

@@ -65,7 +65,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
             <DialogTitle>イベントを編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
           </DialogHeader>
-          <DialogBody>
+          <DialogBody className='-mx-6 px-6'>
             {editingEvent && (
               <EventForm
                 roomId={editingEvent.id}
