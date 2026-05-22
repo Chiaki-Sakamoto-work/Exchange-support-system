@@ -1,6 +1,7 @@
 'use client';
 
 import type { profiles } from '@prisma/client';
+import type { GetRestaurantOptionsResult, Room } from '@type';
 import {
   ArrowLeftRight,
   Calendar1,
@@ -13,8 +14,6 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Room } from '@/app/types';
-import type { GetRestaurantOptionsResult } from '@/app/types/restaurants';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +51,7 @@ import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantA
 import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/RestaurantRadioCardSkeleton';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
+import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
 import {
   createEvent,
   deleteEventAction,
@@ -278,10 +278,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     setIsProcessing(false);
   };
 
-  const isNewRecruit = (profile: profiles | null) =>
-    profile?.user_type === '新入社員';
-  const getDisplayName = (profile: profiles | null) =>
-    profile?.username ?? '名無しさん';
   const getUserBadgeUser = (profile: profiles | null) => ({
     name: getDisplayName(profile),
     avatarUrl: profile?.avatar_url,

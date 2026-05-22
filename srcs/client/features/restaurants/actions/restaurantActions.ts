@@ -1,9 +1,6 @@
 'use server';
 
-import type {
-  GetRestaurantOptionsResult,
-  RestaurantList,
-} from '@/app/types/restaurants';
+import type { GetRestaurantOptionsResult, RestaurantList } from '@type';
 import { getRestaurantOptionsResult } from '../libs/restaurantApi';
 
 export async function getRestaurantOptions(): Promise<GetRestaurantOptionsResult> {

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
+import { isStringNewRecruit } from '@/features/users/lib/profile';
 
 export interface ProfileHeaderProps {
   user: {
@@ -39,7 +40,9 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
           <div className='flex gap-2 mb-4 mt-2'>
             {user.user_type && (
               <Badge
-                variant={user.user_type === '新卒' ? 'primary' : 'secondary'}
+                variant={
+                  isStringNewRecruit(user.user_type) ? 'primary' : 'secondary'
+                }
               >
                 {user.user_type}
               </Badge>
