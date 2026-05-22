@@ -64,6 +64,19 @@ export const EventListLoadingSkeleton = ({
   </div>
 );
 
+export const MyEventsLoadingSkeleton = () => (
+  <div
+    aria-busy='true'
+    className='flex flex-col gap-4 animate-in fade-in duration-300'
+  >
+    <span className='sr-only'>読み込み中</span>
+    <div className='flex justify-end'>
+      <SkeletonBlock className='h-12 w-full rounded-2xl' />
+    </div>
+    <EventListLoadingSkeleton />
+  </div>
+);
+
 export const EventDetailLoadingSkeleton = ({
   mode,
 }: {
