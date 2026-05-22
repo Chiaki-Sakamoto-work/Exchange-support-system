@@ -87,7 +87,7 @@ export const EventHome = () => {
         : '参加予定のイベントはありません';
 
   return (
-    <div className='flex h-full min-h-0 flex-col overflow-hidden'>
+    <div className='flex h-full min-h-0 flex-col '>
       <Tabs
         value={subTab}
         onValueChange={(val) => setSubTab(val as TabMode)}
@@ -99,11 +99,11 @@ export const EventHome = () => {
           <TabsTrigger value='joined'>参加予定</TabsTrigger>
         </TabsList>
 
-        <div className='mt-2 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-1 overflow-hidden'>
+        <div className='mt-2 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-1'>
           {/* 🌟 「参加する」タブの中身 (EventExploreから流用) */}
           <TabsContent
             value='explore'
-            className='col-start-1 row-start-1 flex min-h-0 flex-col overflow-hidden bg-background'
+            className='col-start-1 row-start-1 flex min-h-0 flex-col  bg-background'
           >
             <EventCardList
               ariaLabel='募集中イベント一覧'
@@ -131,7 +131,7 @@ export const EventHome = () => {
           {/* 「参加予定」タブの中身 (前回の3分割フィルター) */}
           <TabsContent
             value='joined'
-            className='col-start-1 row-start-1 flex min-h-0 flex-col overflow-hidden bg-background'
+            className='col-start-1 row-start-1 flex min-h-0 flex-col bg-background'
           >
             {!isLoading && (
               <div className='z-10 flex shrink-0 justify-center bg-background pt-2 pb-6'>
