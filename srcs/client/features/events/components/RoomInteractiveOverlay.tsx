@@ -89,7 +89,7 @@ export const RoomInteractiveOverlay = ({
               }
             }}
           >
-            <ChatPanel roomId={roomId} />
+            {/*<ChatPanel roomId={roomId} />*/}
           </div>
         </div>
       </div>
