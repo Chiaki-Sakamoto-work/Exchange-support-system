@@ -1,8 +1,8 @@
-import type { UserType } from '@/app/types/user';
 import { getDepartments } from '@/features/events/actions/eventActions';
 import { ProfileEditForm } from '@/features/profile/components/ProfileEditForm';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
+import type { UserType } from '@/types/user';
 
 export default async function ProfileEditPage() {
   const session = await auth();

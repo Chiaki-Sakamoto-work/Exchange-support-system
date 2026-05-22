@@ -1,6 +1,6 @@
-import type { Room } from '@/app/types';
 import { isNewRecruit } from '@/features/users/lib/profile';
 import { formatDate, isEventOngoing } from '@/lib/date';
+import type { Room } from '@/types';
 
 export type EventCardViewModel = {
   title: string;

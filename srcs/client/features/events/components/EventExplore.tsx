@@ -3,6 +3,7 @@
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
+import { toEventCardViewModel } from '../libs/eventCard';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
@@ -32,16 +33,6 @@ export const EventExplore = () => {
     fetchExploreData();
   }, [fetchExploreData]);
 
-  const formatDate = (date: Date | null) => {
-    if (!date) return '日時未定';
-    return new Date(date).toLocaleString('ja-JP', {
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   if (isLoading) {
     return <EventListLoadingSkeleton showHeader />;
   }
@@ -59,24 +50,10 @@ export const EventExplore = () => {
       <div className='space-y-4'>
         {exploreEvents.length > 0 ? (
           exploreEvents.map((room) => {
-            // 主催者を探す（is_owner: true のユーザー）
-            const ownerProfile = {
-              name: room.user_rooms[0]?.profiles?.username || '不明',
-            };
-            const formattedTags = room.room_tags.map((rt) => ({
-              id: rt.tags.id,
-              name: rt.tags.name,
-            }));
-
             return (
               <EventCard
                 key={room.id}
-                tags={formattedTags}
-                title={room.title}
-                shop={room.location_name || '未定'}
-                date={formatDate(room.event_start_at)}
-                participants={`${room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                ownerProfile={ownerProfile}
+                event={toEventCardViewModel(room)}
                 onClick={() => setSelectedRoomId(room.id)}
               />
             );
