@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type EventCardListProps = {
@@ -23,12 +23,20 @@ export const EventCardList = ({
   contentClassName,
 }: EventCardListProps) => {
   const shouldShowFade = false; //isLoading || !isEmpty;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    setIsScrolled(e.currentTarget.scrollTop > 0);
+  };
 
   return (
     <section
       aria-label={ariaLabel}
+      onScroll={handleScroll}
       className={cn(
         'relative -mx-4 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4',
+        isScrolled &&
+          'border-t border-border shadow-[inset_0_10px_10px_-10px_rgba(0,0,0,0.05)]',
         className,
       )}
     >

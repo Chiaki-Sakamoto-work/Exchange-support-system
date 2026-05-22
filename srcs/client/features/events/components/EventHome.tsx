@@ -134,12 +134,12 @@ export const EventHome = () => {
             className='col-start-1 row-start-1 flex min-h-0 flex-col bg-background'
           >
             {!isLoading && (
-              <div className='z-10 flex shrink-0 justify-center bg-background pt-2 pb-6'>
+              <div className='z-10 flex shrink-0 justify-center bg-background pt-2 pb-2'>
                 <Tabs
                   value={filter}
                   onValueChange={(val) => setFilter(val as FilterMode)}
                 >
-                  <TabsList className='grid grid-cols-3 w-64 h-9 bg-zinc-100 p-1 rounded-full'>
+                  <TabsList className='grid grid-cols-3 w-64 h-9 bg-muted p-1 rounded-full'>
                     <TabsTrigger value='all' className='text-xs rounded-full'>
                       全て
                     </TabsTrigger>
