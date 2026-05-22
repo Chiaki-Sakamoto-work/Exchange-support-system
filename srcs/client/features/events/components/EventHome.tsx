@@ -11,7 +11,6 @@ import {
 import { toEventCardViewModel } from '../libs/eventCard';
 import { EventCard } from './EventCard';
 import { EventCardList } from './EventCardList';
-import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 
