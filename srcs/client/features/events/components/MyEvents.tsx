@@ -1,6 +1,5 @@
 'use client';
 
-import { EventCard } from '@feature/events/components/EventCard';
 import type { Room } from '@type';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -13,7 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { toEventCardViewModel } from '../libs/eventCard';
+import { EventCard } from '@/features/events/components/EventCard/EventCard';
+import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
 import { EventCardList } from './EventCardList';
 import { EventForm } from './EventForm';
 

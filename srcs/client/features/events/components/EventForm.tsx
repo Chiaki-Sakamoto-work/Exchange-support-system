@@ -50,7 +50,7 @@ import { Stepper } from '@/components/ui/Stepper';
 import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
 import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/RestaurantRadioCardSkeleton';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
-import { UserBadge } from '@/features/users/components/UserBadge';
+import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
 import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
 import {
   createEvent,
