@@ -23,7 +23,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogTitle,
-} from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
+} from '@/components/ui/AlertDialog';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {

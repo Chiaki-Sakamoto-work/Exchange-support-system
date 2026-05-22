@@ -1,9 +1,6 @@
 'use client';
 
-{
-  /*import { ChatPanel } from '@feature/chat/components/ChatPanel';*/
-}
-
+import { ChatPanel } from '@feature/chat/components/ChatPanel';
 import { EventInfoPanel } from '@feature/events/components/EventInfoPanel';
 import { useState } from 'react';
 
@@ -92,7 +89,7 @@ export const RoomInteractiveOverlay = ({
               }
             }}
           >
-            {/*<ChatPanel roomId={roomId} />*/}
+            <ChatPanel roomId={roomId} />
           </div>
         </div>
       </div>

@@ -186,22 +186,14 @@ export const EventHome = () => {
         </div>
 
         {/* モーダル部分 */}
-        {selectedRoomId !== null &&
-          (modalMode === 'explore' ? (
-            <EventDetailModal
-              roomId={selectedRoomId}
-              mode={modalMode}
-              onClose={() => setSelectedRoomId(null)}
-              onSuccess={fetchAllData}
-            />
-          ) : (
-            <RoomInteractiveOverlay
-              roomId={selectedRoomId}
-              mode={modalMode}
-              onClose={() => setSelectedRoomId(null)}
-              onSuccess={fetchAllData}
-            />
-          ))}
+        {selectedRoomId !== null && (
+          <RoomInteractiveOverlay
+            roomId={selectedRoomId}
+            mode={modalMode}
+            onClose={() => setSelectedRoomId(null)}
+            onSuccess={fetchAllData}
+          />
+        )}
       </Tabs>
     </div>
   );
