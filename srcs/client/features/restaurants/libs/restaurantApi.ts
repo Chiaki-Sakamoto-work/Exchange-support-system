@@ -1,7 +1,4 @@
-import {
-  type RestaurantApiResponse,
-  RestaurantApiResponseSchema,
-} from '@/app/types/restaurants';
+import { type RestaurantApiResponse, RestaurantApiResponseSchema } from '@type';
 
 export async function getRestaurantOptionsResult(): Promise<RestaurantApiResponse> {
   const endpoint = process.env.RESTAURANT_API_URL;

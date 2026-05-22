@@ -1,6 +1,7 @@
 'use client';
 
 import type { profiles } from '@prisma/client';
+import type { GetRestaurantOptionsResult, Room } from '@type';
 import {
   ArrowLeftRight,
   Calendar1,
@@ -13,8 +14,6 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Room } from '@/app/types';
-import type { GetRestaurantOptionsResult } from '@/app/types/restaurants';
 import {
   AlertDialog,
   AlertDialogAction,

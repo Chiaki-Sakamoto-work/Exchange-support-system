@@ -1,7 +1,7 @@
 'use client';
 
+import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
-import type { Room } from '@/app/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import {
   getExploreEvents,
@@ -12,6 +12,7 @@ import { toEventCardViewModel } from '../libs/eventCard';
 import { EventCard } from './EventCard';
 import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
+import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -194,14 +195,22 @@ export const EventHome = () => {
         </div>
 
         {/* モーダル部分 */}
-        {selectedRoomId !== null && (
-          <EventDetailModal
-            roomId={selectedRoomId}
-            mode={modalMode}
-            onClose={() => setSelectedRoomId(null)}
-            onSuccess={fetchAllData}
-          />
-        )}
+        {selectedRoomId !== null &&
+          (modalMode === 'explore' ? (
+            <EventDetailModal
+              roomId={selectedRoomId}
+              mode={modalMode}
+              onClose={() => setSelectedRoomId(null)}
+              onSuccess={fetchAllData}
+            />
+          ) : (
+            <RoomInteractiveOverlay
+              roomId={selectedRoomId}
+              mode={modalMode}
+              onClose={() => setSelectedRoomId(null)}
+              onSuccess={fetchAllData}
+            />
+          ))}
       </Tabs>
     </div>
   );
