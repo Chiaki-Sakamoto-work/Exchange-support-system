@@ -31,6 +31,7 @@ export const EventDetailDialog = ({
   const [error, setError] = useState<string | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(true);
 
+  // RoomIdからEventData（Roomの情報）を呼び出す
   useEffect(() => {
     let isActive = true;
 
@@ -65,6 +66,7 @@ export const EventDetailDialog = ({
     }
   };
 
+  // Loading中
   if (isLoading) {
     return (
       <Dialog open={isDetailDialogOpen} onOpenChange={handleOpenChange}>
@@ -78,6 +80,7 @@ export const EventDetailDialog = ({
     );
   }
 
+  // エラー発生
   if (error || !eventData) {
     return (
       <Dialog open={isDetailDialogOpen} onOpenChange={handleOpenChange}>
@@ -93,6 +96,7 @@ export const EventDetailDialog = ({
     );
   }
 
+  // 本当の部分
   return (
     <Dialog open={isDetailDialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent

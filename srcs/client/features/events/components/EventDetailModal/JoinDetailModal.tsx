@@ -51,17 +51,10 @@ export const JoinDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
       >
         {(eventData) => (
           <>
-            <DialogHeader className='gap-0.5'>
-              <DialogTitle>{eventData.title}</DialogTitle>
-              <DialogDescription>イベントの詳細情報</DialogDescription>
-              <DialogIconAction
-                variant='destructive'
-                className='top-6 right-6'
-                onClick={() => setIsLeaveDialogOpen(true)}
-              >
-                <LogOut className='h-5 w-5' />
-              </DialogIconAction>
-            </DialogHeader>
+            <JoinEventHeader
+              title={eventData.title}
+              onLeaveClick={() => setIsLeaveDialogOpen(true)}
+            />
             <EventDetailContent eventData={eventData} />
           </>
         )}
@@ -75,3 +68,22 @@ export const JoinDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
     </>
   );
 };
+
+type JoinEventHeaderProps = {
+  title: string;
+  onLeaveClick: () => void;
+};
+
+const JoinEventHeader = ({ title, onLeaveClick }: JoinEventHeaderProps) => (
+  <DialogHeader className='gap-0.5'>
+    <DialogTitle>{title}</DialogTitle>
+    <DialogDescription>イベントの詳細情報</DialogDescription>
+    <DialogIconAction
+      variant='destructive'
+      className='top-6 right-6'
+      onClick={onLeaveClick}
+    >
+      <LogOut className='h-5 w-5' />
+    </DialogIconAction>
+  </DialogHeader>
+);

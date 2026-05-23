@@ -49,23 +49,41 @@ export const ExploreDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
     >
       {(eventData) => (
         <>
-          <DialogHeader className='gap-0.5'>
-            <DialogTitle>{eventData.title}</DialogTitle>
-            <DialogDescription>イベントの詳細情報</DialogDescription>
-            <DialogIconAction
-              variant='default'
-              className='top-6 right-6'
-              onClick={handleJoinAction}
-              size='sm'
-              disabled={isProcessing}
-              asChild
-            >
-              <Button>参加</Button>
-            </DialogIconAction>
-          </DialogHeader>
+          <ExploreEventHeader
+            title={eventData.title}
+            onJoinClick={handleJoinAction}
+            disabled={isProcessing}
+          />
           <EventDetailContent eventData={eventData} />
         </>
       )}
     </EventDetailDialog>
   );
 };
+
+type ExploreEventHeaderProps = {
+  title: string;
+  onJoinClick: () => void;
+  disabled: boolean;
+};
+
+const ExploreEventHeader = ({
+  title,
+  onJoinClick,
+  disabled,
+}: ExploreEventHeaderProps) => (
+  <DialogHeader className='gap-0.5'>
+    <DialogTitle>{title}</DialogTitle>
+    <DialogDescription>イベントの詳細情報</DialogDescription>
+    <DialogIconAction
+      variant='default'
+      className='top-6 right-6'
+      onClick={onJoinClick}
+      size='sm'
+      disabled={disabled}
+      asChild
+    >
+      <Button>参加</Button>
+    </DialogIconAction>
+  </DialogHeader>
+);

@@ -46,17 +46,10 @@ export const HostDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
           />
         ) : (
           <>
-            <DialogHeader className='gap-0.5'>
-              <DialogTitle>{eventData.title}</DialogTitle>
-              <DialogDescription>イベントの詳細情報</DialogDescription>
-              <DialogIconAction
-                variant='secondary'
-                className='top-6 right-6'
-                onClick={() => setIsEditing(true)}
-              >
-                <PenBoxIcon className='h-5 w-5' />
-              </DialogIconAction>
-            </DialogHeader>
+            <HostEventHeader
+              title={eventData.title}
+              onEditClick={() => setIsEditing(true)}
+            />
             <EventDetailContent eventData={eventData} />
           </>
         )
@@ -64,3 +57,22 @@ export const HostDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
     </EventDetailDialog>
   );
 };
+
+type HostEventHeaderProps = {
+  title: string;
+  onEditClick: () => void;
+};
+
+const HostEventHeader = ({ title, onEditClick }: HostEventHeaderProps) => (
+  <DialogHeader className='gap-0.5'>
+    <DialogTitle>{title}</DialogTitle>
+    <DialogDescription>イベントの詳細情報</DialogDescription>
+    <DialogIconAction
+      variant='secondary'
+      className='top-6 right-6'
+      onClick={onEditClick}
+    >
+      <PenBoxIcon className='h-5 w-5' />
+    </DialogIconAction>
+  </DialogHeader>
+);
