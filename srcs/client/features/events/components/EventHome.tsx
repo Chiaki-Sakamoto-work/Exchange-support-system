@@ -11,7 +11,6 @@ import {
 import { toEventCardViewModel } from '../libs/eventCard';
 import { EventCard } from './EventCard';
 import { EventCardList } from './EventCardList';
-import { EventDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 
@@ -186,22 +185,14 @@ export const EventHome = () => {
         </div>
 
         {/* モーダル部分 */}
-        {selectedRoomId !== null &&
-          (modalMode === 'explore' ? (
-            <EventDetailModal
-              roomId={selectedRoomId}
-              mode={modalMode}
-              onClose={() => setSelectedRoomId(null)}
-              onSuccess={fetchAllData}
-            />
-          ) : (
-            <RoomInteractiveOverlay
-              roomId={selectedRoomId}
-              mode={modalMode}
-              onClose={() => setSelectedRoomId(null)}
-              onSuccess={fetchAllData}
-            />
-          ))}
+        {selectedRoomId !== null && (
+          <RoomInteractiveOverlay
+            roomId={selectedRoomId}
+            mode={modalMode}
+            onClose={() => setSelectedRoomId(null)}
+            onSuccess={fetchAllData}
+          />
+        )}
       </Tabs>
     </div>
   );
