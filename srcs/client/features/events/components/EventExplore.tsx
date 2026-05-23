@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
-import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
+import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventExplore = () => {

@@ -20,7 +20,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-export const ExploreDetailModel = ({ roomId, onClose, onSuccess }: Props) => {
+export const ExploreDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleJoinAction = async () => {
