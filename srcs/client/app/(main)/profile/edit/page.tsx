@@ -40,6 +40,8 @@ export default async function ProfileEditPage() {
       };
 
   return (
-    <ProfileEditForm initialData={initialData} departments={departmentList} />
+    <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6'>
+      <ProfileEditForm initialData={initialData} departments={departmentList} />
+    </div>
   );
 }
