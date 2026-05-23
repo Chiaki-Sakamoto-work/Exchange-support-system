@@ -11,40 +11,6 @@ import type { Room } from '@/types';
 import { EventForm } from './EventForm';
 
 type EventEditDialogContentProps = {
-<<<<<<< HEAD
-  eventData: Room;
-  onSuccess: () => void;
-  onCancel: () => void;
-};
-
-export const EventEditDialogContent = ({
-  eventData,
-  onCancel,
-  onSuccess,
-}: EventEditDialogContentProps) => {
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>{eventData.title}を編集</DialogTitle>
-        <DialogDescription>内容を更新できます</DialogDescription>
-      </DialogHeader>
-      <DialogBody className='-mx-6 px-6'>
-        <EventForm
-          roomId={eventData.id}
-          initialData={eventData}
-          onSuccess={onSuccess}
-        />
-        <Button
-          type='button'
-          variant='outline'
-          className='mt-4 w-full'
-          onClick={onCancel}
-        >
-          キャンセル
-        </Button>
-      </DialogBody>
-    </>
-=======
   className?: string;
   eventData: Room;
   onSuccess: () => void;
@@ -76,6 +42,5 @@ export const EventEditDialogContent = ({
         </DialogBody>
       </DialogContent>
     </Dialog>
->>>>>>> eb97202 (refactor: ~ing (too many error now))
   );
 };
