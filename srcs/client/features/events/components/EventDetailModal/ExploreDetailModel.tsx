@@ -10,7 +10,9 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import { joinEventAction } from '../../actions/eventActions';
+import { EventDetailContent } from '../EventDetailContent';
 import { EventDetailDialog } from '../EventDetailDialog';
+import { EventDetailLoadingContentSkeleton } from '../EventLoadingSkeleton';
 
 type Props = {
   roomId: number;
@@ -18,7 +20,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-export const ExploreDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
+export const ExploreDetailModel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleJoinAction = async () => {
@@ -40,21 +42,30 @@ export const ExploreDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
   };
 
   return (
-    <EventDetailDialog roomId={roomId} onClose={onClose}>
-      <DialogHeader className='gap-0.5'>
-        <DialogTitle>{eventData.title}</DialogTitle>
-        <DialogDescription>イベントの詳細情報</DialogDescription>
-        <DialogIconAction
-          variant='default'
-          className='top-6 right-6'
-          onClick={handleJoinAction}
-          size='sm'
-          disabled={isProcessing}
-          asChild
-        >
-          <Button>参加</Button>
-        </DialogIconAction>
-      </DialogHeader>
+    <EventDetailDialog
+      roomId={roomId}
+      onClose={onClose}
+      loadingFallback={<EventDetailLoadingContentSkeleton mode='explore' />}
+    >
+      {(eventData) => (
+        <>
+          <DialogHeader className='gap-0.5'>
+            <DialogTitle>{eventData.title}</DialogTitle>
+            <DialogDescription>イベントの詳細情報</DialogDescription>
+            <DialogIconAction
+              variant='default'
+              className='top-6 right-6'
+              onClick={handleJoinAction}
+              size='sm'
+              disabled={isProcessing}
+              asChild
+            >
+              <Button>参加</Button>
+            </DialogIconAction>
+          </DialogHeader>
+          <EventDetailContent eventData={eventData} />
+        </>
+      )}
     </EventDetailDialog>
   );
 };

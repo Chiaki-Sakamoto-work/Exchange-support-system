@@ -11,9 +11,10 @@ import {
 import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
 import { EventCardList } from './EventCardList';
-import { EventDetailModal } from './EventDetailModal/EventDetailModel';
+import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
+import { HostDetailModal } from './EventDetailModal/HostDetailModal';
+import { JoinDetailModal } from './EventDetailModal/JoinDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
-import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -85,6 +86,28 @@ export const EventHome = () => {
       : filter === 'joined'
         ? '他人が開催した予定はありません'
         : '参加予定のイベントはありません';
+
+  const renderDetailModal = () => {
+    if (selectedRoomId === null) {
+      return null;
+    }
+
+    const detailModalProps = {
+      roomId: selectedRoomId,
+      onClose: () => setSelectedRoomId(null),
+      onSuccess: fetchAllData,
+    };
+
+    if (modalMode === 'hosted') {
+      return <HostDetailModal {...detailModalProps} />;
+    }
+
+    if (modalMode === 'joined') {
+      return <JoinDetailModal {...detailModalProps} />;
+    }
+
+    return <ExploreDetailModal {...detailModalProps} />;
+  };
 
   return (
     <div className='flex h-full min-h-0 flex-col '>

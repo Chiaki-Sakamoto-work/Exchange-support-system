@@ -9,7 +9,9 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import { cancelParticipationAction } from '../../actions/eventActions';
+import { EventDetailContent } from '../EventDetailContent';
 import { EventDetailDialog } from '../EventDetailDialog';
+import { EventDetailLoadingContentSkeleton } from '../EventLoadingSkeleton';
 import { ExitEventAlertDialog } from '../ExitEventAlertDialog';
 
 type Props = {
@@ -42,18 +44,27 @@ export const JoinDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
 
   return (
     <>
-      <EventDetailDialog roomId={roomId} onClose={onClose}>
-        <DialogHeader className='gap-0.5'>
-          <DialogTitle>{eventData.title}</DialogTitle>
-          <DialogDescription>イベントの詳細情報</DialogDescription>
-          <DialogIconAction
-            variant='destructive'
-            className='top-6 right-6'
-            onClick={() => setIsLeaveDialogOpen(true)}
-          >
-            <LogOut className='h-5 w-5' />
-          </DialogIconAction>
-        </DialogHeader>
+      <EventDetailDialog
+        roomId={roomId}
+        onClose={onClose}
+        loadingFallback={<EventDetailLoadingContentSkeleton mode='joined' />}
+      >
+        {(eventData) => (
+          <>
+            <DialogHeader className='gap-0.5'>
+              <DialogTitle>{eventData.title}</DialogTitle>
+              <DialogDescription>イベントの詳細情報</DialogDescription>
+              <DialogIconAction
+                variant='destructive'
+                className='top-6 right-6'
+                onClick={() => setIsLeaveDialogOpen(true)}
+              >
+                <LogOut className='h-5 w-5' />
+              </DialogIconAction>
+            </DialogHeader>
+            <EventDetailContent eventData={eventData} />
+          </>
+        )}
       </EventDetailDialog>
       <ExitEventAlertDialog
         isLeaveDialogOpen={isLeaveDialogOpen}

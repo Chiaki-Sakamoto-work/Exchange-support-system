@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
-import { EventDetailModal } from './EventDetailModal/EventDetailModel';
+import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventExplore = () => {
@@ -67,9 +67,8 @@ export const EventExplore = () => {
 
       {/* モーダルの表示（mode は 'explore' 固定で渡す） */}
       {selectedRoomId !== null && (
-        <EventDetailModal
+        <ExploreDetailModal
           roomId={selectedRoomId}
-          mode='explore'
           onClose={() => setSelectedRoomId(null)}
           onSuccess={() => {
             setSelectedRoomId(null); // モーダルを閉じて

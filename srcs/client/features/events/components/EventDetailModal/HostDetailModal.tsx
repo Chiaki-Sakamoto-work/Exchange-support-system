@@ -8,8 +8,10 @@ import {
   DialogIconAction,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { EventDetailContent } from '../EventDetailContent';
 import { EventDetailDialog } from '../EventDetailDialog';
 import { EventEditDialogContent } from '../EventEditDialogContent';
+import { EventDetailLoadingContentSkeleton } from '../EventLoadingSkeleton';
 
 type Props = {
   roomId: number;
@@ -19,38 +21,46 @@ type Props = {
 
 export const HostDetailModal = ({ roomId, onClose, onSuccess }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
-      setIsEditing(false);
-    }
+
+  const handleClose = () => {
+    setIsEditing(false);
+    onClose();
   };
 
   return (
-    <>
-      {isEditing ? (
-        <EventEditDialogContent
-          eventData={eventData}
-          onSuccess={() => {
-            onSuccess();
-            setIsEditing(false);
-          }}
-          onOpenChange={onOpenChange}
-        />
-      ) : (
-        <EventDetailDialog roomId={roomId} onClose={onClose}>
-          <DialogHeader className='gap-0.5'>
-            <DialogTitle>{eventData.title}</DialogTitle>
-            <DialogDescription>イベントの詳細情報</DialogDescription>
-            <DialogIconAction
-              variant='secondary'
-              className='top-6 right-6'
-              onClick={() => setIsEditing(true)}
-            >
-              <PenBoxIcon className='h-5 w-5' />
-            </DialogIconAction>
-          </DialogHeader>
-        </EventDetailDialog>
-      )}
-    </>
+    <EventDetailDialog
+      roomId={roomId}
+      onClose={handleClose}
+      loadingFallback={<EventDetailLoadingContentSkeleton mode='hosted' />}
+      preventOutsideClose={isEditing}
+    >
+      {(eventData) =>
+        isEditing ? (
+          <EventEditDialogContent
+            eventData={eventData}
+            onSuccess={() => {
+              onSuccess();
+              setIsEditing(false);
+            }}
+            onCancel={() => setIsEditing(false)}
+          />
+        ) : (
+          <>
+            <DialogHeader className='gap-0.5'>
+              <DialogTitle>{eventData.title}</DialogTitle>
+              <DialogDescription>イベントの詳細情報</DialogDescription>
+              <DialogIconAction
+                variant='secondary'
+                className='top-6 right-6'
+                onClick={() => setIsEditing(true)}
+              >
+                <PenBoxIcon className='h-5 w-5' />
+              </DialogIconAction>
+            </DialogHeader>
+            <EventDetailContent eventData={eventData} />
+          </>
+        )
+      }
+    </EventDetailDialog>
   );
 };
