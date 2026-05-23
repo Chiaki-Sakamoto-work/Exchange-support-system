@@ -4,5 +4,5 @@ export type {
   UserBadgeVariant,
 } from './UserBadge';
 export { UserBadge } from './UserBadge';
-export type { UserBadgeViewModel } from './UserBadge.viewmodel';
-export { toUserBadgeViewModel } from './UserBadge.viewmodel';
+export type { UserBadgeViewModel } from './userBadge.viewmodel';
+export { toUserBadgeViewModel } from './userBadge.viewmodel';

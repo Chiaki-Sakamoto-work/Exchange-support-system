@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
-import type { EventCardViewModel } from './EventCard.viewmodel';
+import type { EventCardViewModel } from './eventCard.viewmodel';
 
 export type EventCardProps = {
   event: EventCardViewModel;
