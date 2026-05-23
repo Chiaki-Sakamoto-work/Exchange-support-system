@@ -3,9 +3,8 @@
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
-import { EventCard } from './EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
-import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModal';
+import { EventCard, toEventCardViewModel } from './EventCard';
+import { ExploreDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventExplore = () => {

@@ -8,12 +8,13 @@ import {
   getHostedEvents,
   getJoinedEvents,
 } from '../actions/eventActions';
-import { EventCard } from './EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
+import { EventCard, toEventCardViewModel } from './EventCard';
 import { EventCardList } from './EventCardList';
-import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModal';
-import { HostDetailModal } from './EventDetailModal/HostDetailModal';
-import { JoinDetailModal } from './EventDetailModal/JoinDetailModal';
+import {
+  ExploreDetailModal,
+  HostDetailModal,
+  JoinDetailModal,
+} from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventHome = () => {
