@@ -4,7 +4,7 @@ import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
 import { EventCard } from './EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
+import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
 import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 

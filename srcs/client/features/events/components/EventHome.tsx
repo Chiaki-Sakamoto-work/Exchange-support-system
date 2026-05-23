@@ -9,7 +9,7 @@ import {
   getJoinedEvents,
 } from '../actions/eventActions';
 import { EventCard } from './EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
+import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
 import { HostDetailModal } from './EventDetailModal/HostDetailModal';

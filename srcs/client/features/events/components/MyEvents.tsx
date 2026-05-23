@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import { EventCard } from '@/features/events/components/EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
+import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { EventForm } from './EventForm';
 
