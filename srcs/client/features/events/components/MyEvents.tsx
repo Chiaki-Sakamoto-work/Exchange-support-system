@@ -4,18 +4,12 @@ import type { Room } from '@type';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import {
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/Dialog';
+import { Dialog, DialogContent } from '@/components/ui/Dialog';
 import { EventCard } from '@/features/events/components/EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodel';
 import { EventCardList } from './EventCardList';
-import { EventForm } from './EventForm';
+import { EventCreateDialogContent } from './EventCreateDialogContent';
+import { EventEditDialogContent } from './EventEditDialogContent';
 
 type Props = {
   onSuccess?: () => void;
@@ -61,41 +55,27 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         onOpenChange={() => setEditingEvent(null)}
       >
         <DialogContent preventOutsideClose>
-          <DialogHeader>
-            <DialogTitle>イベントを編集</DialogTitle>
-            <DialogDescription>内容を更新できます</DialogDescription>
-          </DialogHeader>
-          <DialogBody className='-mx-6 px-6'>
-            {editingEvent && (
-              <EventForm
-                roomId={editingEvent.id}
-                initialData={editingEvent}
-                onSuccess={() => {
-                  setEditingEvent(null);
-                  onSuccess?.();
-                }}
-              />
-            )}
-          </DialogBody>
+          {editingEvent && (
+            <EventEditDialogContent
+              eventData={editingEvent}
+              onCancel={() => setEditingEvent(null)}
+              onSuccess={() => {
+                setEditingEvent(null);
+                onSuccess?.();
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent preventOutsideClose>
-          <DialogHeader>
-            <DialogTitle>イベントを作成</DialogTitle>
-            <DialogDescription>
-              新しいイベントの情報を入力してください
-            </DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <EventForm
-              onSuccess={() => {
-                setIsCreateOpen(false);
-                onSuccess?.();
-              }}
-            />
-          </DialogBody>
+          <EventCreateDialogContent
+            onSuccess={() => {
+              setIsCreateOpen(false);
+              onSuccess?.();
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>
