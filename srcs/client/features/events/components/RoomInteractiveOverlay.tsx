@@ -19,6 +19,18 @@ export const RoomInteractiveOverlay = ({
 }: Props) => {
   const [activeLayer, setActiveLayer] = useState<'details' | 'chat'>('details');
 
+  const eventDetailByMode = () => {
+    const detailModalProps = {
+      roomId: roomId,
+      onClose: onClose,
+      onSuccess: onSuccess,
+    };
+    if (mode === 'hosted') return <HostDetailPanel {...detailModalProps} />;
+    else if (mode === 'joined')
+      return <JoinedDetailPanel {...detailModalProps} />;
+    else return <ExploreDetailPanel {...detailModalProps} />;
+  };
+
   return (
     <>
       {/* biome-ignore lint/a11y/noStaticElementInteractions: modal overlay */}

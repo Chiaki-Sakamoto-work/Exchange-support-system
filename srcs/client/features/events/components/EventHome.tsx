@@ -11,9 +11,6 @@ import {
 import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
 import { EventCardList } from './EventCardList';
-import { ExploreDetailModal } from './EventDetailModal/ExploreDetailModel';
-import { HostDetailModal } from './EventDetailModal/HostDetailModal';
-import { JoinDetailModal } from './EventDetailModal/JoinDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventHome = () => {
@@ -98,6 +95,7 @@ export const EventHome = () => {
       onSuccess: fetchAllData,
     };
 
+<<<<<<< HEAD
     if (modalMode === 'hosted') {
       return <HostDetailModal {...detailModalProps} />;
     }
@@ -107,6 +105,9 @@ export const EventHome = () => {
     }
 
     return <ExploreDetailModal {...detailModalProps} />;
+=======
+    return <RoomInteractiveOverlay {...roomInteractiveOverlayProps} />;
+>>>>>>> b9ea07f (refactor(lint refactor): lint refactor 󰑌)
   };
 
   return (
