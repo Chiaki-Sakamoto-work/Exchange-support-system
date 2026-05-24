@@ -18,17 +18,10 @@ export const RoomInteractiveOverlay = ({
   onSuccess,
 }: Props) => {
   const [activeLayer, setActiveLayer] = useState<'details' | 'chat'>('details');
-
-  const eventDetailByMode = () => {
-    const detailModalProps = {
-      roomId: roomId,
-      onClose: onClose,
-      onSuccess: onSuccess,
-    };
-    if (mode === 'hosted') return <HostDetailPanel {...detailModalProps} />;
-    else if (mode === 'joined')
-      return <JoinedDetailPanel {...detailModalProps} />;
-    else return <ExploreDetailPanel {...detailModalProps} />;
+  const detailModalProps = {
+    roomId: roomId,
+    onClose: onClose,
+    onSuccess: onSuccess,
   };
 
   return (
@@ -36,7 +29,7 @@ export const RoomInteractiveOverlay = ({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: modal overlay */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: modal overlay */}
       <div
-        className='fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blue-sm transition-opacity p-4 md:p-0'
+        className='fixed inset-0 z-70 flex items-center justify-center bg-black/20 backdrop-blue-sm transition-opacity p-4 md:p-0'
         onClick={onClose}
       >
         <div className='relative w-full h-[80vh] md:h-[75vh] flex justify-center'>
@@ -48,11 +41,11 @@ export const RoomInteractiveOverlay = ({
             className={`
               absolute rounded-2xl p-6 transition-all duration-500 ease-out bg-white/70 backdrop-blur-md border border-white
               w-[95%] h-[90%] top-1/2 -translate-y-1/2
-              md:w-[400px] md:h-[400px] md:left-80 top-1/2 -translate-y-1/2
+              md:w-[500px] md:h-[550px] md:left-80 top-1/2 -translate-y-1/2
               ${
                 activeLayer === 'details'
-                  ? 'z-50 opacity-100 shadow-2xl scale-100 md:scale-105'
-                  : 'z-40 opacity-80 md:opacity-85 shadow-lg scale-95 md:scale-100 cursor-pointer hover:opacity-100'
+                  ? 'z-70 opacity-100 shadow-2xl scale-100 md:scale-105'
+                  : 'z-60 opacity-80 md:opacity-85 shadow-lg scale-95 md:scale-100 cursor-pointer hover:opacity-100'
               }
             `}
             onMouseEnter={() => setActiveLayer('details')}
@@ -66,12 +59,9 @@ export const RoomInteractiveOverlay = ({
               }
             }}
           >
-            <EventInfoPanel
-              roomId={roomId}
-              mode={mode}
-              onClose={onClose}
-              onSuccess={onSuccess}
-            />
+            {mode === 'hosted' && <HostDetailPanel {...detailModalProps} />}
+            {mode === 'joined' && <JoinedDetailPanel {...detailModalProps} />}
+            {mode === 'explore' && <ExploreDetailPanel {...detailModalProps} />}
           </div>
           {/*chat panel*/}
           {/* biome-ignore lint/a11y/useSemanticElements: panel contains nested interactive elements */}
@@ -86,8 +76,8 @@ export const RoomInteractiveOverlay = ({
 
               ${
                 activeLayer === 'chat'
-                  ? 'z-50 opacity-100 shadow-2xl scale-100 md:scale-105'
-                  : 'z-40 opacity-80 md:opacity-85 shadow-lg scale-95 md:scale-100 cursor-pointer hover:opacity-100'
+                  ? 'z-70 opacity-100 shadow-2xl scale-100 md:scale-105'
+                  : 'z-60 opacity-80 md:opacity-85 shadow-lg scale-95 md:scale-100 cursor-pointer hover:opacity-100'
               }
             `}
             onMouseEnter={() => setActiveLayer('chat')}
