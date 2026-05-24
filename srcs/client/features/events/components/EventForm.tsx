@@ -57,6 +57,7 @@ import {
   deleteEventAction,
   updateEventAction,
 } from '../actions/eventActions';
+import { DeleteEventAlertDialog } from './DeleteEventAlertDialog';
 
 type Props = {
   onSuccess: () => void;
@@ -207,14 +208,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
   const handleDelete = async () => {
     if (!roomId) return;
 
-    if (
-      !window.confirm(
-        'このイベントを削除してもよろしいですか？（この操作は取り消せません）',
-      )
-    ) {
-      return;
-    }
-
     setIsProcessing(true);
     // 先ほど確認したサーバー側の削除アクションを呼び出す
     const result = await deleteEventAction(roomId, '/create');
@@ -226,6 +219,11 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       toast.error(result?.error || '削除に失敗しました');
     }
     setIsProcessing(false);
+  };
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const handleDeleteDialogOpenChange = (open: boolean) => {
+    setIsDeleteDialogOpen(open);
   };
 
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
@@ -639,15 +637,21 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
       {roomId && (
         <Button
-          type='submit'
-          className='w-full'
-          variant='destructive'
+          type='button'
+          className='w-full bg-white border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground'
+          variant='outline'
           disabled={isProcessing}
-          onClick={handleDelete}
+          onClick={() => setIsDeleteDialogOpen(true)}
         >
           削除する
         </Button>
       )}
+      <DeleteEventAlertDialog
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        handleDeleteDialogOpenChange={handleDeleteDialogOpenChange}
+        handleConfirmDelete={handleDelete}
+        disabled={isProcessing}
+      />
     </form>
   );
 };
