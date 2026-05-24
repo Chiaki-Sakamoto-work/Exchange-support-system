@@ -28,6 +28,7 @@ import {
   getEventDetail,
   joinEventAction,
 } from '../actions/eventActions';
+import { EventEditActionMenu } from './EventEditActionMenu';
 import { EventForm } from './EventForm';
 import { EventDetailLoadingSkeleton } from './EventLoadingSkeleton';
 import { ExitEventAlertDialog } from './ExitEventAlertDialog';
@@ -169,11 +170,20 @@ export const EventInfoPanel = ({ roomId, mode, onClose, onSuccess }: Props) => {
   if (isEditing) {
     return (
       <div className='h-full flex flex-col gap-4 overflow-y-auto pr-1'>
-        <div className='flex flex-col gap-1 pb-2 border-b border-zinc-200'>
+        <div className='relative flex flex-col gap-1 border-b border-zinc-200 pb-2 pr-10'>
           <h2 className='text-xl font-bold text-zinc-900'>
             {eventData.title}を編集
           </h2>
           <p className='text-sm text-zinc-500'>内容を更新できます</p>
+          <EventEditActionMenu
+            roomId={roomId}
+            className='top-0 right-0'
+            onCancel={() => setIsEditing(false)}
+            onDeleted={() => {
+              onSuccess();
+              onClose();
+            }}
+          />
         </div>
         <div className='flex-1'>
           <EventForm
@@ -183,15 +193,9 @@ export const EventInfoPanel = ({ roomId, mode, onClose, onSuccess }: Props) => {
               onSuccess();
               setIsEditing(false); // 成功したら詳細表示に戻る
             }}
+            onCancel={() => setIsEditing(false)}
           />
         </div>
-        <Button
-          variant='outline'
-          onClick={() => setIsEditing(false)}
-          className='w-full mt-2'
-        >
-          キャンセル
-        </Button>
       </div>
     );
   }
