@@ -32,7 +32,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
       <div className='flex shrink-0 justify-end'>
         <Button
           type='submit'
-          className='w-full bg-gray-400'
+          className='w-full bg-muted-foreground'
           variant='accent'
           onClick={() => setIsCreateOpen(true)}
           aria-label='イベントを作成'
