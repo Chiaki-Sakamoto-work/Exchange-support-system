@@ -2,7 +2,7 @@
 
 import { cancelParticipationAction } from '@feature/events/actions/eventActions';
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
-import { EventDetailLoadingSkeleton } from '@feature/events/components/EventLoadingSkeleton';
+import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
 import { ExitEventAlertDialog } from '@feature/events/components/ExitEventAlertDialog';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { LogOut } from 'lucide-react';
@@ -61,7 +61,7 @@ export const JoinedDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   };
 
   if (isLoading) {
-    return <EventDetailLoadingSkeleton mode='joined' />;
+    return <EventDetailPanelSkeleton mode='joined' />;
   }
 
   if (error || !eventData) {
