@@ -175,7 +175,7 @@ export const EventForm = ({
       if (selectedDate < now) {
         // エラーメッセージを出して、ここで処理を強制ストップ
         toast.error('開催日時に過去の時間は指定できません');
-        return; 
+        return;
       }
     }
 
