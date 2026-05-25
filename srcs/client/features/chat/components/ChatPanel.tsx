@@ -95,7 +95,7 @@ export const ChatPanel = ({ roomId }: Props) => {
   }, [messages]);
 
   // メッセージ送信処理
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const textToSend = inputText;
