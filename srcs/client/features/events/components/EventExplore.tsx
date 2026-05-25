@@ -3,9 +3,8 @@
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { getExploreEvents } from '../actions/eventActions';
-import { toEventCardViewModel } from '../libs/eventCard';
-import { EventCard } from './EventCard';
-import { EventDetailModal } from './EventDetailModal';
+import { EventCard, toEventCardViewModel } from './EventCard';
+import { ExploreDetailModal } from './EventDetailModal';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventExplore = () => {
@@ -67,9 +66,8 @@ export const EventExplore = () => {
 
       {/* モーダルの表示（mode は 'explore' 固定で渡す） */}
       {selectedRoomId !== null && (
-        <EventDetailModal
+        <ExploreDetailModal
           roomId={selectedRoomId}
-          mode='explore'
           onClose={() => setSelectedRoomId(null)}
           onSuccess={() => {
             setSelectedRoomId(null); // モーダルを閉じて

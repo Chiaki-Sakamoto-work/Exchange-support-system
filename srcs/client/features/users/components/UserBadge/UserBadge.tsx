@@ -1,19 +1,14 @@
 import type * as React from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
-import { UserAvatar } from './UserAvatar';
+import { UserAvatar } from '../UserAvatar';
+import type { UserBadgeViewModel } from './userBadge.viewmodel';
 
 type UserBadgeVariant = 'default' | 'accept' | 'destructive' | 'secondary';
 type UserBadgeLeadingVisual = 'avatar' | 'dot';
 
-type UserBadgeUser = {
-  name: string;
-  avatarUrl?: string | null;
-  isNewRecruit?: boolean;
-};
-
 type UserBadgeProps = {
-  user: UserBadgeUser;
+  user: UserBadgeViewModel;
   variant?: UserBadgeVariant;
   label?: React.ReactNode;
   leadingVisual?: UserBadgeLeadingVisual;
@@ -98,7 +93,7 @@ function UserBadgeContent({
   label,
   leadingVisual,
 }: {
-  user: UserBadgeUser;
+  user: UserBadgeViewModel;
   label?: React.ReactNode;
   leadingVisual: UserBadgeLeadingVisual;
 }) {
@@ -135,7 +130,7 @@ function UserBadgeContent({
 export type {
   UserBadgeLeadingVisual,
   UserBadgeProps,
-  UserBadgeUser,
   UserBadgeVariant,
+  UserBadgeViewModel,
 };
 export { UserBadge };

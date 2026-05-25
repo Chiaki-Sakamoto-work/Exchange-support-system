@@ -88,62 +88,72 @@ export const EventDetailLoadingSkeleton = ({
       showCloseButton={false}
       className='max-h-[80vh]'
     >
-      <span className='sr-only'>読み込み中</span>
-
-      <div>
-        <DialogHeader className='gap-0.5'>
-          <DialogTitle>
-            <SkeletonBlock className='h-5 w-2/3 rounded-md' />
-          </DialogTitle>
-          <DialogDescription asChild>
-            <SkeletonBlock className='h-4 w-32 rounded-md' />
-          </DialogDescription>
-
-          <SkeletonBlock
-            className={cn(
-              'absolute top-6 right-6 rounded-full',
-              mode === 'explore' ? 'h-9 w-18' : 'size-8',
-            )}
-          />
-        </DialogHeader>
-
-        <DialogBody className='flex flex-col gap-6'>
-          <Card
-            size='default'
-            variant='secondary shadow-none'
-            className='min-h-0! overflow-visible! py-2!'
-          >
-            <CardContent className='flex-none! gap-0'>
-              {Array.from({ length: 3 }, (_, index) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <this is only used skeleton>
-                  key={index}
-                  className={cn(
-                    'flex items-center gap-3 py-3',
-                    index < 2 && 'border-b border-border',
-                  )}
-                >
-                  <SkeletonBlock className='size-4 shrink-0 rounded-md' />
-                  <SkeletonBlock className='h-4 w-14 rounded-md' />
-                  <SkeletonBlock className='ml-auto h-4 w-28 rounded-md' />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <div className='flex flex-col gap-3'>
-            <SkeletonBlock className='h-4 w-14 rounded-md' />
-            <div className='flex flex-wrap gap-2'>
-              <SkeletonBlock className='h-8 w-24 rounded-full' />
-              <SkeletonBlock className='h-8 w-28 rounded-full' />
-              <SkeletonBlock className='h-8 w-20 rounded-full' />
-              <SkeletonBlock className='h-8 w-24 rounded-full' />
-            </div>
-          </div>
-        </DialogBody>
-      </div>
+      <EventDetailLoadingContentSkeleton mode={mode} />
     </DialogContent>
   </Dialog>
+);
+
+export const EventDetailLoadingContentSkeleton = ({
+  mode,
+}: {
+  mode: EventDetailLoadingSkeletonMode;
+}) => (
+  <>
+    <span className='sr-only'>読み込み中</span>
+
+    <div>
+      <DialogHeader className='gap-0.5'>
+        <DialogTitle>
+          <SkeletonBlock className='h-5 w-2/3 rounded-md' />
+        </DialogTitle>
+        <DialogDescription asChild>
+          <SkeletonBlock className='h-4 w-32 rounded-md' />
+        </DialogDescription>
+
+        <SkeletonBlock
+          className={cn(
+            'absolute top-6 right-6 rounded-full',
+            mode === 'explore' ? 'h-9 w-18' : 'size-8',
+          )}
+        />
+      </DialogHeader>
+
+      <DialogBody className='flex flex-col gap-6'>
+        <Card
+          size='default'
+          variant='secondary shadow-none'
+          className='min-h-0! overflow-visible! py-2!'
+        >
+          <CardContent className='flex-none! gap-0'>
+            {Array.from({ length: 3 }, (_, index) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: <this is only used skeleton>
+                key={index}
+                className={cn(
+                  'flex items-center gap-3 py-3',
+                  index < 2 && 'border-b border-border',
+                )}
+              >
+                <SkeletonBlock className='size-4 shrink-0 rounded-md' />
+                <SkeletonBlock className='h-4 w-14 rounded-md' />
+                <SkeletonBlock className='ml-auto h-4 w-28 rounded-md' />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <div className='flex flex-col gap-3'>
+          <SkeletonBlock className='h-4 w-14 rounded-md' />
+          <div className='flex flex-wrap gap-2'>
+            <SkeletonBlock className='h-8 w-24 rounded-full' />
+            <SkeletonBlock className='h-8 w-28 rounded-full' />
+            <SkeletonBlock className='h-8 w-20 rounded-full' />
+            <SkeletonBlock className='h-8 w-24 rounded-full' />
+          </div>
+        </div>
+      </DialogBody>
+    </div>
+  </>
 );
 
 export const EventLoadingSkeleton = () => {

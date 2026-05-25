@@ -8,8 +8,7 @@ import {
   getHostedEvents,
   getJoinedEvents,
 } from '../actions/eventActions';
-import { toEventCardViewModel } from '../libs/eventCard';
-import { EventCard } from './EventCard';
+import { EventCard, toEventCardViewModel } from './EventCard';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';

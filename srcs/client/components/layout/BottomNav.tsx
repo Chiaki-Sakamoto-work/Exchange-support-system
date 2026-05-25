@@ -54,6 +54,14 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
     setVisualActiveValue(activeValue);
   }, [activeValue]);
 
+  useEffect(() => {
+    for (const { href } of NAV_ITEMS) {
+      if (href !== activeValue) {
+        router.prefetch(href);
+      }
+    }
+  }, [activeValue, router]);
+
   const activeIndex = Math.max(
     NAV_ITEMS.findIndex(({ href }) => href === visualActiveValue),
     0,
@@ -65,7 +73,7 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
     gridTemplateColumns: `repeat(${TAB_COUNT}, minmax(0, 1fr))`,
   };
 
-  const handleNavigte = (href: NavItemHref) => {
+  const handleNavigate = (href: NavItemHref) => {
     setVisualActiveValue(href);
 
     if (href !== pathname) {
@@ -127,7 +135,7 @@ export const BottomNav = ({ className, listClassName }: BottomNavProps) => {
             <TabsTrigger
               key={href}
               value={href}
-              onClick={() => handleNavigte(href)}
+              onClick={() => handleNavigate(href)}
               className='z-10 h-full rounded-2xl px-2 py-2 text-muted-foreground data-active:scale-105 data-active:text-foreground'
             >
               <span className='flex flex-col items-center justify-center gap-1'>
