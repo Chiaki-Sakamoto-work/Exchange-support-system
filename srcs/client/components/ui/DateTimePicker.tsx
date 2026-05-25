@@ -151,22 +151,46 @@ function WheelColumn({
 }
 
 export function DateTimePicker({
+  id,
   value,
   onChange,
   minDate,
 }: {
+  id?: string;
   value: string;
   onChange: (v: string) => void;
   minDate?: string;
 }) {
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const timePanelRef = useRef<HTMLDivElement>(null);
   const { date, time } = parse(value);
   const [hourStr, minuteStr] = time ? time.split(':') : ['', ''];
   const hour = hourStr ? parseInt(hourStr, 10) : 19;
   const minute = minuteStr ? parseInt(minuteStr, 10) : 0;
+  const hasDate = !!date;
   const hasTime = !!time;
-  const [open, setOpen] = useState(hasTime);
+  const [open, setOpen] = useState(hasDate && hasTime);
   const [showPresets, setShowPresets] = useState(true);
+
+  useEffect(() => {
+    if (!hasDate) setOpen(false);
+  }, [hasDate]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const panel = timePanelRef.current;
+      const target = event.target;
+      if (!panel || !(target instanceof Node) || panel.contains(target)) return;
+      setOpen(false);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [open]);
 
   const openDatePicker = () => {
     const el = dateInputRef.current;
@@ -183,8 +207,24 @@ export function DateTimePicker({
   };
 
   const setHm = (h: number, m: number) => {
+    if (!date) return;
     const t = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     onChange(format(date, t));
+  };
+
+  const selectPreset = (preset: string) => {
+    if (!date) return;
+    onChange(format(date, preset));
+    setOpen(false);
+  };
+
+  const handleDateChange = (nextDate: string) => {
+    if (!nextDate) {
+      onChange('');
+      setOpen(false);
+      return;
+    }
+    onChange(format(nextDate, time));
   };
 
   const clearTime = () => {
@@ -202,126 +242,141 @@ export function DateTimePicker({
       >
         <Calendar className='w-4 h-4 text-muted-foreground shrink-0' />
         <input
+          id={id}
           ref={dateInputRef}
           type='date'
           value={date}
           min={minDate}
-          onChange={(e) => onChange(format(e.target.value, time))}
+          onChange={(e) => handleDateChange(e.target.value)}
           onClick={(e) => e.stopPropagation()}
           className='flex-1 bg-transparent outline-none text-sm text-foreground cursor-pointer'
         />
       </div>
 
-      {!open ? (
-        <div
-          className={`relative w-full flex items-center rounded-xl transition-colors ${
-            hasTime
-              ? 'bg-card border border-border hover:border-[#3182f6] focus-within:border-[#3182f6]'
-              : 'bg-card border border-dashed border-border hover:border-[#3182f6] focus-within:border-[#3182f6] text-muted-foreground hover:text-[#3182f6]'
-          }`}
-        >
-          <button
-            type='button'
-            onClick={() => setOpen(true)}
-            className={`flex-1 flex items-center gap-2 h-12 px-3 rounded-xl outline-none ${
-              hasTime ? 'text-foreground' : 'justify-center'
+      {hasDate &&
+        (!open ? (
+          <div
+            className={`relative w-full flex items-center rounded-xl transition-colors ${
+              hasTime
+                ? 'bg-card border border-border hover:border-[#3182f6] focus-within:border-[#3182f6]'
+                : 'bg-card border border-dashed border-border hover:border-[#3182f6] focus-within:border-[#3182f6] text-muted-foreground hover:text-[#3182f6]'
             }`}
           >
-            <Clock className='w-4 h-4 shrink-0' />
-            <span className='text-sm flex-1 text-left tabular-nums'>
-              {hasTime
-                ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-                : '時間を指定する (任意)'}
-            </span>
-          </button>
-          {hasTime && (
             <button
               type='button'
-              onClick={(e) => {
-                e.stopPropagation();
-                clearTime();
-              }}
-              className='mx-3 text-[11px] text-muted-foreground hover:text-accent transition-colors relative z-10'
-              aria-label='時間をクリア'
+              onClick={() => setOpen(true)}
+              className={`flex-1 flex items-center gap-2 h-12 px-3 rounded-xl outline-none ${
+                hasTime ? 'text-foreground' : 'justify-center'
+              }`}
             >
-              クリア
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className='bg-card border border-border rounded-xl p-3 space-y-2'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2 text-muted-foreground'>
-              <Clock className='w-4 h-4' />
-              <span className='text-sm'>時間</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <span className='text-foreground tabular-nums'>
-                {String(hour).padStart(2, '0')}:
-                {String(minute).padStart(2, '0')}
+              <Clock className='w-4 h-4 shrink-0' />
+              <span className='text-sm flex-1 text-left tabular-nums'>
+                {hasTime
+                  ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+                  : '時間を指定する'}
               </span>
+            </button>
+            {hasTime && (
               <button
                 type='button'
-                onClick={() => setOpen(false)}
-                className='w-6 h-6 rounded-full bg-secondary text-muted-foreground hover:bg-foreground hover:text-white flex items-center justify-center transition-colors'
-                aria-label='時間UIを閉じる'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  clearTime();
+                }}
+                className='mx-3 text-[11px] text-muted-foreground hover:text-accent transition-colors relative z-10'
+                aria-label='時間をクリア'
               >
-                <X className='w-3 h-3' />
+                クリア
               </button>
-            </div>
-          </div>
-
-          <div className='flex items-stretch gap-2 bg-secondary rounded-lg px-2 py-1'>
-            <WheelColumn
-              values={HOURS}
-              selected={hour}
-              onSelect={(h) => setHm(h, minute)}
-            />
-            <div className='flex items-center justify-center text-muted-foreground tabular-nums'>
-              :
-            </div>
-            <WheelColumn
-              values={MINUTES}
-              selected={minute}
-              onSelect={(m) => setHm(hour, m)}
-            />
-          </div>
-
-          <div className='flex items-center justify-between pt-1'>
-            <button
-              type='button'
-              onClick={() => setShowPresets((s) => !s)}
-              className='flex items-center gap-1 text-[11px] text-muted-foreground hover:text-accent transition-colors'
-            >
-              <Sparkles className='w-3 h-3' />
-              <span>
-                {showPresets ? 'プリセットを隠す' : 'プリセットを表示'}
-              </span>
-            </button>
-            {showPresets && (
-              <div className='flex flex-wrap gap-1 justify-end'>
-                {PRESETS.map((p) => {
-                  const active = time === p;
-                  return (
-                    <button
-                      key={p}
-                      type='button'
-                      onClick={() => onChange(format(date, p))}
-                      className={`px-2 py-0.5 rounded-full text-[11px] tabular-nums transition-colors ${
-                        active
-                          ? 'bg-accent text-white'
-                          : 'bg-secondary text-muted-foreground hover:bg-foreground hover:text-white'
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-              </div>
             )}
           </div>
-        </div>
-      )}
+        ) : (
+          // biome-ignore lint/a11y/useKeyWithClickEvents: Custom picker chrome closes when clicked.
+          // biome-ignore lint/a11y/noStaticElementInteractions: Custom picker chrome closes when clicked.
+          <div
+            ref={timePanelRef}
+            className='bg-card border border-border rounded-xl p-3 space-y-2'
+            onClick={() => setOpen(false)}
+          >
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-2 text-muted-foreground'>
+                <Clock className='w-4 h-4' />
+                <span className='text-sm'>時間</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <span className='text-foreground tabular-nums'>
+                  {String(hour).padStart(2, '0')}:
+                  {String(minute).padStart(2, '0')}
+                </span>
+                <button
+                  type='button'
+                  onClick={() => setOpen(false)}
+                  className='w-6 h-6 rounded-full bg-secondary text-muted-foreground hover:bg-foreground hover:text-white flex items-center justify-center transition-colors'
+                  aria-label='時間UIを閉じる'
+                >
+                  <X className='w-3 h-3' />
+                </button>
+              </div>
+            </div>
+
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: Wheel interactions should not close the picker. */}
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: Wheel interactions should not close the picker. */}
+            <div
+              className='flex items-stretch gap-2 bg-secondary rounded-lg px-2 py-1'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <WheelColumn
+                values={HOURS}
+                selected={hour}
+                onSelect={(h) => setHm(h, minute)}
+              />
+              <div className='flex items-center justify-center text-muted-foreground tabular-nums'>
+                :
+              </div>
+              <WheelColumn
+                values={MINUTES}
+                selected={minute}
+                onSelect={(m) => setHm(hour, m)}
+              />
+            </div>
+
+            <div className='flex items-center justify-between pt-1'>
+              <button
+                type='button'
+                onClick={() => {
+                  setShowPresets((s) => !s);
+                }}
+                className='flex items-center gap-1 text-[11px] text-muted-foreground hover:text-accent transition-colors'
+              >
+                <Sparkles className='w-3 h-3' />
+                <span>
+                  {showPresets ? 'プリセットを隠す' : 'プリセットを表示'}
+                </span>
+              </button>
+              {showPresets && (
+                <div className='flex flex-wrap gap-1 justify-end'>
+                  {PRESETS.map((p) => {
+                    const active = time === p;
+                    return (
+                      <button
+                        key={p}
+                        type='button'
+                        onClick={() => selectPreset(p)}
+                        className={`px-2 py-0.5 rounded-full text-[11px] tabular-nums transition-colors ${
+                          active
+                            ? 'bg-accent text-white'
+                            : 'bg-secondary text-muted-foreground hover:bg-foreground hover:text-white'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
     </div>
   );
 }
