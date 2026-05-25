@@ -1,7 +1,11 @@
 export const formatDate = (date: Date | null) => {
   if (!date) return '日時未定';
 
-  const d = new Date(date);
+  const jstDateString = new Date(date).toLocaleString('en-US', {
+    timeZone: 'Asia/Tokyo',
+  });
+
+  const d = new Date(jstDateString);
 
   const yyyy = d.getFullYear();
 
