@@ -42,9 +42,7 @@ function Input({
   const { className: buttonClassName, ...buttonRestProps } = buttonProps || {};
 
   return (
-    <div
-      className={cn('relative union flex items-center w-full peer', className)}
-    >
+    <div className={cn('relative union flex items-center w-full peer')}>
       {/* アイコンがある場合、入力欄の左側に絶対配置で表示 */}
       {icon && (
         <div className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10'>

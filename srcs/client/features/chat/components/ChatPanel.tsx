@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
+import { SpeechBubble } from './SpeechBubble';
 
 type Props = {
   roomId: number;
@@ -56,8 +57,19 @@ export const ChatPanel = ({ roomId }: Props) => {
           table: 'messages',
           filter: `room_id=eq.${roomId}`,
         },
-        (payload) => {
-          const newMessage = payload.new as ChatMessage;
+        async (payload) => {
+          const rawMessage = payload.new;
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', rawMessage.user_id)
+            .single();
+
+          const newMessage = {
+            ...rawMessage,
+            profiles: profile,
+          } as ChatMessage;
 
           setMessages((prev) => {
             const isExist = prev.some((msg) => msg.id === newMessage.id);
@@ -83,17 +95,26 @@ export const ChatPanel = ({ roomId }: Props) => {
   }, [messages]);
 
   // メッセージ送信処理
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
-    setIsSending(true);
-    try {
-      const newMessage = await sendMessage(roomId, inputText);
 
-      setMessages((prev) => [...prev, newMessage]);
-      setInputText('');
+    const textToSend = inputText;
+    if (!textToSend.trim()) return;
+
+    setInputText('');
+    setIsSending(true);
+
+    try {
+      const newMessage = await sendMessage(roomId, textToSend);
+
+      setMessages((prev) => {
+        const isExist = prev.some((msg) => msg.id === newMessage.id);
+        if (isExist) return prev;
+        return [...prev, newMessage];
+      });
     } catch (_error) {
       toast.error('送信に失敗しました');
+      setInputText(textToSend);
     } finally {
       setIsSending(false);
     }
@@ -101,9 +122,9 @@ export const ChatPanel = ({ roomId }: Props) => {
 
   return (
     <div className='flex flex-col h-full w-full relative'>
-      <div className='flex items-center pb-3 border-b border-zinc-200/60 shrink-0'>
-        <h3 className='text-lg font-bold text-zinc-800'>チャット</h3>
-        <span className='ml-3 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full'>
+      <div className='flex items-center pb-3 border-b border-muted/60 shrink-0'>
+        <h3 className='text-lg font-bold text-muted-foreground'>チャット</h3>
+        <span className='ml-3 px-2 py-0.5 text-xs font-semibold bg-accent/10 text-accent rounded-full'>
           {messages.length}件
         </span>
       </div>
@@ -111,7 +132,12 @@ export const ChatPanel = ({ roomId }: Props) => {
       {/* メッセージタイムライン（スクロールエリア） */}
       <div
         ref={scrollRef}
-        className='flex-1 overflow-y-auto py-4 space-y-4 pr-2 scroll-smooth'
+        className='flex-1 overflow-y-auto py-4 space-y-4 pr-2 scroll-smooth 
+                   [&::-webkit-scrollbar]:w-1.5 
+                   [&::-webkit-scrollbar-track]:bg-transparent 
+                   [&::-webkit-scrollbar-thumb]:bg-zinc-300 
+                   dark:[&::-webkit-scrollbar-thumb]:bg-zinc-700 
+                   [&::-webkit-scrollbar-thumb]:rounded-full'
       >
         {isLoading ? (
           <div className='text-center text-sm text-zinc-500 mt-4'>
@@ -125,30 +151,7 @@ export const ChatPanel = ({ roomId }: Props) => {
           messages.map((msg) => {
             const isMyMessage = msg.user_id === currentUserId;
             return (
-              <div
-                key={msg.id}
-                className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`flex flex-col max-w-[75%] ${isMyMessage ? 'items-end' : 'items-start'}`}
-                >
-                  {!isMyMessage && (
-                    <span className='text-xs text-zinc-500 mb-1 ml-1'>
-                      {msg.profiles?.username}
-                    </span>
-                  )}
-                  {/* 吹き出し */}
-                  <div
-                    className={`px-4 py-2 rounded-2xl text-sm shadow-sm ${
-                      isMyMessage
-                        ? 'bg-blue-500 text-white rounded-br-sm'
-                        : 'bg-white/80 border border-zinc-200 text-zinc-800 rounded-bl-sm'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              </div>
+              <SpeechBubble key={msg.id} msg={msg} isMyMessage={isMyMessage} />
             );
           })
         )}
@@ -157,22 +160,23 @@ export const ChatPanel = ({ roomId }: Props) => {
       {/* ⌨️ 入力フォーム */}
       <form
         onSubmit={handleSendMessage}
-        className='pt-3 border-t border-zinc-200/60 mt-auto shrink-0 flex gap-2'
+        className='pt-3 border-t border-muted mt-auto shrink-0 flex gap-2 items-center'
       >
         <Input
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder='メッセージを入力...'
-          disabled={isSending}
-          className='flex-1 bg-white/80 border-zinc-300 focus-visible:ring-blue-500 shadow-sm'
+          // disabled={isSending}
+          className='flex-1 border-muted focus-visible:ring-accent shadow-sm'
         />
         <Button
           type='submit'
+          variant='accent'
           disabled={isSending || !inputText.trim()}
-          size='icon'
-          className='bg-blue-600 hover:bg-blue-700 text-white rounded-full shrink-0 shadow-sm transition-all'
+          size='icon-lg'
+          className='text-white shrink-0 shadow-sm transition-all'
         >
-          <Send className='h-4 w-4' />
+          <Send className='h-5 w-5' />
         </Button>
       </form>
     </div>
