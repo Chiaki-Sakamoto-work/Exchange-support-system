@@ -1,6 +1,7 @@
 'use client';
 
 import type { Room } from '@type';
+import { DialogBody } from '@/components/ui/Dialog';
 import { EventDetailAllergySection } from './EventDetailAllergySection';
 import { EventDetailParticipantsSection } from './EventDetailParticipantsSection';
 import { EventDetailSummarySection } from './EventDetailSummarySection';
