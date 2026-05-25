@@ -163,8 +163,22 @@ export const EventForm = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // 過去の時間になっていないか厳密にチェック！
+    if (formData.datetime) {
+      const selectedDate = new Date(formData.datetime);
+      const now = new Date();
+
+      // 選ばれた時間が「今」より過去だったら...
+      if (selectedDate < now) {
+        // エラーメッセージを出して、ここで処理を強制ストップ
+        toast.error('開催日時に過去の時間は指定できません');
+        return; 
+      }
+    }
+
     setIsProcessing(true);
 
     let result: { success: boolean; error?: string } | undefined;
