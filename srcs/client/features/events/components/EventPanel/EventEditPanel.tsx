@@ -1,6 +1,5 @@
 import { EventForm } from '@feature/events/components/EventForm';
 import type { Room } from '@type';
-import { Button } from '@/components/ui/Button';
 
 type EventEditPanelProps = {
   eventData: Room;

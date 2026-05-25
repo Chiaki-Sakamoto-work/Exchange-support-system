@@ -1,12 +1,12 @@
 'use client';
 
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
+import { EventEditActionMenu } from '@feature/events/components/EventEditActionMenu';
 import { EventDetailLoadingSkeleton } from '@feature/events/components/EventLoadingSkeleton';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { PenBoxIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { EventEditActionMenu } from '@feature/events/components/EventEditActionMenu';
 import { EventEditPanel } from './EventEditPanel';
 
 type Props = {

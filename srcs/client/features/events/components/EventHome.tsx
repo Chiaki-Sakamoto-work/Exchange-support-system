@@ -1,5 +1,6 @@
 'use client';
 
+import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -9,10 +10,9 @@ import {
   getJoinedEvents,
 } from '../actions/eventActions';
 import { EventCard } from './EventCard/EventCard';
-import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
+import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
-import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
