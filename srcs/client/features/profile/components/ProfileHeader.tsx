@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
+import { isStringNewRecruit } from '@/features/users/lib/profile';
 
 export interface ProfileHeaderProps {
   user: {
@@ -39,7 +40,9 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
           <div className='flex gap-2 mb-4 mt-2'>
             {user.user_type && (
               <Badge
-                variant={user.user_type === '新卒' ? 'primary' : 'secondary'}
+                variant={
+                  isStringNewRecruit(user.user_type) ? 'primary' : 'secondary'
+                }
               >
                 {user.user_type}
               </Badge>
@@ -51,15 +54,29 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => {
           </div>
 
           {user.allergies && user.allergies.length > 0 && (
-            <div className='flex flex-wrap justify-center gap-2 mb-4'>
-              {user.allergies.map((allergy: string) => (
-                <Badge
-                  key={allergy}
-                  className='bg-destructive/[0.08] text-destructive'
-                >
-                  {allergy} アレルギー
-                </Badge>
-              ))}
+            <div className='mb-4 mt-2 flex w-full flex-col items-center gap-2'>
+              <div className='flex w-full items-center justify-center gap-2 text-zinc-500 text-xs font-bold'>
+                <span
+                  aria-hidden='true'
+                  className='h-px min-w-9 flex-1 bg-zinc-200'
+                />
+                <span>アレルギー</span>
+                <span
+                  aria-hidden='true'
+                  className='h-px min-w-9 flex-1 bg-zinc-200'
+                />
+              </div>
+
+              <div className='flex flex-wrap justify-center gap-2'>
+                {user.allergies.map((allergy: string) => (
+                  <Badge
+                    key={allergy}
+                    className='bg-destructive/[0.08] text-destructive'
+                  >
+                    {allergy}
+                  </Badge>
+                ))}
+              </div>
             </div>
           )}
         </div>

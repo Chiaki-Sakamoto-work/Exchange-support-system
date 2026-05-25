@@ -27,6 +27,9 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
+  --color-yellow: var(--yellow);
+  --color-warning: var(--warning);
+
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
 
@@ -40,6 +43,13 @@
   --radius-sm: calc(var(--radius) - 4px);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --animate-skeleton-gradient: skeleton-gradient 0.8s ease-in-out infinite;
+  @keyframes skeleton-gradient {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 :root {
@@ -57,6 +67,7 @@
   --lime: #c3f933;
   --red: #f04452;
   --white: #ffffff;
+  --yellow: #ffd000;
 
   --gray-100: #f5f6f8; /* background gray */
   --gray-200: #f1f3f5; /* input background */
@@ -69,6 +80,8 @@
   /* =========================================
     Semantic Colors
      ========================================= */
+  --warning: var(--yellow);
+
   --background: var(--gray-100);
   --foreground: var(--navy);
 

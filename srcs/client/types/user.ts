@@ -1,5 +1,7 @@
 // import type { profiles, room_tags, rooms, user_rooms } from '@prisma/client';
 
+import type { BaseUserType } from '@/features/profile/schemas/profile';
+
 // export type User = profiles;
 
 // export type EventWithDetails = rooms & {
@@ -14,3 +16,5 @@
 // };
 
 // export type Participant = EventWithDetails['user_rooms'][number];
+
+export type UserType = BaseUserType | null;

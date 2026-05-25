@@ -1,9 +1,8 @@
 'use client';
 
-import { EventCard } from '@feature/events/components/EventCard';
+import type { Room } from '@type';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import type { Room } from '@/app/types';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -13,7 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { formatDate } from '@/lib/date';
+import { EventCard } from '@/features/events/components/EventCard/EventCard';
+import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
+import { EventCardList } from './EventCardList';
+import { EventCreateDialogContent } from './EventCreateDialogContent';
+import { EventEditActionMenu } from './EventEditActionMenu';
 import { EventForm } from './EventForm';
 
 type Props = {
@@ -26,11 +29,11 @@ const MyEvents = ({ events, onSuccess }: Props) => {
   const [editingEvent, setEditingEvent] = useState<Room | null>(null);
 
   return (
-    <div className='flex flex-col gap-4'>
-      <div className='flex justify-end'>
+    <div className='flex h-full min-h-0 flex-col gap-4'>
+      <div className='flex shrink-0 justify-end'>
         <Button
           type='submit'
-          className='w-full bg-gray-400'
+          className='w-full bg-muted-foreground'
           variant='accent'
           onClick={() => setIsCreateOpen(true)}
           aria-label='イベントを作成'
@@ -39,41 +42,42 @@ const MyEvents = ({ events, onSuccess }: Props) => {
           イベントを作成
         </Button>
       </div>
-      {events.map((event) => {
-        const currentHost = event.user_rooms.find((ur) => ur.is_owner);
-        const owner = currentHost?.profiles;
-        const tags = event.room_tags.map((rt) => ({
-          id: rt.tags.id,
-          name: rt.tags.name,
-        }));
-
-        return (
-          <EventCard
-            key={event.id}
-            title={event.title}
-            shop={event.location_name ?? '未定'}
-            date={formatDate(event.event_start_at)}
-            tags={tags}
-            participants={`${event._count.user_rooms}/${event.capacity_limit}`}
-            ownerProfile={{
-              name: owner?.username ?? '未定',
-              image: owner?.avatar_url ?? undefined,
-            }}
-            onClick={() => setEditingEvent(event)}
-            icon='edit'
-          />
-        );
-      })}
+      <EventCardList
+        ariaLabel='MYイベント一覧'
+        emptyMessage='作成したイベントはありません'
+        isEmpty={events.length === 0}
+      >
+        {events.map((event) => {
+          return (
+            <EventCard
+              key={event.id}
+              event={toEventCardViewModel(event)}
+              onClick={() => setEditingEvent(event)}
+              icon='edit'
+            />
+          );
+        })}
+      </EventCardList>
       <Dialog
         open={editingEvent !== null}
         onOpenChange={() => setEditingEvent(null)}
       >
-        <DialogContent preventOutsideClose>
+        <DialogContent preventOutsideClose showCloseButton={false}>
+          {editingEvent && (
+            <EventEditActionMenu
+              roomId={editingEvent.id}
+              onCancel={() => setEditingEvent(null)}
+              onDeleted={() => {
+                setEditingEvent(null);
+                onSuccess?.();
+              }}
+            />
+          )}
           <DialogHeader>
             <DialogTitle>イベントを編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
           </DialogHeader>
-          <DialogBody>
+          <DialogBody className='-mx-6 px-6'>
             {editingEvent && (
               <EventForm
                 roomId={editingEvent.id}
@@ -82,6 +86,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
                   setEditingEvent(null);
                   onSuccess?.();
                 }}
+                onCancel={() => setEditingEvent(null)}
               />
             )}
           </DialogBody>
@@ -90,20 +95,12 @@ const MyEvents = ({ events, onSuccess }: Props) => {
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent preventOutsideClose>
-          <DialogHeader>
-            <DialogTitle>イベントを作成</DialogTitle>
-            <DialogDescription>
-              新しいイベントの情報を入力してください
-            </DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <EventForm
-              onSuccess={() => {
-                setIsCreateOpen(false);
-                onSuccess?.();
-              }}
-            />
-          </DialogBody>
+          <EventCreateDialogContent
+            onSuccess={() => {
+              setIsCreateOpen(false);
+              onSuccess?.();
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>

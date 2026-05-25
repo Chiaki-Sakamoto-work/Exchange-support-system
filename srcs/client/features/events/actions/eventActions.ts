@@ -1,8 +1,8 @@
 'use server';
 
 import type { RoomStatus } from '@prisma/client';
+import { fullEventInclude } from '@type';
 import { revalidatePath } from 'next/cache';
-import { fullEventInclude } from '@/app/types';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 
@@ -14,9 +14,13 @@ export async function getHostedEvents() {
 
   if (!user) return [];
 
+  const twoHoursAgo = new Date();
+  twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+
   return await prisma.rooms.findMany({
     where: {
       user_rooms: { some: { user_id: user.id, is_owner: true } },
+      event_start_at: { gte: twoHoursAgo },
     },
     // 💡 共通の fullEventInclude を使わず、ここで個別に指定する
     include: {
@@ -53,9 +57,14 @@ export async function getJoinedEvents() {
     console.log('⚠️ ログインユーザーが見つかりません');
     return [];
   }
+
+  const twoHoursAgo = new Date();
+  twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+
   return await prisma.rooms.findMany({
     where: {
       user_rooms: { some: { user_id: user.id, is_owner: false } },
+      event_start_at: { gte: twoHoursAgo },
     },
     include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
@@ -72,7 +81,11 @@ export async function getEventDetail(roomId: number) {
       include: {
         user_rooms: {
           include: {
-            profiles: true, // 参加者のプロフィール情報（名前など）も一緒に取得
+            profiles: {
+              include: {
+                departments: true,
+              },
+            },
           },
         },
         room_tags: {
@@ -317,11 +330,14 @@ export async function getExploreEvents() {
       data: { user },
     } = await supabase.auth.getUser();
 
+    const twoHoursAgo = new Date();
+    twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
         event_start_at: {
-          gte: new Date(),
+          gte: twoHoursAgo,
         },
         user_rooms: {
           none: {

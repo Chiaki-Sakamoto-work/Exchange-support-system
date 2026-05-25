@@ -1,16 +1,17 @@
 'use client';
 
+import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
+import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
-import type { Room } from '@/app/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { formatDate } from '@/lib/date';
 import {
   getExploreEvents,
   getHostedEvents,
   getJoinedEvents,
 } from '../actions/eventActions';
-import { EventCard } from './EventCard';
-import { EventDetailModal } from './EventDetailModal';
+import { EventCard } from './EventCard/EventCard';
+import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
+import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
 
 export const EventHome = () => {
@@ -84,81 +85,73 @@ export const EventHome = () => {
         ? '他人が開催した予定はありません'
         : '参加予定のイベントはありません';
 
+  const renderDetailModal = () => {
+    if (selectedRoomId === null) {
+      return null;
+    }
+    const roomInteractiveOverlayProps = {
+      roomId: selectedRoomId,
+      mode: modalMode,
+      onClose: () => setSelectedRoomId(null),
+      onSuccess: fetchAllData,
+    };
+    return <RoomInteractiveOverlay {...roomInteractiveOverlayProps} />;
+  };
+
   return (
-    <div className=''>
+    <div className='flex h-full min-h-0 flex-col '>
       <Tabs
         value={subTab}
         onValueChange={(val) => setSubTab(val as TabMode)}
-        className='flex flex-col w-full'
+        className='flex h-full min-h-0 w-full flex-col'
       >
         {/* 🌟 タブのメニュー名を「参加する」に変更 */}
         <TabsList className='w-full h-[48px] shrink-0'>
-          <TabsTrigger value='explore'>開催中イベント</TabsTrigger>
+          <TabsTrigger value='explore'>募集中</TabsTrigger>
           <TabsTrigger value='joined'>参加予定</TabsTrigger>
         </TabsList>
 
-        <div className='w-full flex-1 grid grid-cols-1 grid-rows-1 mt-2'>
+        <div className='mt-2 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-1'>
           {/* 🌟 「参加する」タブの中身 (EventExploreから流用) */}
           <TabsContent
             value='explore'
-            className='col-start-1 row-start-1 bg-background'
+            className='col-start-1 row-start-1 flex min-h-0 flex-col  bg-background'
           >
-            {isLoading ? (
-              <div className='pt-2'>
-                <EventListLoadingSkeleton />
-              </div>
-            ) : (
-              <div className='space-y-4 pt-2'>
-                {exploreEvents.length > 0 ? (
-                  exploreEvents.map((room) => {
-                    // 主催者を安全に取得
-                    const ownerProfile = {
-                      name:
-                        room.user_rooms?.find((ur) => ur.is_owner)?.profiles
-                          ?.username || '不明',
-                    };
-                    const formattedTags = room.room_tags.map((rt) => ({
-                      id: rt.tags.id,
-                      name: rt.tags.name,
-                    }));
-
-                    return (
-                      <EventCard
-                        key={room.id}
-                        title={room.title}
-                        shop={room.location_name || '未定'}
-                        date={formatDate(room.event_start_at)}
-                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                        tags={formattedTags}
-                        ownerProfile={ownerProfile}
-                        onClick={() => {
-                          setSelectedRoomId(room.id);
-                          setModalMode('explore'); // 🌟 exploreモードでモーダルを開く
-                        }}
-                      />
-                    );
-                  })
-                ) : (
-                  <p className='text-center text-sm text-zinc-500 py-10'>
-                    現在、参加できる新しい予定はありません
-                  </p>
-                )}
-              </div>
-            )}
+            <EventCardList
+              ariaLabel='募集中イベント一覧'
+              emptyMessage='現在、参加できる新しい予定はありません'
+              isEmpty={exploreEvents.length === 0}
+              isLoading={isLoading}
+              loadingFallback={<EventListLoadingSkeleton />}
+              className='pt-2'
+            >
+              {exploreEvents.map((room) => {
+                return (
+                  <EventCard
+                    key={room.id}
+                    event={toEventCardViewModel(room)}
+                    onClick={() => {
+                      setSelectedRoomId(room.id);
+                      setModalMode('explore');
+                    }}
+                  />
+                );
+              })}
+            </EventCardList>
           </TabsContent>
 
           {/* 「参加予定」タブの中身 (前回の3分割フィルター) */}
           <TabsContent
             value='joined'
-            className='col-start-1 row-start-1 bg-background'
+            className='col-start-1 row-start-1 flex min-h-0 flex-col bg-background'
           >
             {!isLoading && (
-              <div className='sticky top-0 z-10 bg-background pt-2 pb-4 flex justify-center'>
+              <div className='z-10 flex shrink-0 justify-center bg-background pt-2 pb-2'>
                 <Tabs
                   value={filter}
                   onValueChange={(val) => setFilter(val as FilterMode)}
                 >
-                  <TabsList className='grid grid-cols-3 w-64 h-9 bg-zinc-100 p-1 rounded-full'>
+                  <TabsList className='grid grid-cols-3 w-64 h-9 bg-muted p-1 rounded-full'>
                     <TabsTrigger value='all' className='text-xs rounded-full'>
                       全て
                     </TabsTrigger>
@@ -172,67 +165,40 @@ export const EventHome = () => {
                       value='joined'
                       className='text-xs rounded-full'
                     >
-                      参加
+                      他催
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
             )}
 
-            {isLoading ? (
-              <EventListLoadingSkeleton />
-            ) : (
-              <div className='space-y-4'>
-                {displayRooms.length > 0 ? (
-                  displayRooms.map((room) => {
-                    const isMyHosted = hostedRooms.some(
-                      (h) => h.id === room.id,
-                    );
-                    const owner = room.user_rooms?.find((ur) => ur.is_owner);
-                    const ownerProfile = {
-                      name: owner?.profiles?.username || '不明',
-                      image: owner?.profiles?.avatar_url || '不明',
-                    };
-                    const formattedTags = room.room_tags.map((rt) => ({
-                      id: rt.tags.id,
-                      name: rt.tags.name,
-                    }));
-
-                    return (
-                      <EventCard
-                        key={room.id}
-                        title={room.title}
-                        shop={room.location_name || '未定'}
-                        date={formatDate(room.event_start_at)}
-                        participants={`${room._count?.user_rooms || room.user_rooms?.length || 0} / ${room.capacity_limit}`}
-                        tags={formattedTags}
-                        ownerProfile={ownerProfile}
-                        onClick={() => {
-                          setSelectedRoomId(room.id);
-                          setModalMode(isMyHosted ? 'hosted' : 'joined');
-                        }}
-                      />
-                    );
-                  })
-                ) : (
-                  <p className='text-center text-sm text-zinc-500 py-10'>
-                    {emptyMessage}
-                  </p>
-                )}
-              </div>
-            )}
+            <EventCardList
+              ariaLabel='参加予定イベント一覧'
+              emptyMessage={emptyMessage}
+              isEmpty={displayRooms.length === 0}
+              isLoading={isLoading}
+              loadingFallback={<EventListLoadingSkeleton />}
+              className='pt-2'
+            >
+              {displayRooms.map((room) => {
+                const isMyHosted = hostedRooms.some((h) => h.id === room.id);
+                return (
+                  <EventCard
+                    key={room.id}
+                    event={toEventCardViewModel(room)}
+                    onClick={() => {
+                      setSelectedRoomId(room.id);
+                      setModalMode(isMyHosted ? 'hosted' : 'joined');
+                    }}
+                  />
+                );
+              })}
+            </EventCardList>
           </TabsContent>
         </div>
 
         {/* モーダル部分 */}
-        {selectedRoomId !== null && (
-          <EventDetailModal
-            roomId={selectedRoomId}
-            mode={modalMode}
-            onClose={() => setSelectedRoomId(null)}
-            onSuccess={fetchAllData}
-          />
-        )}
+        {renderDetailModal()}
       </Tabs>
     </div>
   );

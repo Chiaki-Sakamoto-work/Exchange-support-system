@@ -1,20 +1,19 @@
 'use client';
 
 import type { profiles } from '@prisma/client';
+import type { GetRestaurantOptionsResult, Room } from '@type';
 import {
   ArrowLeftRight,
   Calendar1,
   FileText,
-  Search,
+  MapPin,
+  Star,
   Store,
   Tag,
-  Trash2,
   UserRound,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import type { Room } from '@/app/types';
-import type { GetRestaurantOptionsResult } from '@/app/types/restaurants';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +23,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogTitle,
-} from '@/components/ui/AlertDialog'; // 💡 プロジェクトの配置パスに合わせて適宜調整してください
+} from '@/components/ui/AlertDialog';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import {
@@ -46,18 +45,18 @@ import {
   RadioCardTitle,
 } from '@/components/ui/RadioCard';
 import { RadioGroup } from '@/components/ui/RadioGroup';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { Stepper } from '@/components/ui/Stepper';
 import { getRestaurantOptions } from '@/features/restaurants/actions/restaurantActions';
+import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/RestaurantRadioCardSkeleton';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
-import { UserBadge } from '@/features/users/components/UserBadge';
-import {
-  createEvent,
-  deleteEventAction,
-  updateEventAction,
-} from '../actions/eventActions';
+import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
+import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
+import { createEvent, updateEventAction } from '../actions/eventActions';
 
 type Props = {
   onSuccess: () => void;
+  onCancel?: () => void;
   // 💡 initialData の型定義を完全にこちらへ差し替えてください
   initialData?: Room & {
     user_rooms: (Room['user_rooms'][number] & {
@@ -67,7 +66,12 @@ type Props = {
   roomId?: number;
 };
 
-export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
+export const EventForm = ({
+  onSuccess,
+  onCancel,
+  initialData,
+  roomId,
+}: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, _setError] = useState<string | null>(null);
 
@@ -197,34 +201,10 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     const lowerQuery = searchQuery.toLowerCase();
     return (
       shop.name.toLowerCase().includes(lowerQuery) ||
-      shop.category.toLowerCase().includes(lowerQuery) ||
+      shop.category?.toLowerCase().includes(lowerQuery) ||
       shop.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
     );
   });
-
-  const handleDelete = async () => {
-    if (!roomId) return;
-
-    if (
-      !window.confirm(
-        'このイベントを削除してもよろしいですか？（この操作は取り消せません）',
-      )
-    ) {
-      return;
-    }
-
-    setIsProcessing(true);
-    // 先ほど確認したサーバー側の削除アクションを呼び出す
-    const result = await deleteEventAction(roomId, '/create');
-
-    if (result?.success) {
-      toast.success('イベントを削除しました');
-      onSuccess(); // フォームを閉じて一覧を更新
-    } else {
-      toast.error(result?.error || '削除に失敗しました');
-    }
-    setIsProcessing(false);
-  };
 
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<
@@ -276,15 +256,15 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
     setIsProcessing(false);
   };
 
-  const isNewRecruit = (profile: profiles | null) =>
-    profile?.user_type === '新入社員';
-  const getDisplayName = (profile: profiles | null) =>
-    profile?.username ?? '名無しさん';
   const getUserBadgeUser = (profile: profiles | null) => ({
     name: getDisplayName(profile),
     avatarUrl: profile?.avatar_url,
     isNewRecruit: isNewRecruit(profile),
   });
+
+  const isRestaurantLoading = restaurantData === null;
+  const restaurantError =
+    restaurantData?.success === false ? restaurantData.error : null;
 
   const renderParticipantBadge = (
     participant: Room['user_rooms'][number],
@@ -424,93 +404,99 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       {/* 2. お店・場所 */}
       <Card variant='secondary shadow-none'>
         <CardContent>
-          <div className='flex flex-col gap-2.5'>
+          <div className='flex flex-col gap-3 w-full'>
             <Label htmlFor='shop'>
               <Store className='w-4 h-4' />
               お店を選ぶ (任意)
             </Label>
 
             {/* 🌟 1. 検索バーの追加 */}
-            <div className='relative'>
-              <Search className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-              <Input
+            <div className='flex items-center gap-3'>
+              <SearchInput
                 type='text'
                 placeholder='店名、カテゴリ、タグで検索...'
-                className='pl-9 bg-white'
+                className='w-full rounded-full'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            {/* 🌟 2. スクロールエリア（max-h-64 と overflow-y-auto を追加） */}
-            <div className='max-h-[280px] overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin'>
-              {/* 🌟 3. shopList ではなく filteredShops でループを回すように変更 */}
-              {filteredShops.length > 0 ? (
+            {/* 2. スクロールエリア */}
+            <div className='max-h-[280px] pt-2 overflow-y-auto pr-1 pb-1 space-y-2 scrollbar-thin w-full'>
+              {isRestaurantLoading ? (
+                <RestaurantRadioCardSkeleton />
+              ) : restaurantError ? (
+                <div className='py-8 text-center w-full'>
+                  <p className='text-sm text-zinc-500'>{restaurantError}</p>
+                </div>
+              ) : filteredShops.length > 0 ? (
+                /* 🌟 RadioGroup 自体も横幅いっぱいに広げる */
                 <RadioGroup
                   value={formData.shop}
                   onValueChange={handleShopChange}
+                  className='w-full grid gap-2'
                 >
                   {filteredShops.map((shop) => (
                     <RadioCard
                       key={shop.placeId}
                       value={shop.name}
-                      className='w-full'
+                      className='w-full min-w-0 max-w-full hover:scale-100'
                     >
-                      <RadioCardHeader>
-                        <RadioCardTitle className='flex items-center justify-between gap-2 min-w-0'>
-                          <span
-                            className='truncate shrink mr-2'
-                            title={shop.name} // 💡 ホバーした時にフルネームが出るようにする親切設計
-                          >
-                            {shop.name}
-                          </span>
+                      <RadioCardHeader className='w-full min-w-0 p-0'>
+                        <RadioCardTitle className='text-foreground flex items-center justify-between gap-2 max-w-[250px] min-w-0'>
                           {shop.googleMapsUrl && (
                             <a
                               href={shop.googleMapsUrl}
                               target='_blank'
                               rel='noopener noreferrer'
-                              className='text-xs text-blue-500 hover:text-blue-700 hover:underline z-10'
+                              className='group/pin relative flex items-center border-b border-transparent hover:border-accent hover:text-accent/70 z-10 shrink-0'
                               onClick={(e) => e.stopPropagation()}
                             >
-                              マップで見る
+                              {/* <GoogleMapPin className='size-5 ' /> */}
+                              <MapPin className='size-4 text-accent hover:text-accent/80' />
+
+                              {/* <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-0 hidden group-hover/pin:block w-max bg-white/70 rounded px-2 py-0 text-[10px] text-accent'>
+                                マップで見る
+                              </span> */}
                             </a>
                           )}
+                          <span className='truncate shrink w-full'>
+                            {shop.name}
+                          </span>
                         </RadioCardTitle>
-
-                        <RadioCardDescription>
-                          <div className='flex flex-col gap-1.5 mt-1'>
-                            <div className='flex items-center gap-2 text-xs text-zinc-600'>
-                              <span className='font-medium'>
-                                {shop.category}
-                              </span>
-                              <span>•</span>
-                              <span className='text-yellow-600 font-medium'>
-                                ★ {shop.avgRating.toFixed(1)}
-                              </span>
-                              <span>({shop.reviewCount}件)</span>
-                            </div>
-
-                            {shop.tags && shop.tags.length > 0 && (
-                              <div className='flex flex-wrap gap-1'>
-                                {shop.tags.map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className='px-1.5 py-0.5 bg-background text-zinc-600 rounded text-[10px]'
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </RadioCardDescription>
                       </RadioCardHeader>
+                      <RadioCardDescription className='w-full min-w-0'>
+                        <div className='flex flex-col gap-1.5 mt-1 w-full min-w-0'>
+                          <div className='flex items-center gap-2 text-xs text-zinc-600 w-full'>
+                            <span className='font-medium shrink-0'>
+                              {shop.category}
+                            </span>
+                            <span className='shrink-0'>•</span>
+                            <span className='flex flex-row items-center gap-1 text-yellow-500 font-medium shrink-0'>
+                              <Star className='size-3' fill='currentColor' />
+                              {shop.avgRating.toFixed(1)}
+                            </span>
+                            <span className='text-muted-foreground shrink-0'>
+                              ({shop.reviewCount}件)
+                            </span>
+                          </div>
+
+                          {shop.tags && shop.tags.length > 0 && (
+                            <div className='flex flex-wrap gap-1 w-full min-w-0 '>
+                              {shop.tags.slice(0, 3).map((tag) => (
+                                <Badge key={tag} size='xs' variant='secondary'>
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </RadioCardDescription>
                     </RadioCard>
                   ))}
                 </RadioGroup>
               ) : (
-                /* 🌟 4. 検索にヒットしなかった時の親切なメッセージ */
-                <div className='py-8 text-center'>
+                <div className='py-8 text-center w-full'>
                   <p className='text-sm text-zinc-500'>
                     該当するお店が見つかりません
                   </p>
@@ -631,14 +617,13 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
       {roomId && (
         <Button
-          type='submit'
+          type='button'
           className='w-full'
-          variant='destructive'
+          variant='outline'
           disabled={isProcessing}
-          onClick={handleDelete}
+          onClick={onCancel}
         >
-          <Trash2 className='w-4 h-4' />
-          削除する
+          キャンセル
         </Button>
       )}
     </form>
