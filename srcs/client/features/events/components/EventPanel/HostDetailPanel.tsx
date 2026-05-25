@@ -6,6 +6,7 @@ import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { PenBoxIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { EventEditActionMenu } from '@feature/events/components/EventEditActionMenu';
 import { EventEditPanel } from './EventEditPanel';
 
 type Props = {
@@ -31,7 +32,7 @@ const EventDetailHeader = ({ title, onEditClick }: EventDetailHeaderProps) => (
   </div>
 );
 
-export const HostDetailPanel = ({ roomId, onSuccess }: Props) => {
+export const HostDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const { eventData, isLoading, error } = useEventDetail(roomId);
 
@@ -49,14 +50,24 @@ export const HostDetailPanel = ({ roomId, onSuccess }: Props) => {
 
   if (isEditing) {
     return (
-      <EventEditPanel
-        eventData={eventData}
-        onCancel={() => setIsEditing(false)}
-        onSuccess={() => {
-          onSuccess();
-          setIsEditing(false);
-        }}
-      />
+      <>
+        <EventEditActionMenu
+          roomId={roomId}
+          onCancel={() => setIsEditing(false)}
+          onDeleted={() => {
+            onSuccess();
+            onClose();
+          }}
+        />
+        <EventEditPanel
+          eventData={eventData}
+          onCancel={() => setIsEditing(false)}
+          onSuccess={() => {
+            onSuccess();
+            setIsEditing(false);
+          }}
+        />
+      </>
     );
   }
 

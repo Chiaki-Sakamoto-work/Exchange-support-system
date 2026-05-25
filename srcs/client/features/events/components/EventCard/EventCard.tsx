@@ -11,11 +11,7 @@ import {
 } from '@/components/ui/Card';
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { cn } from '@/lib/utils';
-<<<<<<< HEAD
-import type { EventCardViewModel } from './eventCard.viewmodel';
-=======
 import type { EventCardViewModel } from './EventCard.viewmodal';
->>>>>>> eb97202 (refactor: ~ing (too many error now))
 
 export type EventCardProps = {
   event: EventCardViewModel;

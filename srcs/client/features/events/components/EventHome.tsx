@@ -12,6 +12,7 @@ import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/EventCard.viewmodal';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
+import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -88,26 +89,13 @@ export const EventHome = () => {
     if (selectedRoomId === null) {
       return null;
     }
-
-    const detailModalProps = {
+    const roomInteractiveOverlayProps = {
       roomId: selectedRoomId,
+      mode: modalMode,
       onClose: () => setSelectedRoomId(null),
       onSuccess: fetchAllData,
     };
-
-<<<<<<< HEAD
-    if (modalMode === 'hosted') {
-      return <HostDetailModal {...detailModalProps} />;
-    }
-
-    if (modalMode === 'joined') {
-      return <JoinDetailModal {...detailModalProps} />;
-    }
-
-    return <ExploreDetailModal {...detailModalProps} />;
-=======
     return <RoomInteractiveOverlay {...roomInteractiveOverlayProps} />;
->>>>>>> b9ea07f (refactor(lint refactor): lint refactor 󰑌)
   };
 
   return (

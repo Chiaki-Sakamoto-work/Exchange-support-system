@@ -1,7 +1,11 @@
 'use client';
 
 import { ChatPanel } from '@feature/chat/components/ChatPanel';
-import { EventInfoPanel } from '@feature/events/components/EventInfoPanel';
+import {
+  ExploreDetailPanel,
+  HostDetailPanel,
+  JoinedDetailPanel,
+} from '@feature/events/components/EventPanel';
 import { useState } from 'react';
 
 type Props = {

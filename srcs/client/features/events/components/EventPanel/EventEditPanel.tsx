@@ -26,16 +26,9 @@ export const EventEditPanel = ({
           roomId={eventData.id}
           initialData={eventData}
           onSuccess={onSuccess}
+          onCancel={onCancel}
         />
       </div>
-      <Button
-        type='button'
-        variant='outline'
-        className='w-full mt-2'
-        onClick={onCancel}
-      >
-        キャンセル
-      </Button>
     </div>
   );
 };
