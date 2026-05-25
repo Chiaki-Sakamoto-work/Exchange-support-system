@@ -52,14 +52,11 @@ import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/R
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge';
 import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
-import {
-  createEvent,
-  deleteEventAction,
-  updateEventAction,
-} from '../actions/eventActions';
+import { createEvent, updateEventAction } from '../actions/eventActions';
 
 type Props = {
   onSuccess: () => void;
+  onCancel?: () => void;
   // 💡 initialData の型定義を完全にこちらへ差し替えてください
   initialData?: Room & {
     user_rooms: (Room['user_rooms'][number] & {
@@ -69,7 +66,12 @@ type Props = {
   roomId?: number;
 };
 
-export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
+export const EventForm = ({
+  onSuccess,
+  onCancel,
+  initialData,
+  roomId,
+}: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, _setError] = useState<string | null>(null);
 
@@ -203,30 +205,6 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
       shop.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
     );
   });
-
-  const handleDelete = async () => {
-    if (!roomId) return;
-
-    if (
-      !window.confirm(
-        'このイベントを削除してもよろしいですか？（この操作は取り消せません）',
-      )
-    ) {
-      return;
-    }
-
-    setIsProcessing(true);
-    // 先ほど確認したサーバー側の削除アクションを呼び出す
-    const result = await deleteEventAction(roomId, '/create');
-
-    if (result?.success) {
-      toast.success('イベントを削除しました');
-      onSuccess(); // フォームを閉じて一覧を更新
-    } else {
-      toast.error(result?.error || '削除に失敗しました');
-    }
-    setIsProcessing(false);
-  };
 
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<
@@ -639,13 +617,13 @@ export const EventForm = ({ onSuccess, initialData, roomId }: Props) => {
 
       {roomId && (
         <Button
-          type='submit'
+          type='button'
           className='w-full'
-          variant='destructive'
+          variant='outline'
           disabled={isProcessing}
-          onClick={handleDelete}
+          onClick={onCancel}
         >
-          削除する
+          キャンセル
         </Button>
       )}
     </form>

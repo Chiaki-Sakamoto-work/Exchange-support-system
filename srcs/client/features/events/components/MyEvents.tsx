@@ -4,11 +4,19 @@ import type { Room } from '@type';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Dialog, DialogContent } from '@/components/ui/Dialog';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/Dialog';
 import { EventCard, toEventCardViewModel } from './EventCard';
 import { EventCardList } from './EventCardList';
 import { EventCreateDialogContent } from './EventCreateDialogContent';
-import { EventEditDialogContent } from './EventEditDialogContent';
+import { EventEditActionMenu } from './EventEditActionMenu';
+import { EventForm } from './EventForm';
 
 type Props = {
   onSuccess?: () => void;
@@ -24,7 +32,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
       <div className='flex shrink-0 justify-end'>
         <Button
           type='submit'
-          className='w-full bg-gray-400'
+          className='w-full bg-muted-foreground'
           variant='accent'
           onClick={() => setIsCreateOpen(true)}
           aria-label='イベントを作成'
@@ -53,17 +61,34 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         open={editingEvent !== null}
         onOpenChange={() => setEditingEvent(null)}
       >
-        <DialogContent preventOutsideClose>
+        <DialogContent preventOutsideClose showCloseButton={false}>
           {editingEvent && (
-            <EventEditDialogContent
-              eventData={editingEvent}
+            <EventEditActionMenu
+              roomId={editingEvent.id}
               onCancel={() => setEditingEvent(null)}
-              onSuccess={() => {
+              onDeleted={() => {
                 setEditingEvent(null);
                 onSuccess?.();
               }}
             />
           )}
+          <DialogHeader>
+            <DialogTitle>イベントを編集</DialogTitle>
+            <DialogDescription>内容を更新できます</DialogDescription>
+          </DialogHeader>
+          <DialogBody className='-mx-6 px-6'>
+            {editingEvent && (
+              <EventForm
+                roomId={editingEvent.id}
+                initialData={editingEvent}
+                onSuccess={() => {
+                  setEditingEvent(null);
+                  onSuccess?.();
+                }}
+                onCancel={() => setEditingEvent(null)}
+              />
+            )}
+          </DialogBody>
         </DialogContent>
       </Dialog>
 
