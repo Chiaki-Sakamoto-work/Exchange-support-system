@@ -20,7 +20,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/HoverCard';
-import { UserBadge } from '@/features/users/components/UserBadge';
+import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
 import { getDisplayName } from '@/features/users/lib/profile';
 import { formatDate } from '@/lib/date';
 import {

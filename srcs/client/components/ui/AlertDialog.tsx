@@ -97,7 +97,7 @@ function AlertDialogContent({
         data-size={size}
         className={cn(
           // 画面中央への配置とベーススタイル
-          'group/alert-dialog-content fixed top-1/2 left-1/2 z-50 flex flex-col w-full -translate-x-1/2 -translate-y-1/2 gap-0 rounded-2xl bg-popover p-6 text-popover-foreground duration-100 outline-none max-w-[calc(100%-2rem)] max-h-172.5',
+          'group/alert-dialog-content fixed top-1/2 left-1/2 z-90 flex flex-col w-full -translate-x-1/2 -translate-y-1/2 gap-0 rounded-2xl bg-popover p-6 text-popover-foreground duration-100 outline-none max-w-[calc(100%-2rem)] max-h-172.5',
           // サイズ別の最大幅指定
           'data-[size=default]:max-w-96 data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm',
           // 開閉アニメーション

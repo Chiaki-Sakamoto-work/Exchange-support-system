@@ -1,5 +1,6 @@
 'use client';
 
+import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteractiveOverlay';
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
@@ -8,10 +9,10 @@ import {
   getHostedEvents,
   getJoinedEvents,
 } from '../actions/eventActions';
-import { EventCard, toEventCardViewModel } from './EventCard';
+import { EventCard } from './EventCard/EventCard';
+import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
-import { RoomInteractiveOverlay } from './RoomInteractiveOverlay';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -83,6 +84,19 @@ export const EventHome = () => {
       : filter === 'joined'
         ? '他人が開催した予定はありません'
         : '参加予定のイベントはありません';
+
+  const renderDetailModal = () => {
+    if (selectedRoomId === null) {
+      return null;
+    }
+    const roomInteractiveOverlayProps = {
+      roomId: selectedRoomId,
+      mode: modalMode,
+      onClose: () => setSelectedRoomId(null),
+      onSuccess: fetchAllData,
+    };
+    return <RoomInteractiveOverlay {...roomInteractiveOverlayProps} />;
+  };
 
   return (
     <div className='flex h-full min-h-0 flex-col '>
@@ -184,14 +198,7 @@ export const EventHome = () => {
         </div>
 
         {/* モーダル部分 */}
-        {selectedRoomId !== null && (
-          <RoomInteractiveOverlay
-            roomId={selectedRoomId}
-            mode={modalMode}
-            onClose={() => setSelectedRoomId(null)}
-            onSuccess={fetchAllData}
-          />
-        )}
+        {renderDetailModal()}
       </Tabs>
     </div>
   );

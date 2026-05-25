@@ -5,10 +5,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/HoverCard';
-import {
-  toUserBadgeViewModel,
-  UserBadge,
-} from '@/features/users/components/UserBadge';
+import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
+import { toUserBadgeViewModel } from '@/features/users/components/UserBadge/userBadge.viewmodel';
 import { getDisplayName } from '@/features/users/lib/profile';
 import type { Participant } from '@/types';
 
@@ -53,7 +51,7 @@ export const ParticipantBadge = ({
         // 🌟 追加1：インラインスタイルで「マウスブロック」を強制解除
         style={{ pointerEvents: 'none' }}
         // 🌟 追加2：Tailwind側も「!」をつけて強制適用（!pointer-events-none）
-        className='!pointer-events-none w-auto min-w-56 max-w-72 p-4 flex flex-col gap-3 z-50 shadow-md bg-background'
+        className='!pointer-events-none w-auto min-w-56 max-w-72 p-4 flex flex-col gap-3 z-80 shadow-md bg-background'
       >
         <div className='flex items-center gap-3'>
           <div className='flex flex-col'>
