@@ -76,7 +76,7 @@ export const RoomInteractiveOverlay = ({
               absolute rounded-2xl p-6 transition-all duration-500 ease-out
               bg-white/70 backdrop-blur-md border border-white/40
               w-[95%] h-[90%] top-1/2 -translate-y-1/2
-              md:w-[850px] md:h-[calc(100%-40px)] md:right-0 md:left-auto top-1/2 -translate-y-1/2
+              md:w-[700px] md:h-[calc(100%-40px)] md:right-10 md:left-auto top-1/2 -translate-y-1/2
 
               ${
                 activeLayer === 'chat'

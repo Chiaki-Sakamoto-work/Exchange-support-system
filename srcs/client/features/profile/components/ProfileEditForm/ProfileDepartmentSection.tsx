@@ -73,6 +73,15 @@ export const ProfileDepartmentSection = ({
                     onChange={(event) =>
                       onNewDepartmentNameChange(event.target.value)
                     }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+
+                        if (newDepartmentName.trim() && !isAddingDepartment) {
+                          void onAddDepartment();
+                        }
+                      }
+                    }}
                     placeholder='新しい部署を追加'
                     className='h-9 flex-1'
                   />
