@@ -52,6 +52,7 @@ import { RestaurantRadioCardSkeleton } from '@/features/restaurants/components/R
 import { UserAvatar } from '@/features/users/components/UserAvatar';
 import { UserBadge } from '@/features/users/components/UserBadge/UserBadge';
 import { getDisplayName, isNewRecruit } from '@/features/users/lib/profile';
+import { getLocalDatetimeString, withTokyoTimezone } from '@/lib/date';
 import { createEvent, updateEventAction } from '../actions/eventActions';
 
 type Props = {
@@ -85,9 +86,7 @@ export const EventForm = ({
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
-    datetime: initialData?.event_start_at
-      ? new Date(initialData.event_start_at).toISOString().slice(0, 16)
-      : '',
+    datetime: getLocalDatetimeString(initialData?.event_start_at),
     capacity: initialData?.capacity_limit || 4,
     tags: initialData?.room_tags?.map((rt) => rt.tags.name) || ([] as string[]),
     shop: initialData?.location_name || '',
@@ -166,9 +165,11 @@ export const EventForm = ({
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const tokyoDatetime = withTokyoTimezone(formData.datetime);
+
     // 過去の時間になっていないか厳密にチェック！
-    if (formData.datetime) {
-      const selectedDate = new Date(formData.datetime);
+    if (tokyoDatetime) {
+      const selectedDate = new Date(tokyoDatetime);
       const now = new Date();
 
       // 選ばれた時間が「今」より過去だったら...
@@ -189,6 +190,7 @@ export const EventForm = ({
 
     const submitData = {
       ...formData,
+      datetime: formData.datetime ? tokyoDatetime : '',
       capacity: Number(formData.capacity),
       tags: formData.tags,
       locationAddress: selectedShopData?.googleMapsUrl || '',
@@ -249,7 +251,7 @@ export const EventForm = ({
     // 💡 確実に新しいホストのID（selectedProfile.id）だけをターゲットにして送信する
     const submitData = {
       title: formData.title,
-      datetime: formData.datetime,
+      datetime: withTokyoTimezone(formData.datetime),
       capacity: Number(formData.capacity),
       tags: formData.tags,
       shop: formData.shop,
