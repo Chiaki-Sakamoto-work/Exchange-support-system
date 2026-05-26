@@ -333,6 +333,7 @@ export const EventForm = ({
               開催日時
             </Label>
             <DateTimePicker
+              id='datetime'
               value={formData.datetime}
               onChange={handleDateTimeChange}
               minDate={today}
