@@ -1,6 +1,6 @@
 import { getHostedEvents } from '@feature/events/actions/eventActions';
-import { MyEvents } from '@/features/events/components/MyEvents';
 import type { Metadata } from 'next';
+import { MyEvents } from '@/features/events/components/MyEvents';
 
 export const metadata: Metadata = {
   title: 'My events',

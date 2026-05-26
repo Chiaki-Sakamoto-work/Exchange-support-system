@@ -1,8 +1,8 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { ProfileDashboard } from '@/features/profile/components/ProfileDashboard';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
-import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Profile',

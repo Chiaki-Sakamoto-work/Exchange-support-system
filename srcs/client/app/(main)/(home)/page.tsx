@@ -1,5 +1,5 @@
-import { EventHome } from '@/features/events/components/EventHome';
 import type { Metadata } from 'next';
+import { EventHome } from '@/features/events/components/EventHome';
 
 export const metadata: Metadata = {
   title: 'Home',
