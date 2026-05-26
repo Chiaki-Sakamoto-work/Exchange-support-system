@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Nomikai Hub',
-  description: 'みんなで楽しく飲み会を',
+  title: {
+    default: 'ICOICO | 交流支援制度利用促進',
+    template: '%s | ICOICO',
+  },
+  description: '交流支援制度利用促進',
 };
 
 // RootLayout は 1つだけに絞る！
