@@ -5,7 +5,7 @@ import {
   joinEventAction,
 } from '@feature/events/actions/eventActions';
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
-import { EventDetailLoadingSkeleton } from '@feature/events/components/EventLoadingSkeleton';
+import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
 import type { Room } from '@type';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -37,7 +37,7 @@ export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   }, [roomId]);
 
   if (isLoading) {
-    return <EventDetailLoadingSkeleton mode='explore' />;
+    return <EventDetailPanelSkeleton mode='explore' />;
   }
 
   if (error || !eventData) {
