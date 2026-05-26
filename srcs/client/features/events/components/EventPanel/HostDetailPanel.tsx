@@ -1,8 +1,8 @@
 'use client';
 
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
+import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
 import { EventEditActionMenu } from '@feature/events/components/EventEditActionMenu';
-import { EventDetailLoadingSkeleton } from '@feature/events/components/EventLoadingSkeleton';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { PenBoxIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -37,7 +37,7 @@ export const HostDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const { eventData, isLoading, error } = useEventDetail(roomId);
 
   if (isLoading) {
-    return <EventDetailLoadingSkeleton mode='hosted' />;
+    return <EventDetailPanelSkeleton mode='hosted' />;
   }
 
   if (error || !eventData) {

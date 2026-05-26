@@ -10,4 +10,4 @@ export const getFallback = (profile: profiles | null) =>
   getDisplayName(profile).slice(0, 1).toUpperCase();
 
 export const isStringNewRecruit = (userType: string | null | undefined) =>
-  userType === '新卒';
+  userType === '新入社員';

@@ -33,10 +33,10 @@ export const ProfileUserTypeSection = ({
             <p className='text-sm!'>一般社員</p>
           </RadioCard>
           <RadioCard
-            value='新卒'
+            value='新入社員'
             className='h-auto! bg-muted  py-3!  data-[state=checked]:text-foreground'
           >
-            <p>新卒</p>
+            <p>新入社員（新卒・中途）</p>
           </RadioCard>
         </RadioGroup>
       </CardContent>

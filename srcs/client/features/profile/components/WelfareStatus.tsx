@@ -31,7 +31,7 @@ export const WelfareStatus = ({ is_support_used }: WelfareStatusProps) => {
           )}
         >
           <CardContent className='flex-row! justify-between! items-center! text-foreground! w-full!'>
-            <span className='text-sm'>飲み会補助</span>
+            <span className='text-sm'>交流支援制度</span>
             <Badge variant={isSupportUsed ? 'accent' : 'secondary'} size='sm'>
               {isSupportUsed ? '利用済み' : '未利用'}
             </Badge>

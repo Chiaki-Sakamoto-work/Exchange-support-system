@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
+import { ChatPanelSkeleton } from './ChatPanelSkeleton';
 import { SpeechBubble } from './SpeechBubble';
 
 type Props = {
@@ -120,6 +121,10 @@ export const ChatPanel = ({ roomId }: Props) => {
     }
   };
 
+  if (isLoading) {
+    return <ChatPanelSkeleton />;
+  }
+
   return (
     <div className='flex flex-col h-full w-full relative'>
       <div className='flex items-center pb-3 border-b border-muted/60 shrink-0'>
@@ -139,11 +144,7 @@ export const ChatPanel = ({ roomId }: Props) => {
                    dark:[&::-webkit-scrollbar-thumb]:bg-zinc-700 
                    [&::-webkit-scrollbar-thumb]:rounded-full'
       >
-        {isLoading ? (
-          <div className='text-center text-sm text-zinc-500 mt-4'>
-            読み込み中...
-          </div>
-        ) : messages.length === 0 ? (
+        {messages.length === 0 ? (
           <div className='text-center text-sm text-zinc-500 mt-4'>
             メッセージはまだありません
           </div>

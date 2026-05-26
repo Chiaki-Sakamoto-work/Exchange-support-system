@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const userTypeEnum = z.enum(['一般社員', '新卒']);
+export const userTypeEnum = z.enum(['一般社員', '新入社員']);
 
 export const profileSchema = z.object({
   username: z.string().min(1, '名前を入力してください'),
