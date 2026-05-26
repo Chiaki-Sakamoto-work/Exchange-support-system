@@ -1,4 +1,4 @@
-import { ChevronRight, PenBox, UsersRound } from 'lucide-react';
+import { ChevronRight, PenBox, Star, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -75,8 +75,14 @@ export const EventCard = ({
                 </Badge>
               )}
               {event.hasNewRecruit && (
-                <Badge variant='accent' size='sm' className='text-[10px]'>
-                  新卒含め
+                <Badge
+                  variant='accent'
+                  size='sm'
+                  className='text-[10px] flex flex-row items-center'
+                >
+                  <Star fill='white' className='w-1 h-1' />
+                  <span>制度利用可</span>
+                  <Star fill='white' className='w-1 h-1' />
                 </Badge>
               )}
             </CardTitle>
