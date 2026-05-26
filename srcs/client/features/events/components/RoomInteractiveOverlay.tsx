@@ -6,7 +6,7 @@ import {
   HostDetailPanel,
   JoinedDetailPanel,
 } from '@feature/events/components/EventPanel';
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 
 type Props = {
   roomId: number;
@@ -35,7 +35,7 @@ export const RoomInteractiveOverlay = ({
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
-    
+
     const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchStartX.current - touchEndX;
     const threshold = 40;
