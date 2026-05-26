@@ -27,7 +27,10 @@ export const ParticipantBadge = ({
 
   const userProfile = profile as profiles & {
     departments?: { name: string } | null;
+    is_support_used?: boolean;
   };
+
+  const isSupportUsed = userProfile?.is_support_used || false;
 
   return (
     <HoverCard open={isOpen}>
@@ -64,6 +67,17 @@ export const ParticipantBadge = ({
               {profile?.user_type || '社員'}
             </span>
           </div>
+        </div>
+
+        <div className='flex items-center justify-between border-t border-border pt-3'>
+          <span className='text-xs font-medium'>交流支援制度</span>
+          <Badge
+            variant={isSupportUsed ? 'accent' : 'secondary'}
+            size='sm'
+            className='text-[10px] px-2 py-0'
+          >
+            {isSupportUsed ? '利用済み' : '未利用'}
+          </Badge>
         </div>
 
         {profile?.bio && (
