@@ -62,7 +62,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
         open={editingEvent !== null}
         onOpenChange={() => setEditingEvent(null)}
       >
-        <DialogContent preventOutsideClose showCloseButton={false}>
+        <DialogContent showCloseButton={false}>
           {editingEvent && (
             <EventEditActionMenu
               roomId={editingEvent.id}
@@ -94,7 +94,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
       </Dialog>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent preventOutsideClose>
+        <DialogContent>
           <EventCreateDialogContent
             onSuccess={() => {
               setIsCreateOpen(false);
