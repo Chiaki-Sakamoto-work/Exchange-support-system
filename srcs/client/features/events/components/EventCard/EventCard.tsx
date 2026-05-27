@@ -1,4 +1,4 @@
-import { ChevronRight, PenBox, Star, UsersRound } from 'lucide-react';
+import { ChevronRight, LogIn, PenBox, Plus, SquarePlus, Star, UserRoundPlus, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,
@@ -16,10 +16,11 @@ import type { EventCardViewModel } from './eventCard.viewmodel';
 export type EventCardProps = {
   event: EventCardViewModel;
   onClick?: () => void;
-  icon?: 'show' | 'edit';
+  icon?: 'show' | 'edit' | 'plus';
 };
 
 const CARD_ICON = {
+  plus: { icon: ChevronRight, size: 'size-5' },
   show: { icon: ChevronRight, size: 'size-5' },
   edit: { icon: PenBox, size: 'size-4' },
 };

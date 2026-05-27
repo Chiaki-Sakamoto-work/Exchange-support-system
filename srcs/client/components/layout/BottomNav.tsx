@@ -1,5 +1,5 @@
 'use client';
-import { House, UserCircle, Utensils } from 'lucide-react';
+import { House, List, Pencil, UserCircle, Utensils } from 'lucide-react';
 import { motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -9,13 +9,13 @@ import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 const NAV_ITEMS = [
   {
     href: '/create',
-    icon: Utensils,
+    icon: Pencil,
     label: '予定管理',
   },
   {
     href: '/',
-    icon: House,
-    label: '予定一覧',
+    icon: List,
+    label: '一覧',
   },
   {
     href: '/profile',

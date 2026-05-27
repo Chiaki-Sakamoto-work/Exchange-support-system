@@ -134,6 +134,7 @@ export const EventHome = () => {
                       setSelectedRoomId(room.id);
                       setModalMode('explore');
                     }}
+                    icon='plus'
                   />
                 );
               })}

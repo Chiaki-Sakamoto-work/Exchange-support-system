@@ -8,6 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from '@/components/ui/AlertDialog';
+import { Delete, Trash2, Undo2 } from 'lucide-react';
 
 type Props = {
   isDeleteDialogOpen: boolean;
@@ -40,6 +41,7 @@ export const DeleteEventAlertDialog = ({
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={disabled} variant='outline'>
+            <Undo2/>
             キャンセル
           </AlertDialogCancel>
           <AlertDialogAction
@@ -47,6 +49,7 @@ export const DeleteEventAlertDialog = ({
             variant='destructive'
             onClick={handleConfirmDelete}
           >
+            <Trash2/>
             削除する
           </AlertDialogAction>
         </AlertDialogFooter>
