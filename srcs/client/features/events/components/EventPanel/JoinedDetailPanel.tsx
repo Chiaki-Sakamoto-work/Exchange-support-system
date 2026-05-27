@@ -4,6 +4,7 @@ import { cancelParticipationAction } from '@feature/events/actions/eventActions'
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
 import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
 import { ExitEventAlertDialog } from '@feature/events/components/ExitEventAlertDialog';
+import { useCurrentUser } from '@feature/events/hooks/useCurrentUser';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { LogOut } from 'lucide-react';
 import { useState } from 'react';
@@ -47,6 +48,7 @@ const JoinedDetailHeader = ({
 export const JoinedDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { eventData, isLoading, error } = useEventDetail(roomId);
+  const { currentUserId } = useCurrentUser();
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const handleExitAction = async () => {
     setIsProcessing(true);
@@ -81,7 +83,10 @@ export const JoinedDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
           onLeaveClick={() => setIsLeaveDialogOpen(true)}
           isProcessing={isProcessing}
         />
-        <EventDetailContent eventData={eventData} />
+        <EventDetailContent
+          eventData={eventData}
+          currentUserId={currentUserId ?? undefined}
+        />
       </div>
 
       <ExitEventAlertDialog

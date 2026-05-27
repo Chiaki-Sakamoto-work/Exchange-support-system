@@ -390,3 +390,61 @@ export async function getDepartments() {
     },
   });
 }
+
+export async function toggleSupportAction(roomId: number, isUsed: boolean) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'ログインが必要です' };
+
+    if (isUsed) {
+      const profile = await prisma.profiles.findUnique({
+        where: { id: user.id },
+        select: { is_support_used: true },
+      });
+
+      if (profile?.is_support_used) {
+        return {
+          success: false,
+          error: 'すでに制度を利用済みのため、ONにできません',
+        };
+      }
+
+      const otherApplication = await prisma.user_rooms.findFirst({
+        where: {
+          user_id: user.id,
+          is_support_applied: true,
+          room_id: { not: roomId },
+          rooms: { status: { in: ['OPEN', 'CLOSED'] } },
+        },
+      });
+
+      if (otherApplication) {
+        return {
+          success: false,
+          error: '他のイベントで申請中です。複数同時にONにはできません。',
+        };
+      }
+    }
+
+    await prisma.user_rooms.update({
+      where: {
+        user_id_room_id: {
+          user_id: user.id,
+          room_id: roomId,
+        },
+      },
+      data: {
+        is_support_applied: isUsed,
+      },
+    });
+
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('制度利用フラグ更新エラー:', error);
+    return { success: false, error: '更新に失敗しました' };
+  }
+}
