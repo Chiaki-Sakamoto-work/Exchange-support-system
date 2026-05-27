@@ -105,14 +105,16 @@ export const RoomInteractiveOverlay = ({
             role='button'
             tabIndex={0}
             className={`
-              absolute rounded-2xl p-6 transition-all duration-500 ease-out bg-white/70 backdrop-blur-md border border-white
+              absolute rounded-2xl p-6 transition-all duration-500 ease-out border border-white
               w-[95%] h-full top-1/2 -translate-y-1/2
               md:static md:w-[450px] md:h-full md:top-auto md:translate-y-0 md:left-auto md:translate-x-0
               md:border-2 md:scale-100
               ${
                 activeLayer === 'details'
-                  ? 'z-70 opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
-                  : 'z-60 opacity-40 shadow-sm scale-90 cursor-pointer left-[-5%] -translate-x-0 md:opacity-70 md:border-transparent md:shadow-none'
+                  // ⭐ アクティブ時: 純白(bg-white), すりガラスなし(backdrop-blur-none)
+                  ? 'z-70 bg-white backdrop-blur-none opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
+                  // ⭐ 非アクティブ時: すりガラス白(bg-white/90 backdrop-blur-md)
+                  : 'z-60 bg-white/90 backdrop-blur-md opacity-60 shadow-sm scale-90 cursor-pointer left-[-5%] -translate-x-0 md:opacity-70 md:border-transparent md:shadow-none'
               }
             `}
             onMouseEnter={() => setActiveLayer('details')}
@@ -136,15 +138,16 @@ export const RoomInteractiveOverlay = ({
             role='button'
             tabIndex={0}
             className={`
-              absolute rounded-2xl p-6 transition-all duration-500 ease-out
-              bg-white/70 backdrop-blur-md border border-white/40
+              absolute rounded-2xl p-6 transition-all duration-500 ease-out border border-white/40
               w-[95%] h-full top-1/2 -translate-y-1/2
               md:static md:flex-1 md:max-w-[750px] md:h-full md:top-auto md:translate-y-0 md:right-auto md:left-auto md:translate-x-0
               md:border-2 md:scale-100
               ${
                 activeLayer === 'chat'
-                  ? 'z-70 opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
-                  : 'z-60 opacity-40 shadow-sm scale-90 cursor-pointer left-[105%] -translate-x-full md:opacity-70 md:border-transparent md:shadow-none'
+                  // ⭐ アクティブ時: 純白(bg-white), すりガラスなし(backdrop-blur-none)
+                  ? 'z-70 bg-white backdrop-blur-none opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
+                  // ⭐ 非アクティブ時: すりガラス白(bg-white/90 backdrop-blur-md)
+                  : 'z-60 bg-white/90 backdrop-blur-md opacity-60 shadow-sm scale-90 cursor-pointer left-[105%] -translate-x-full md:opacity-70 md:border-transparent md:shadow-none'
               }
             `}
             onMouseEnter={() => setActiveLayer('chat')}
