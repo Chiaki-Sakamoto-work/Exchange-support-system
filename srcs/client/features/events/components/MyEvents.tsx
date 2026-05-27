@@ -36,15 +36,15 @@ const MyEvents = ({ events, onSuccess }: Props) => {
           className='w-full bg-muted-foreground'
           variant='accent'
           onClick={() => setIsCreateOpen(true)}
-          aria-label='イベントを作成'
+          aria-label='予定を作成'
         >
           <Plus />
-          イベントを作成
+          予定を作成
         </Button>
       </div>
       <EventCardList
-        ariaLabel='MYイベント一覧'
-        emptyMessage='作成したイベントはありません'
+        ariaLabel='MY予定一覧'
+        emptyMessage='作成した予定はありません'
         isEmpty={events.length === 0}
       >
         {events.map((event) => {
@@ -74,7 +74,7 @@ const MyEvents = ({ events, onSuccess }: Props) => {
             />
           )}
           <DialogHeader>
-            <DialogTitle>イベントを編集</DialogTitle>
+            <DialogTitle>予定を編集</DialogTitle>
             <DialogDescription>内容を更新できます</DialogDescription>
           </DialogHeader>
           <DialogBody className='-mx-6 px-6'>

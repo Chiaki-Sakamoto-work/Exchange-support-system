@@ -31,6 +31,7 @@
 !/**/*.nix
 !/**/*.lock
 !/**/*.svg
+!/srcs/client/assets/*.png
 
 # 4. インフラ系ファイルの許可
 !**/Dockerfile

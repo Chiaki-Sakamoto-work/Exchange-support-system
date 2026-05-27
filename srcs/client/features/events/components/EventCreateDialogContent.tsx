@@ -16,9 +16,9 @@ export const EventCreateDialogContent = ({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>イベントを作成</DialogTitle>
+        <DialogTitle>予定を作成</DialogTitle>
         <DialogDescription>
-          新しいイベントの情報を入力してください
+          新しい予定の情報を入力してください
         </DialogDescription>
       </DialogHeader>
       <DialogBody>

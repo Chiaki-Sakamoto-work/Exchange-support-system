@@ -83,7 +83,7 @@ export const EventDetailDialog = ({
       <Dialog open={isDetailDialogOpen} onOpenChange={handleOpenChange}>
         <DialogContent className='-mx-6 max-h-[80vh] px-6'>
           <DialogHeader>
-            <DialogTitle>イベント詳細を読み込めません</DialogTitle>
+            <DialogTitle>予定詳細を読み込めません</DialogTitle>
             <DialogDescription>
               {error || 'データの取得に失敗しました'}
             </DialogDescription>
