@@ -264,7 +264,7 @@ export const EventForm = ({
     if (result?.success) {
       toast.success('ホスト権限を移動しました！');
       setIsTransferDialogOpen(false);
-      onSuccess(); // これでマイイベント一覧が更新され、主催タブから消えます
+      onSuccess(); // これでマイ予定一覧が更新され、主催タブから消えます
     } else {
       toast.error(result?.error || 'ホスト移動に失敗しました');
     }
@@ -308,7 +308,7 @@ export const EventForm = ({
         </div>
       )}
 
-      {/* 1. イベント名 */}
+      {/* 1. 予定名 */}
       <Card variant='secondary shadow-none'>
         <CardContent className='gap-5'>
           <div className='flex flex-col gap-2.5'>

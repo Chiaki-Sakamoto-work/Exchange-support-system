@@ -83,7 +83,7 @@ export const EventHome = () => {
       ? '主催した予定はありません'
       : filter === 'joined'
         ? '他人が開催した予定はありません'
-        : '参加予定のイベントはありません';
+        : '参加予定の予定はありません';
 
   const renderDetailModal = () => {
     if (selectedRoomId === null) {
@@ -118,7 +118,7 @@ export const EventHome = () => {
             className='col-start-1 row-start-1 flex min-h-0 flex-col  bg-background'
           >
             <EventCardList
-              ariaLabel='募集中イベント一覧'
+              ariaLabel='募集中予定一覧'
               emptyMessage='現在、参加できる新しい予定はありません'
               isEmpty={exploreEvents.length === 0}
               isLoading={isLoading}
@@ -173,7 +173,7 @@ export const EventHome = () => {
             )}
 
             <EventCardList
-              ariaLabel='参加予定イベント一覧'
+              ariaLabel='参加予定予定一覧'
               emptyMessage={emptyMessage}
               isEmpty={displayRooms.length === 0}
               isLoading={isLoading}

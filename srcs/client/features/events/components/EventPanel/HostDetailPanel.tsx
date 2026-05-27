@@ -23,7 +23,7 @@ type EventDetailHeaderProps = {
 const EventDetailHeader = ({ title, onEditClick }: EventDetailHeaderProps) => (
   <div className='flex flex-col gap-1 pr-12'>
     <h2 className='text-2xl font-bold text-zinc-900 tracking-tight'>{title}</h2>
-    <p className='text-sm text-zinc-500'>イベントの詳細情報</p>
+    <p className='text-sm text-zinc-500'>予定の詳細情報</p>
     <div className='absolute top-0 right-0'>
       <Button variant='secondary' size='icon' onClick={onEditClick}>
         <PenBoxIcon className='h-5 w-5' />

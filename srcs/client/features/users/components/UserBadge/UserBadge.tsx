@@ -120,7 +120,7 @@ function UserBadgeContent({
       {label ?? user.name}
       {user.isNewRecruit ? (
         <Badge variant='accent' size='xs'>
-          新
+          新入
         </Badge>
       ) : null}
     </>

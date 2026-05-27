@@ -10,12 +10,12 @@ const NAV_ITEMS = [
   {
     href: '/create',
     icon: Utensils,
-    label: 'MYイベント',
+    label: '予定管理',
   },
   {
     href: '/',
     icon: House,
-    label: 'ホーム',
+    label: '予定一覧',
   },
   {
     href: '/profile',

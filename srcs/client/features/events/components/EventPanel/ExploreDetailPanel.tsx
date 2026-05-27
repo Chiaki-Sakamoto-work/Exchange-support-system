@@ -73,7 +73,7 @@ export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
         <h2 className='text-2xl font-bold text-zinc-900 tracking-tight'>
           {eventData.title}
         </h2>
-        <p className='text-sm text-zinc-500'>イベントの詳細情報</p>
+        <p className='text-sm text-zinc-500'>予定の詳細情報</p>
         <div className='absolute top-0 right-0'>
           <Button
             variant='accent'

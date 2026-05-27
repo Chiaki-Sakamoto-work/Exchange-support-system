@@ -55,7 +55,7 @@ export const EventEditActionMenu = ({
     const result = await deleteEventAction(roomId, '/create');
 
     if (result?.success) {
-      toast.success('イベントを削除しました');
+      toast.success('予定を削除しました');
       setIsDeleteDialogOpen(false);
       setIsProcessing(false);
       onDeleted();
