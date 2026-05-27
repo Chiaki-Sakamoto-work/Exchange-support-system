@@ -18,7 +18,7 @@ export const useEventDetail = (roomId: number) => {
       const result = await getEventDetail(roomId);
 
       if (result.success && result.room) {
-        setEventData(result.room);
+        setEventData({ ...result.room });
       } else {
         setError(result.error || 'エラーが発生しました');
       }
@@ -34,7 +34,10 @@ export const useEventDetail = (roomId: number) => {
     loadDetail(false);
   }, [loadDetail]);
 
-  useRoomRealtime(roomId, () => {});
+  useRoomRealtime(roomId, () => {
+    console.log('リアルタイム更新が走りました！データを再取得します。');
+    loadDetail(true);
+  });
 
   return { eventData, isLoading, error };
 };

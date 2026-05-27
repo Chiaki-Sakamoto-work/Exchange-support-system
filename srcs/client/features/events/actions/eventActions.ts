@@ -73,6 +73,7 @@ export async function getJoinedEvents() {
 
 export async function getEventDetail(roomId: number) {
   try {
+    noStore();
     const room = await prisma.rooms.findUnique({
       where: {
         id: roomId,
