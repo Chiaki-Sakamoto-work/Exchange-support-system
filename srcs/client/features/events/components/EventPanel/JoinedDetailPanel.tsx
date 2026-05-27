@@ -33,11 +33,12 @@ const JoinedDetailHeader = ({
     <div className='absolute top-0 right-0'>
       <Button
         variant='destructive'
-        size='icon'
+        size='sm'
         onClick={onLeaveClick}
         disabled={isProcessing}
       >
-        <LogOut className='h-5 w-5' />
+        <LogOut className='h-4 w-4' />
+        <span>退室</span>
       </Button>
     </div>
   </div>

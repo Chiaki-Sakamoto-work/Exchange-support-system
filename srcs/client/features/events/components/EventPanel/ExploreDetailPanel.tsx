@@ -76,12 +76,13 @@ export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
         <p className='text-sm text-zinc-500'>予定の詳細情報</p>
         <div className='absolute top-0 right-0'>
           <Button
-            variant='accent'
+            variant='default'
             onClick={handleJoinAction}
             disabled={isProcessing}
-            size='icon'
+            size='sm'
           >
-            <LogIn className='size-5' />
+            <LogIn className='size-4' />
+            <span>参加</span>
           </Button>
         </div>
       </div>
