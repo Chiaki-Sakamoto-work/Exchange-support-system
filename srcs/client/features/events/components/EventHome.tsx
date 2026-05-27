@@ -4,6 +4,7 @@ import { RoomInteractiveOverlay } from '@feature/events/components/RoomInteracti
 import type { Room } from '@type';
 import { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { createClient } from '@/lib/supabase/client';
 import {
   getExploreEvents,
   getHostedEvents,
@@ -13,7 +14,6 @@ import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
-import { createClient } from '@/lib/supabase/client';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
@@ -62,7 +62,7 @@ export const EventHome = () => {
         () => {
           console.log('入退室を検知しました。リストを更新します。');
           fetchAllData();
-        }
+        },
       )
       .on(
         'postgres_changes',
@@ -70,7 +70,7 @@ export const EventHome = () => {
         () => {
           console.log('イベントの変更を検知しました。リストを更新します。');
           fetchAllData();
-        }
+        },
       )
       .subscribe();
 
