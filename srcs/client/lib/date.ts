@@ -7,6 +7,11 @@ export const formatDate = (date: Date | null) => {
 
   const d = new Date(jstDateString);
 
+  const nowJstString = new Date().toLocaleString('en-US', {
+    timeZone: 'Asia/Tokyo',
+  });
+  const currentYear = new Date(nowJstString).getFullYear();
+
   const yyyy = d.getFullYear();
 
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -14,7 +19,11 @@ export const formatDate = (date: Date | null) => {
   const hh = String(d.getHours()).padStart(2, '0');
   const min = String(d.getMinutes()).padStart(2, '0');
 
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  if (yyyy === currentYear) {
+    return `${mm}月${dd}日 ${hh}:${min}`;
+  }
+
+  return `${yyyy}年${mm}月${dd}日 ${hh}:${min}`;
 };
 
 // 🌟 追記: 開催中かどうかを判定する共通関数
