@@ -121,6 +121,9 @@ export async function getEventDetail(roomId: number) {
 // 予定の削除（主催者用）
 export async function deleteEventAction(roomId: number, path: string) {
   try {
+    await prisma.messages.deleteMany({
+      where: { room_id: roomId },
+    });
     // 🌟 修正1: 部屋を消す前に、まず関連する名簿(user_rooms)を全て削除する！
     await prisma.user_rooms.deleteMany({
       where: { room_id: roomId },
