@@ -111,9 +111,7 @@ export const RoomInteractiveOverlay = ({
               md:border-2 md:scale-100
               ${
                 activeLayer === 'details'
-                  // ⭐ アクティブ時: 純白(bg-white), すりガラスなし(backdrop-blur-none)
                   ? 'z-70 bg-white backdrop-blur-none opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
-                  // ⭐ 非アクティブ時: すりガラス白(bg-white/90 backdrop-blur-md)
                   : 'z-60 bg-white/90 backdrop-blur-md opacity-60 shadow-sm scale-90 cursor-pointer left-[-5%] -translate-x-0 md:opacity-70 md:border-transparent md:shadow-none'
               }
             `}
@@ -144,9 +142,7 @@ export const RoomInteractiveOverlay = ({
               md:border-2 md:scale-100
               ${
                 activeLayer === 'chat'
-                  // ⭐ アクティブ時: 純白(bg-white), すりガラスなし(backdrop-blur-none)
                   ? 'z-70 bg-white backdrop-blur-none opacity-100 shadow-2xl scale-100 left-1/2 -translate-x-1/2 md:border-emerald-400 md:shadow-[0_0_20px_rgba(52,211,153,0.3)]'
-                  // ⭐ 非アクティブ時: すりガラス白(bg-white/90 backdrop-blur-md)
                   : 'z-60 bg-white/90 backdrop-blur-md opacity-60 shadow-sm scale-90 cursor-pointer left-[105%] -translate-x-full md:opacity-70 md:border-transparent md:shadow-none'
               }
             `}
