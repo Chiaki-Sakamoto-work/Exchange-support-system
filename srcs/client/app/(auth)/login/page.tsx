@@ -2,9 +2,8 @@ import { LoginForm } from '@/features/auth/components/LoginForm';
 
 export default function LoginPage() {
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen'>
-      <h1 className='text-2xl font-bold mb-6'>アプリにログイン</h1>
+    <main className='login-page flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8'>
       <LoginForm />
-    </div>
+    </main>
   );
 }
