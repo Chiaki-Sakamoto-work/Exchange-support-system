@@ -1,4 +1,4 @@
-import { ChevronRight, LogIn, PenBox, Plus, SquarePlus, Star, UserRoundPlus, UsersRound } from 'lucide-react';
+import { ChevronRight, PenBox, Star, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import {
   Card,

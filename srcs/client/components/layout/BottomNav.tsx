@@ -1,5 +1,5 @@
 'use client';
-import { House, List, Pencil, UserCircle, Utensils } from 'lucide-react';
+import { List, Pencil, UserCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';

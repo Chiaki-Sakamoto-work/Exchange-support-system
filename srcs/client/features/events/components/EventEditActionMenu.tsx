@@ -98,7 +98,7 @@ export const EventEditActionMenu = ({
               onCancel();
             }}
           >
-            <Undo2/>
+            <Undo2 />
             キャンセル
           </Button>
           <Button
@@ -112,7 +112,7 @@ export const EventEditActionMenu = ({
               setIsDeleteDialogOpen(true);
             }}
           >
-            <Trash2/>
+            <Trash2 />
             削除する
           </Button>
         </div>

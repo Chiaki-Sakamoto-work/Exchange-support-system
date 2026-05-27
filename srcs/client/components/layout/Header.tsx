@@ -2,7 +2,6 @@ import Image from 'next/image';
 // import faviconImage from '@/assets/icoico_favicon.png';
 import logoImage from '@/assets/icoico.png';
 
-
 export const Header = () => {
   return (
     <header className='flex justify-center items-center pt-4 mb-0'>
