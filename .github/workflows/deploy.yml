@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - fix/164-implement-supabase-realtime-to-update-attendee-count-instantly-without-reloading
     paths:
       - 'srcs/client/prisma/schema.prisma'
       - 'srcs/client/prisma/migrations/**'
