@@ -13,30 +13,25 @@ import { EventCard } from './EventCard/EventCard';
 import { toEventCardViewModel } from './EventCard/eventCard.viewmodel';
 import { EventCardList } from './EventCardList';
 import { EventListLoadingSkeleton } from './EventLoadingSkeleton';
+import { createClient } from '@/lib/supabase/client';
 
 export const EventHome = () => {
   type TabMode = 'explore' | 'joined';
   type FilterMode = 'all' | 'hosted' | 'joined';
-
   const [subTab, setSubTab] = useState<TabMode>('explore');
   const [filter, setFilter] = useState<FilterMode>('all');
-
-  // 🌟 3. explore用のStateを追加
   const [exploreEvents, setExploreEvents] = useState<Room[]>([]);
   const [hostedRooms, setHostedRooms] = useState<Room[]>([]);
   const [joinedRooms, setJoinedRooms] = useState<Room[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
-
-  // 🌟 モーダルのモードに 'explore' を追加
   const [modalMode, setModalMode] = useState<'hosted' | 'joined' | 'explore'>(
     'explore',
   );
-
-  // 🌟 4. Promise.all に getExploreEvents を追加し、3つのデータを一気に取得
   const fetchAllData = useCallback(async () => {
-    setIsLoading(true);
+    if (exploreEvents.length === 0 && hostedRooms.length === 0) {
+      setIsLoading(true);
+    }
     try {
       const [hosted, joined, exploreRes] = await Promise.all([
         getHostedEvents(),
@@ -53,10 +48,35 @@ export const EventHome = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [exploreEvents.length, hostedRooms.length]);
 
   useEffect(() => {
     fetchAllData();
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel('event-home-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_rooms' },
+        () => {
+          console.log('入退室を検知しました。リストを更新します。');
+          fetchAllData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'rooms' },
+        () => {
+          console.log('イベントの変更を検知しました。リストを更新します。');
+          fetchAllData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchAllData]);
 
   const sortByDate = (rooms: Room[]) => {
@@ -105,14 +125,12 @@ export const EventHome = () => {
         onValueChange={(val) => setSubTab(val as TabMode)}
         className='flex h-full min-h-0 w-full flex-col'
       >
-        {/* 🌟 タブのメニュー名を「参加する」に変更 */}
         <TabsList className='w-full h-[48px] shrink-0'>
           <TabsTrigger value='explore'>募集中</TabsTrigger>
           <TabsTrigger value='joined'>参加予定</TabsTrigger>
         </TabsList>
 
         <div className='mt-2 grid min-h-0 w-full flex-1 grid-cols-1 grid-rows-1'>
-          {/* 🌟 「参加する」タブの中身 (EventExploreから流用) */}
           <TabsContent
             value='explore'
             className='col-start-1 row-start-1 flex min-h-0 flex-col  bg-background'
@@ -141,7 +159,6 @@ export const EventHome = () => {
             </EventCardList>
           </TabsContent>
 
-          {/* 「参加予定」タブの中身 (前回の3分割フィルター) */}
           <TabsContent
             value='joined'
             className='col-start-1 row-start-1 flex min-h-0 flex-col bg-background'
@@ -198,7 +215,6 @@ export const EventHome = () => {
           </TabsContent>
         </div>
 
-        {/* モーダル部分 */}
         {renderDetailModal()}
       </Tabs>
     </div>
