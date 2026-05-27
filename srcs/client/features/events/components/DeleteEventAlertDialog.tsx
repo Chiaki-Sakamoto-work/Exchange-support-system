@@ -34,7 +34,7 @@ export const DeleteEventAlertDialog = ({
         </AlertDialogDescription>
 
         <AlertDialogBody>
-          <span>このイベントを削除してもよろしいですか？</span>
+          <span>この予定を削除してもよろしいですか？</span>
           <span>削除すると参加者全員に反映されます。</span>
         </AlertDialogBody>
 

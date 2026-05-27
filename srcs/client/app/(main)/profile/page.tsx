@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { ProfileDashboard } from '@/features/profile/components/ProfileDashboard';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/supabase/auth';
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  description: 'Profile 画面',
+};
 
 export default async function ProfilePage() {
   const session = await auth();

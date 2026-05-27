@@ -46,7 +46,7 @@ export async function getHostedEvents() {
   });
 }
 
-// 2. 自分が参加(is_owner: false)のイベントを取得
+// 2. 自分が参加(is_owner: false)の予定を取得
 export async function getJoinedEvents() {
   const supabase = await createClient();
   const {
@@ -370,7 +370,7 @@ export async function getExploreEvents() {
 
     return { success: true, events: availableEvents };
   } catch (error) {
-    console.error('未参加イベントの取得エラー:', error);
+    console.error('未参加予定の取得エラー:', error);
     return { success: false, error: 'データの取得に失敗しました' };
   }
 }

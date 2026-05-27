@@ -1,6 +1,6 @@
 'use client';
 
-import { Ellipsis } from 'lucide-react';
+import { Ellipsis, Trash2, Undo2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
@@ -55,7 +55,7 @@ export const EventEditActionMenu = ({
     const result = await deleteEventAction(roomId, '/create');
 
     if (result?.success) {
-      toast.success('イベントを削除しました');
+      toast.success('予定を削除しました');
       setIsDeleteDialogOpen(false);
       setIsProcessing(false);
       onDeleted();
@@ -68,7 +68,7 @@ export const EventEditActionMenu = ({
   };
 
   return (
-    <div ref={menuRef} className={cn('absolute top-3 right-3 z-10', className)}>
+    <div ref={menuRef} className={cn('absolute top-3 right-3 z-90', className)}>
       <Button
         type='button'
         variant='ghost'
@@ -98,6 +98,7 @@ export const EventEditActionMenu = ({
               onCancel();
             }}
           >
+            <Undo2 />
             キャンセル
           </Button>
           <Button
@@ -111,6 +112,7 @@ export const EventEditActionMenu = ({
               setIsDeleteDialogOpen(true);
             }}
           >
+            <Trash2 />
             削除する
           </Button>
         </div>
