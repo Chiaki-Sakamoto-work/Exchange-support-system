@@ -104,6 +104,7 @@ model user_rooms {
   user_id    String    @db.Uuid
   room_id    Int
   is_owner   Boolean?  @default(false)
+  is_support_applied Boolean?  @default(false)
   joined_at  DateTime? @default(now()) @db.Timestamptz(6) // 追加
   left_at    DateTime? @db.Timestamptz(6) // 追加
   created_at DateTime? @default(now()) @db.Timestamptz(6)

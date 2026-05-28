@@ -3,6 +3,7 @@
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
 import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
 import { EventEditActionMenu } from '@feature/events/components/EventEditActionMenu';
+import { useCurrentUser } from '@feature/events/hooks/useCurrentUser';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { PenBoxIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -36,6 +37,7 @@ const EventDetailHeader = ({ title, onEditClick }: EventDetailHeaderProps) => (
 export const HostDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const { eventData, isLoading, error } = useEventDetail(roomId);
+  const { currentUserId } = useCurrentUser();
 
   if (isLoading) {
     return <EventDetailPanelSkeleton mode='hosted' />;
@@ -78,7 +80,10 @@ export const HostDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
         title={eventData.title}
         onEditClick={() => setIsEditing(true)}
       />
-      <EventDetailContent eventData={eventData} />
+      <EventDetailContent
+        eventData={eventData}
+        currentUserId={currentUserId ?? undefined}
+      />
     </div>
   );
 };

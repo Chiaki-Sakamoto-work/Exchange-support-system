@@ -1,0 +1,16 @@
+name: 30-Minute Cron Job
+
+on:
+  schedule:
+    # 30分ごとに実行する
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # 🌟 インデントを「on:」の真下に修正！
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Next.js API
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          https://exchange-support-system.vercel.app/api/cron/delete-rooms
