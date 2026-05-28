@@ -4,7 +4,7 @@ on:
   schedule:
     # 30分ごとに実行する
     - cron: '*/30 * * * *'
-  workflow_dispatch: # 🌟 インデントを「on:」の真下に修正！
+  workflow_dispatch: # 手動実行ボタン
 
 jobs:
   run-cron:
@@ -12,5 +12,7 @@ jobs:
     steps:
       - name: Call Next.js API
         run: |
-          curl -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-          https://exchange-support-system.vercel.app/api/cron/delete-rooms
+          curl -L \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_TOKEN }}" \
+            https://exchange-support-system.vercel.app/api/cron/delete-rooms
