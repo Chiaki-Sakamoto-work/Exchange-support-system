@@ -152,7 +152,7 @@ export const EventDetailContent = ({
   };
 
   return (
-    <DialogBody className='flex flex-col gap-6'>
+    <DialogBody className='flex flex-col gap-6 overflow-y-auto max-h-[60vh]'>
       {myData && (
         <div
           className={`
@@ -221,7 +221,7 @@ export const EventDetailContent = ({
       <Card
         size='default'
         variant='secondary shadow-none'
-        className='min-h-0! overflow-visible! py-0!'
+        className='min-h-35! overflow-visible! py-0!'
       >
         <CardContent className='flex-none! gap-0'>
           <div className='flex items-center gap-3 border-b border-border py-3'>
