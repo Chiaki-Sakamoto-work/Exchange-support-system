@@ -6,6 +6,7 @@ import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 
+// 1. 自分が主催している未完了の予定を取得
 export async function getHostedEvents() {
   const supabase = await createClient();
   const {
@@ -14,18 +15,13 @@ export async function getHostedEvents() {
 
   if (!user) return [];
 
-  const twoHoursAgo = new Date();
-  twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
-
   return await prisma.rooms.findMany({
     where: {
       user_rooms: { some: { user_id: user.id, is_owner: true } },
-      event_start_at: { gte: twoHoursAgo },
+      status: { in: ['OPEN', 'CLOSED'] },
     },
-    // 💡 共通の fullEventInclude を使わず、ここで個別に指定する
     include: {
       user_rooms: {
-        // ⭕ where: { is_owner: true } を排除！ これで参加者全員が profiles 付きで取得できます
         include: {
           profiles: true,
         },
@@ -46,7 +42,7 @@ export async function getHostedEvents() {
   });
 }
 
-// 2. 自分が参加(is_owner: false)の予定を取得
+// 2. 自分が参加(is_owner: false)している未完了の予定を取得
 export async function getJoinedEvents() {
   const supabase = await createClient();
   const {
@@ -58,19 +54,17 @@ export async function getJoinedEvents() {
     return [];
   }
 
-  const twoHoursAgo = new Date();
-  twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
-
   return await prisma.rooms.findMany({
     where: {
       user_rooms: { some: { user_id: user.id, is_owner: false } },
-      event_start_at: { gte: twoHoursAgo },
+      status: { in: ['OPEN', 'CLOSED'] },
     },
     include: fullEventInclude,
     orderBy: { event_start_at: 'asc' },
   });
 }
 
+// 3. 予定の詳細情報を取得
 export async function getEventDetail(roomId: number) {
   try {
     noStore();
@@ -78,7 +72,6 @@ export async function getEventDetail(roomId: number) {
       where: {
         id: roomId,
       },
-      // includeで関連するデータも引っ張ってくる
       include: {
         user_rooms: {
           include: {
@@ -103,7 +96,6 @@ export async function getEventDetail(roomId: number) {
       },
     });
 
-    // もし予定が削除されていた時の安全装置
     if (!room) {
       return {
         success: false,
@@ -118,25 +110,20 @@ export async function getEventDetail(roomId: number) {
   }
 }
 
-// 予定の削除（主催者用）
+// 4. 予定の削除（主催者用）
 export async function deleteEventAction(roomId: number, path: string) {
   try {
     await prisma.messages.deleteMany({
       where: { room_id: roomId },
     });
-    // 🌟 修正1: 部屋を消す前に、まず関連する名簿(user_rooms)を全て削除する！
     await prisma.user_rooms.deleteMany({
       where: { room_id: roomId },
     });
-
-    // その後で、安全に部屋本体を削除
     await prisma.rooms.delete({
       where: { id: roomId },
     });
 
-    // 🌟 修正2: 画面の古い記憶（キャッシュ）を捨てて最新にする
     revalidatePath(path);
-
     return { success: true };
   } catch (error) {
     console.error('削除エラー:', error);
@@ -144,7 +131,7 @@ export async function deleteEventAction(roomId: number, path: string) {
   }
 }
 
-// 参加のキャンセル
+// 5. 参加のキャンセル
 export async function cancelParticipationAction(roomId: number) {
   try {
     const supabase = await createClient();
@@ -159,9 +146,7 @@ export async function cancelParticipationAction(roomId: number) {
       },
     });
 
-    // 🌟 追加: キャッシュをクリア
     revalidatePath('/');
-
     return { success: true };
   } catch (error) {
     console.error('キャンセルエラー:', error);
@@ -169,7 +154,7 @@ export async function cancelParticipationAction(roomId: number) {
   }
 }
 
-// 新しく参加する（参加タブ用）
+// 6. 新しく参加する（参加タブ用）
 export async function joinEventAction(roomId: number) {
   try {
     const supabase = await createClient();
@@ -179,6 +164,30 @@ export async function joinEventAction(roomId: number) {
 
     if (!user) return { success: false, error: 'ログインが必要です' };
 
+    const room = await prisma.rooms.findUnique({
+      where: { id: roomId },
+      select: {
+        capacity_limit: true,
+        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
+        _count: { select: { user_rooms: true } },
+      },
+    });
+
+    if (
+      room &&
+      room.capacity_limit !== null &&
+      room._count.user_rooms >= room.capacity_limit
+    ) {
+      await prisma.rooms.update({
+        where: { id: roomId },
+        data: { status: 'CLOSED' },
+      });
+      return {
+        success: false,
+        error: '申し訳ありません、このイベントは満員になりました。',
+      };
+    }
+
     await prisma.user_rooms.create({
       data: {
         room_id: roomId,
@@ -187,9 +196,18 @@ export async function joinEventAction(roomId: number) {
       },
     });
 
-    // 🌟 追加: キャッシュをクリア
-    revalidatePath('/');
+    if (
+      room &&
+      room.capacity_limit !== null &&
+      room._count.user_rooms + 1 >= room.capacity_limit
+    ) {
+      await prisma.rooms.update({
+        where: { id: roomId },
+        data: { status: 'CLOSED' },
+      });
+    }
 
+    revalidatePath('/');
     return { success: true };
   } catch (error) {
     console.error('参加エラー:', error);
@@ -197,7 +215,7 @@ export async function joinEventAction(roomId: number) {
   }
 }
 
-// 予定を作成する
+// 7. 予定を作成する
 export async function createEvent(formData: {
   title: string;
   datetime: string;
@@ -216,13 +234,18 @@ export async function createEvent(formData: {
       return { success: false, error: 'ログインが必要です' };
     }
 
+    const startAt = new Date(formData.datetime);
+    const endAt = new Date(startAt);
+    endAt.setHours(endAt.getHours() + 2);
+
     const newRoom = await prisma.rooms.create({
       data: {
         title: formData.title,
         capacity_limit: formData.capacity,
         location_name: formData.shop,
         location_address: formData.locationAddress,
-        event_start_at: new Date(formData.datetime),
+        event_start_at: startAt,
+        event_end_at: endAt,
         status: 'OPEN' as RoomStatus,
         user_rooms: {
           create: {
@@ -234,9 +257,7 @@ export async function createEvent(formData: {
           create: formData.tags.map((tagName) => ({
             tags: {
               connectOrCreate: {
-                // 중복 생성을 방지하기 위한 고유 조건 (schema.prisma의 @unique 설정 기준)
                 where: { name: tagName },
-                // 테이블에 해당 태그가 없을 경우 새로 생성할 데이터
                 create: { name: tagName },
               },
             },
@@ -255,6 +276,7 @@ export async function createEvent(formData: {
   }
 }
 
+// 8. 予定を更新する
 export async function updateEventAction(
   roomId: number,
   formData: {
@@ -272,8 +294,8 @@ export async function updateEventAction(
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
     if (formData.hostId && formData.hostId !== user?.id) {
-      // 1. まず、現在の参加者（user_rooms）から、自分の is_owner を false にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
@@ -284,7 +306,6 @@ export async function updateEventAction(
         },
       });
 
-      // 2. 次に、新しく選ばれた人の is_owner を true にする
       await prisma.user_rooms.updateMany({
         where: {
           room_id: roomId,
@@ -296,7 +317,10 @@ export async function updateEventAction(
       });
     }
 
-    // 🌟 部屋本体（rooms）の更新処理（ここはそのまま）
+    const startAt = new Date(formData.datetime);
+    const endAt = new Date(startAt);
+    endAt.setHours(endAt.getHours() + 2);
+
     await prisma.rooms.update({
       where: { id: roomId },
       data: {
@@ -304,7 +328,8 @@ export async function updateEventAction(
         capacity_limit: Number(formData.capacity),
         location_name: formData.shop,
         location_address: formData.locationAddress,
-        event_start_at: new Date(formData.datetime),
+        event_start_at: startAt,
+        event_end_at: endAt,
         room_tags: {
           deleteMany: {},
           create: formData.tags.map((tagName) => ({
@@ -319,7 +344,7 @@ export async function updateEventAction(
       },
     });
 
-    revalidatePath('/'); // キャッシュをクリアして画面を更新
+    revalidatePath('/');
     return { success: true };
   } catch (error) {
     console.error('更新エラー:', error);
@@ -327,6 +352,7 @@ export async function updateEventAction(
   }
 }
 
+// 9. まだ参加していない予定を取得する（イベントを探すタブ用）
 export async function getExploreEvents() {
   try {
     const supabase = await createClient();
@@ -334,15 +360,9 @@ export async function getExploreEvents() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const twoHoursAgo = new Date();
-    twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
-
     const events = await prisma.rooms.findMany({
       where: {
         status: 'OPEN',
-        event_start_at: {
-          gte: twoHoursAgo,
-        },
         user_rooms: {
           none: {
             user_id: user?.id,
@@ -379,6 +399,7 @@ export async function getExploreEvents() {
   }
 }
 
+// 10. 部署一覧の取得
 export async function getDepartments() {
   return await prisma.departments.findMany({
     select: {
@@ -389,4 +410,63 @@ export async function getDepartments() {
       id: 'asc',
     },
   });
+}
+
+// 11. 交流支援制度フラグの切り替え
+export async function toggleSupportAction(roomId: number, isUsed: boolean) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'ログインが必要です' };
+
+    if (isUsed) {
+      const profile = await prisma.profiles.findUnique({
+        where: { id: user.id },
+        select: { is_support_used: true },
+      });
+
+      if (profile?.is_support_used) {
+        return {
+          success: false,
+          error: 'すでに制度を利用済みのため、ONにできません',
+        };
+      }
+
+      const otherApplication = await prisma.user_rooms.findFirst({
+        where: {
+          user_id: user.id,
+          is_support_applied: true,
+          room_id: { not: roomId },
+          rooms: { status: { in: ['OPEN', 'CLOSED'] } },
+        },
+      });
+
+      if (otherApplication) {
+        return {
+          success: false,
+          error: '他のイベントで申請中です。複数同時にONにはできません。',
+        };
+      }
+    }
+
+    await prisma.user_rooms.update({
+      where: {
+        user_id_room_id: {
+          user_id: user.id,
+          room_id: roomId,
+        },
+      },
+      data: {
+        is_support_applied: isUsed,
+      },
+    });
+
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('制度利用フラグ更新エラー:', error);
+    return { success: false, error: '更新に失敗しました' };
+  }
 }

@@ -1,0 +1,18 @@
+name: 30-Minute Cron Job
+
+on:
+  schedule:
+    # 30分ごとに実行する
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # 手動実行ボタン
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Next.js API
+        run: |
+          curl -L \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_TOKEN }}" \
+            https://exchange-support-system.vercel.app/api/cron/delete-rooms

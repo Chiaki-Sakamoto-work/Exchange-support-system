@@ -11,51 +11,93 @@ export async function GET(request: Request) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
-  const twoHoursAgo = new Date();
-  twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+  const now = new Date();
+
+  // 30日前の日時を計算 (削除用)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   try {
-    const targetRooms = await prisma.rooms.findMany({
+    // ==========================================
+    // 🔥 フェーズ 1: 【15分ごと】イベント終了の検知とプロフィール即時更新
+    // ==========================================
+    const expiredRooms = await prisma.rooms.findMany({
       where: {
-        // biome-ignore lint/style/useNamingConvention: Prismaの仕様のため無視
-        OR: [{ status: 'COMPLETED' }, { event_start_at: { lt: twoHoursAgo } }],
+        event_end_at: { lte: now }, // 終了時間を過ぎている
+        status: { in: ['OPEN', 'CLOSED'] }, // まだ完了していない
       },
-      select: { id: true }, // IDだけ取得
+      include: {
+        user_rooms: {
+          where: { is_support_applied: true },
+          select: { user_id: true },
+        },
+      },
     });
 
-    // IDを配列にまとめる (例: [1, 2, 5])
-    const roomIds = targetRooms.map((room) => room.id);
+    if (expiredRooms.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        for (const room of expiredRooms) {
+          // ① 部屋を「開催終了（COMPLETED）」にする
+          await tx.rooms.update({
+            where: { id: room.id },
+            data: { status: 'COMPLETED' },
+          });
 
-    // 削除対象がなければここで終了
-    if (roomIds.length === 0) {
-      console.log('[Cron] 削除対象の古い部屋はありませんでした。');
-      return NextResponse.json({ success: true, count: 0 });
+          // ② 申請していた人のプロフィールを「利用済み」にする
+          const userIds = room.user_rooms.map((ur) => ur.user_id);
+          if (userIds.length > 0) {
+            await tx.profiles.updateMany({
+              where: { id: { in: userIds } },
+              data: { is_support_used: true },
+            });
+          }
+        }
+      });
+      console.log(
+        `[Cron] ${expiredRooms.length}件のイベントを完了にし、プロフィールを更新しました。`,
+      );
     }
 
-    // 「トランザクション」を使って、子データ → 親データの順に一気に消す
-    await prisma.$transaction([
-      // ① その部屋に紐づく参加者リストをすべて削除
-      prisma.user_rooms.deleteMany({
-        where: { room_id: { in: roomIds } },
-      }),
-      // ② その部屋に紐づくタグ付けデータをすべて削除
-      prisma.room_tags.deleteMany({
-        where: { room_id: { in: roomIds } },
-      }),
-      // ③ 最後に部屋本体を安全に削除！
-      prisma.rooms.deleteMany({
-        where: { id: { in: roomIds } },
-      }),
-    ]);
+    // ==========================================
+    // 🧹 フェーズ 2: 【古いデータのみ】30日経過した履歴の完全削除
+    // ==========================================
+    const deleteTargetRooms = await prisma.rooms.findMany({
+      where: {
+        status: { in: ['COMPLETED', 'CANCELLED'] },
+        updated_at: { lt: thirtyDaysAgo }, // 30日以上前に終わった古いイベント
+      },
+      select: { id: true },
+    });
 
-    console.log(
-      `[Cron] ${roomIds.length}件の古い部屋と関連データを削除しました。`,
-    );
-    return NextResponse.json({ success: true, count: roomIds.length });
+    const deleteRoomIds = deleteTargetRooms.map((room) => room.id);
+
+    if (deleteRoomIds.length > 0) {
+      await prisma.$transaction([
+        prisma.messages.deleteMany({
+          where: { room_id: { in: deleteRoomIds } },
+        }),
+        prisma.user_rooms.deleteMany({
+          where: { room_id: { in: deleteRoomIds } },
+        }),
+        prisma.room_tags.deleteMany({
+          where: { room_id: { in: deleteRoomIds } },
+        }),
+        prisma.rooms.deleteMany({ where: { id: { in: deleteRoomIds } } }),
+      ]);
+      console.log(
+        `[Cron] 30日以上経過した ${deleteRoomIds.length}件の古い部屋を完全に削除しました。`,
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      completedCount: expiredRooms.length,
+      deletedCount: deleteRoomIds.length,
+    });
   } catch (error) {
-    console.error('Cron削除エラー:', error);
+    console.error('Cron一括処理エラー:', error);
     return NextResponse.json(
-      { success: false, error: '削除に失敗しました' },
+      { success: false, error: '処理に失敗しました' },
       { status: 500 },
     );
   }

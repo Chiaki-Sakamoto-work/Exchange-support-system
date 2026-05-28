@@ -3,6 +3,7 @@
 import { joinEventAction } from '@feature/events/actions/eventActions';
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
 import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
+import { useCurrentUser } from '@feature/events/hooks/useCurrentUser';
 import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { LogIn } from 'lucide-react';
 import { useState } from 'react';
@@ -18,6 +19,7 @@ type Props = {
 export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { eventData, isLoading, error } = useEventDetail(roomId);
+  const { currentUserId } = useCurrentUser();
 
   if (isLoading) {
     return <EventDetailPanelSkeleton mode='explore' />;
@@ -68,7 +70,10 @@ export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
           </Button>
         </div>
       </div>
-      <EventDetailContent eventData={eventData} />
+      <EventDetailContent
+        eventData={eventData}
+        currentUserId={currentUserId ?? undefined}
+      />
     </div>
   );
 };
