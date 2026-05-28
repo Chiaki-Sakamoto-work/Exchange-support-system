@@ -318,9 +318,10 @@ export const EventDetailContent = ({
                 key={`allergy-${participant.user_id}`}
                 size='sm'
                 variant='default shadow-none'
+                className='min-w-0! w-full!'
               >
-                <CardContent className='flex-row items-center text-foreground'>
-                  <span className='mr-auto text-foreground'>
+                <CardContent className='flex-row items-center text-foreground h-full!'>
+                  <span className='mr-auto text-foreground shrink-0 '>
                     {getDisplayName(participant.profiles)}
                   </span>
                   <span className='ml-auto flex flex-wrap justify-end gap-2'>
