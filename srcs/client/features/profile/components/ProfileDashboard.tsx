@@ -22,8 +22,8 @@ export interface UserProfileProps {
 
 export const ProfileDashboard = ({ user }: { user: UserProfileProps }) => {
   return (
-    <div>
-      <div className='px-4 flex flex-col gap-4'>
+    <div className='flex-1 min-h-0 overflow-y-auto overflow-x-hidden'>
+      <div className='px-4 flex flex-col gap-4 pb-10'>
         {/* メインカード (ProfileHeaderをラップ) */}
 
         <ProfileHeader user={user} />

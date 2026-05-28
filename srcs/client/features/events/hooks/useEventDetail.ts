@@ -1,31 +1,43 @@
 import type { Room } from '@type';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getEventDetail } from '@/features/events/actions/eventActions';
+import { useRoomRealtime } from '@/features/events/hooks/useRoomRealtime';
 
 export const useEventDetail = (roomId: number) => {
   const [eventData, setEventData] = useState<Room>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isActive = true;
-    async function loadDetail() {
-      setIsLoading(true);
+  const loadDetail = useCallback(
+    async (isBackgroundUpdate = false) => {
+      if (!isBackgroundUpdate) {
+        setIsLoading(true);
+      }
       setError(null);
+
       const result = await getEventDetail(roomId);
-      if (!isActive) return;
+
       if (result.success && result.room) {
-        setEventData(result.room);
+        setEventData({ ...result.room });
       } else {
         setError(result.error || 'エラーが発生しました');
       }
-      setIsLoading(false);
-    }
-    loadDetail();
-    return () => {
-      isActive = false;
-    };
-  }, [roomId]);
+
+      if (!isBackgroundUpdate) {
+        setIsLoading(false);
+      }
+    },
+    [roomId],
+  );
+
+  useEffect(() => {
+    loadDetail(false);
+  }, [loadDetail]);
+
+  useRoomRealtime(roomId, () => {
+    console.log('リアルタイム更新が走りました！データを再取得します。');
+    loadDetail(true);
+  });
 
   return { eventData, isLoading, error };
 };
