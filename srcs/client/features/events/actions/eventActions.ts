@@ -2,7 +2,7 @@
 
 import type { RoomStatus } from '@prisma/client';
 import { fullEventInclude } from '@type';
-import { revalidatePath } from 'next/cache';
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 
@@ -73,6 +73,7 @@ export async function getJoinedEvents() {
 
 export async function getEventDetail(roomId: number) {
   try {
+    noStore();
     const room = await prisma.rooms.findUnique({
       where: {
         id: roomId,
@@ -120,6 +121,9 @@ export async function getEventDetail(roomId: number) {
 // 予定の削除（主催者用）
 export async function deleteEventAction(roomId: number, path: string) {
   try {
+    await prisma.messages.deleteMany({
+      where: { room_id: roomId },
+    });
     // 🌟 修正1: 部屋を消す前に、まず関連する名簿(user_rooms)を全て削除する！
     await prisma.user_rooms.deleteMany({
       where: { room_id: roomId },

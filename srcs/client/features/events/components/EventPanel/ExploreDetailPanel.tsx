@@ -1,14 +1,11 @@
 'use client';
 
-import {
-  getEventDetail,
-  joinEventAction,
-} from '@feature/events/actions/eventActions';
+import { joinEventAction } from '@feature/events/actions/eventActions';
 import { EventDetailContent } from '@feature/events/components/EventDetailContent';
 import { EventDetailPanelSkeleton } from '@feature/events/components/EventDetailModalSkeleton';
-import type { Room } from '@type';
+import { useEventDetail } from '@feature/events/hooks/useEventDetail';
 import { LogIn } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 
@@ -20,22 +17,7 @@ type Props = {
 
 export const ExploreDetailPanel = ({ roomId, onClose, onSuccess }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [eventData, setEventData] = useState<Room>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadDetail() {
-      const result = await getEventDetail(roomId);
-      if (result.success && result.room) {
-        setEventData(result.room);
-      } else {
-        setError(result.error || 'エラーが発生しました');
-      }
-      setIsLoading(false);
-    }
-    loadDetail();
-  }, [roomId]);
+  const { eventData, isLoading, error } = useEventDetail(roomId);
 
   if (isLoading) {
     return <EventDetailPanelSkeleton mode='explore' />;
